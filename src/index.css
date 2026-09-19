@@ -1,0 +1,203 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Aleph Paper — surfaces */
+  --color-bg: #ffffff;
+  --color-subtle: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-surface-2: #f6f7f9;
+  --color-raised: #ffffff;
+
+  /* Legacy surface ladder remapped to paper (bg-ink-* call sites) */
+  --color-ink-950: #ffffff;
+  --color-ink-900: #ffffff;
+  --color-ink-800: #f6f7f9;
+  --color-ink-700: #e6e8ee;
+  --color-ink-600: #d0d4dc;
+
+  /* Ink */
+  --color-ink: #111113;
+  --color-ink-2: #3c3f46;
+  --color-ink-3: #6b7080;
+  --color-ink-4: #9aa0ae;
+
+  /* Legacy text tokens → ink scale */
+  --color-text: #111113;
+  --color-text-2: #3c3f46;
+  --color-text-3: #6b7080;
+
+  /* Legacy ink-200 / ink-400 aliases */
+  --color-ink-200: #3c3f46;
+  --color-ink-400: #6b7080;
+
+  /* Line */
+  --color-line: #e6e8ee;
+  --color-line-strong: #d0d4dc;
+
+  /* Brand — one accent */
+  --color-accent: #2f6bff;
+  --color-accent-hover: #1f56e0;
+  --color-accent-pressed: #1646c4;
+  --color-accent-soft: #e8eeff;
+  --color-accent-strong: #1f56e0;
+
+  /* Semantics */
+  --color-mint: #0f9f6e;
+  --color-mint-soft: #e6f7f0;
+  --color-amber: #c47a00;
+  --color-amber-soft: #fff4de;
+  --color-rose: #d63b5a;
+  --color-rose-soft: #fde8ed;
+  --color-violet: #7a3fe0;
+  --color-violet-soft: #f1e9ff;
+
+  --color-backdrop: rgb(17 17 19 / 0.36);
+  --shadow-paper: 0 8px 24px rgb(17 17 19 / 0.06);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces', 'Newsreader', ui-serif, Georgia, serif;
+}
+
+:root {
+  color-scheme: light;
+  --tab-bar-height: 5.25rem;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink-2);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+select option {
+  color: var(--color-ink);
+  background: var(--color-bg);
+}
+
+@utility text-2 {
+  color: var(--color-text-2);
+}
+
+@utility text-3 {
+  color: var(--color-text-3);
+}
+
+@utility safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@utility safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes aleph-pop {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.09) rotate(-2deg);
+  }
+  70% {
+    transform: scale(0.98) rotate(1deg);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes aleph-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(47 107 255 / 0);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgb(47 107 255 / 0.16);
+  }
+}
+
+@keyframes aleph-xp-flash {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  40% {
+    filter: brightness(1.08);
+  }
+}
+
+.animate-glow {
+  animation: aleph-glow 700ms ease-out;
+}
+.animate-xp {
+  animation: aleph-xp-flash 500ms ease-out;
+}
+
+@keyframes aleph-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aleph-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-pop {
+  animation: aleph-pop 600ms ease-out;
+}
+
+.animate-rise {
+  animation: aleph-rise 220ms ease-out;
+}
+
+.animate-fade {
+  animation: aleph-fade 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop,
+  .animate-rise,
+  .animate-fade,
+  .animate-glow,
+  .animate-xp {
+    animation: none;
+  }
+}

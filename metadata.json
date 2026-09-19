@@ -1,0 +1,6 @@
+{
+  "name": "Aleph",
+  "description": "Daily planner and character growth app combining literature, objectives, and reflection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
