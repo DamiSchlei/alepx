@@ -189,12 +189,23 @@ export function GlobalHierarchyTree({
                                   <ChevronDown className="size-3.5" />
                                 )}
                               </button>
-                              <Link
-                                to={`/planning/results/${result.id}`}
-                                className="truncate text-[14px] font-semibold text-ink hover:underline"
-                              >
-                                {result.name}
-                              </Link>
+                              <div className="min-w-0 flex-1">
+                                <span
+                                  className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded"
+                                  style={{
+                                    backgroundColor: `${projectColor}15`,
+                                    color: projectColor,
+                                  }}
+                                >
+                                  Resultado
+                                </span>
+                                <Link
+                                  to={`/planning/results/${result.id}`}
+                                  className="mt-0.5 block truncate text-[14px] font-semibold text-ink hover:underline"
+                                >
+                                  {result.name}
+                                </Link>
+                              </div>
                               <span
                                 className="text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0"
                                 style={{
@@ -252,13 +263,18 @@ export function GlobalHierarchyTree({
                                       <div className="flex items-center justify-between">
                                         <Link
                                           to={`/planning/objectives/${obj.id}`}
-                                          className="text-[13px] font-medium text-ink hover:underline truncate flex items-center gap-1.5"
+                                          className="min-w-0 text-[13px] font-medium text-ink hover:underline truncate flex items-center gap-1.5"
                                         >
                                           <span
                                             className="size-1.5 rounded-full shrink-0"
                                             style={{ backgroundColor: projectColor }}
                                           />
-                                          <span>{obj.name}</span>
+                                          <span className="min-w-0">
+                                            <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                                              Objetivo
+                                            </span>
+                                            <span>{obj.name}</span>
+                                          </span>
                                         </Link>
                                         <Button
                                           variant="ghost"

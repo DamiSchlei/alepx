@@ -85,6 +85,7 @@ function ObjectiveRow({
             </span>
           ) : null}
           <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-ink-3">Objetivo</p>
             <p className={cx('line-clamp-1 text-[16px] font-semibold leading-snug', done ? 'text-ink-3 line-through' : 'text-ink')}>
               {objective.name}
             </p>
@@ -210,7 +211,7 @@ export function ResultDetailPage() {
           style={{ backgroundColor: projectColor }}
         />
         <div className="pl-1">
-          <div
+          <span
             className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider mb-1"
             style={{
               backgroundColor: `${projectColor}18`,
@@ -219,10 +220,13 @@ export function ResultDetailPage() {
           >
             <Folder className="size-3" />
             <span>Proyecto: {result.projectName || 'La Obra Principal'}</span>
-          </div>
+          </span>
+          <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+            Resultado
+          </span>
           <h1 className="line-clamp-2 text-[19px] font-bold leading-snug text-ink">{result.name}</h1>
           <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">
-            Resultado concreto · {meta}
+            {meta}
           </p>
           {result.why ? (
             <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">{result.why}</p>

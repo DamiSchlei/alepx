@@ -27,6 +27,7 @@ import { freeHoursForDay, plannedHoursForDay } from '@/data/dayLoad'
 import {
   activeResults,
   allProjects,
+  objectiveById,
   objectivesOfResult,
   projectColorOfResult,
   tasksForDay,
@@ -58,7 +59,7 @@ export function DayCanvas({
   const results = activeResults(state)
   const projects = allProjects(state)
 
-  // Map of Projects -> Results produced inside
+  // Map of Projects -> Results inside
   const projectMap = useMemo(() => {
     const map = new Map<string, Result[]>()
     for (const p of projects) {
@@ -365,9 +366,7 @@ export function DayCanvas({
                 <div className="mt-3 flex items-center gap-2 text-[11px] font-medium text-ink-3 border-t border-line/60 pt-2 w-full justify-center">
                   <span>
                     {resultsInCurrentProject.length}{' '}
-                    {resultsInCurrentProject.length === 1
-                      ? 'resultado producido'
-                      : 'resultados producidos'}
+                    {resultsInCurrentProject.length === 1 ? 'resultado' : 'resultados'}
                   </span>
                   <span>·</span>
                   <span>
@@ -390,7 +389,7 @@ export function DayCanvas({
                 <div>
                   <span className="text-[12px] font-bold tracking-wider uppercase text-ink-3 flex items-center gap-1.5">
                     <Target className="size-3.5 text-ink-2" />
-                    <span>Resultados Producidos dentro</span>
+                    <span>Resultados</span>
                   </span>
                   <p className="text-[11px] text-ink-3">
                     Lo que se concreta dentro de {currentProjectName}
@@ -417,7 +416,7 @@ export function DayCanvas({
                     Aún no definiste resultados específicos para este proyecto.
                   </p>
                   <p className="mt-1 text-[12px] text-ink-3">
-                    El proyecto es el marco; los resultados son las obras tangibles que se producen dentro.
+                    El proyecto es el marco; los resultados son las obras tangibles que se sostienen dentro.
                   </p>
                   <div className="mt-4 flex justify-center">
                     <button
@@ -433,7 +432,7 @@ export function DayCanvas({
                 </div>
               )}
 
-              {/* Lista de células de Resultados Producidos */}
+              {/* Lista de células de Resultados */}
               {resultsInCurrentProject.map((res) => {
                 const resObjectives = objectivesOfResult(state, res.id)
                 const resTasks = tasks.filter((t) => t.resultId === res.id)
@@ -479,7 +478,7 @@ export function DayCanvas({
                       className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] px-2.5 py-1 rounded-full bg-[#f5f0ff]"
                     >
                       <Plus className="size-3" />
-                      <span>+ Tarea</span>
+                      <span>Tarea</span>
                     </button>
                   </div>
 
@@ -508,7 +507,7 @@ export function DayCanvas({
         )}
       </div>
 
-      {/* MODAL: ZOOM SEMÁNTICO EN EL RESULTADO PRODUCIDO */}
+      {/* MODAL: ZOOM SEMÁNTICO EN EL RESULTADO */}
       <AnimatePresence>
         {zoomedResult && (
           <ResultZoomModal
@@ -597,10 +596,10 @@ export function DayCanvas({
               </div>
 
               <form onSubmit={handleSeedSubmit} className="mt-4 flex flex-col gap-4">
-                {/* Selección del Resultado Producido */}
+                {/* Selección del Resultado */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Resultado Producido
+                    Resultado
                   </label>
                   <select
                     value={seedResultId || ''}
@@ -621,7 +620,7 @@ export function DayCanvas({
                 {/* Destino: Objetivo o directo al Resultado */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Hito / Objetivo específico (opcional)
+                    Nombre del objetivo
                   </label>
                   <select
                     value={seedObjectiveId || ''}
@@ -643,7 +642,7 @@ export function DayCanvas({
                 {/* Título de la acción */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    ¿Qué vas a hacer?
+                    Nombre de la tarea
                   </label>
                   <input
                     type="text"
@@ -651,7 +650,7 @@ export function DayCanvas({
                     autoFocus
                     value={seedTitle}
                     onChange={(e) => setSeedTitle(e.target.value)}
-                    placeholder="Ej. Escribir propuesta / Definir precio..."
+                    placeholder="Nombre de la tarea…"
                     className="w-full rounded-[12px] border border-line px-3.5 py-2.5 text-[15px] outline-none focus:border-[#7a3fe0] focus:ring-1 focus:ring-[#7a3fe0]"
                   />
                 </div>
@@ -840,7 +839,7 @@ export function DayCanvas({
 }
 
 /**
- * Célula de Resultado Producido en el Lienzo
+ * Célula de Resultado en el Lienzo
  */
 function ResultCellCard({
   result,
@@ -889,7 +888,7 @@ function ResultCellCard({
               color: projectColor,
             }}
           >
-            Resultado Producido
+            Resultado
           </span>
           <h3
             onClick={onZoomResult}
@@ -928,7 +927,7 @@ function ResultCellCard({
             }}
           >
             <Plus className="size-3" />
-            <span>+ Tarea</span>
+            <span>Tarea</span>
           </button>
         </div>
       </div>
@@ -966,8 +965,13 @@ function ResultCellCard({
                       className="size-2 rounded-full shrink-0"
                       style={{ backgroundColor: projectColor }}
                     />
-                    <span className="text-[13px] font-medium text-ink truncate group-hover:underline">
-                      {obj.name}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                        Objetivo
+                      </span>
+                      <span className="text-[13px] font-medium text-ink truncate group-hover:underline block">
+                        {obj.name}
+                      </span>
                     </span>
                     <span className="text-[11px] text-ink-3 shrink-0">
                       ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
@@ -1034,7 +1038,7 @@ function ResultCellCard({
 }
 
 /**
- * Modal Zoom Semántico para un Resultado Producido
+ * Modal Zoom Semántico para un Resultado
  */
 function ResultZoomModal({
   result,
@@ -1089,7 +1093,10 @@ function ResultZoomModal({
               <FolderGit2 className="size-3.5" />
               <span>Proyecto: {result.projectName || 'La Obra Principal'}</span>
             </div>
-            <h2 className="text-[20px] font-bold text-ink mt-1 truncate">
+            <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+              Resultado
+            </span>
+            <h2 className="text-[20px] font-bold text-ink mt-0.5 truncate">
               {result.name}
             </h2>
             {result.why && (
@@ -1151,6 +1158,9 @@ function ResultZoomModal({
                         style={{ backgroundColor: projectColor }}
                       />
                       <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                          Objetivo
+                        </p>
                         <p className="text-[13px] font-bold text-ink truncate hover:underline">
                           {obj.name}
                         </p>
@@ -1181,7 +1191,7 @@ function ResultZoomModal({
                 style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
-                <span>+ Tarea</span>
+                <span>Tarea</span>
               </button>
             </div>
 
@@ -1239,6 +1249,8 @@ function TaskStepRow({
   onToggle: () => void
   onOpenTactical?: () => void
 }) {
+  const state = useAleph()
+  const objective = objectiveById(state, task.objectiveId)
   const done = isTaskDone(task.status)
   const tInfo = TERRENO_MAP[task.terreno ?? 'literatura']
 
@@ -1264,15 +1276,29 @@ function TaskStepRow({
           title={tInfo.label}
         />
 
-        <span
+        <div
           onClick={onOpenTactical}
-          className={`text-[13px] font-medium truncate cursor-pointer hover:text-purple-700 transition-colors ${
-            done ? 'line-through text-ink-3' : 'text-ink'
-          }`}
+          className="min-w-0 flex-1 cursor-pointer"
           title="Abrir estudio táctico"
         >
-          {task.title}
-        </span>
+          {objective ? (
+            <p className="text-[10px] font-bold uppercase tracking-wider text-ink-3 truncate">
+              Objetivo · {objective.name}
+            </p>
+          ) : null}
+          <p className="flex min-w-0 items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-ink-3 shrink-0">
+              Tarea
+            </span>
+            <span
+              className={`text-[13px] font-medium truncate ${
+                done ? 'line-through text-ink-3' : 'text-ink'
+              } hover:text-purple-700 transition-colors`}
+            >
+              {task.title}
+            </span>
+          </p>
+        </div>
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
@@ -1329,7 +1355,10 @@ function ObjectiveZoomModal({
         <div className="flex items-start justify-between pb-3 border-b border-line">
           <div>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-3">
-              {resultName}
+              Resultado · {resultName}
+            </span>
+            <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+              Objetivo
             </span>
             <h3 className="text-[19px] font-bold text-ink mt-0.5">
               {objective.name}
@@ -1395,12 +1424,17 @@ function ObjectiveZoomModal({
                       style={{ backgroundColor: tInfo.color }}
                       title={tInfo.label}
                     />
-                    <span
-                      className={`text-[14px] font-semibold truncate ${
-                        done ? 'line-through text-ink-3' : 'text-ink'
-                      }`}
-                    >
-                      {t.title}
+                    <span className="min-w-0">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                        Tarea
+                      </span>
+                      <span
+                        className={`text-[14px] font-semibold truncate block ${
+                          done ? 'line-through text-ink-3' : 'text-ink'
+                        }`}
+                      >
+                        {t.title}
+                      </span>
                     </span>
                   </div>
                   <span className="text-[12px] font-bold text-ink-3 ml-2">

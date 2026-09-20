@@ -341,6 +341,9 @@ export function DayTaskClock({
                       className="min-w-0 flex-1 text-left"
                       title={t('home.clock.openTactical')}
                     >
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                        {t('common.task')}
+                      </span>
                       <span
                         className={cx(
                           'block truncate text-[13px] font-semibold leading-tight',
@@ -351,7 +354,13 @@ export function DayTaskClock({
                       </span>
                       <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[11px] text-ink-3">
                         <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-                        <span className="truncate">{ctx.project?.name ?? ctx.result?.name ?? t('home.clock.loose')}</span>
+                        <span className="truncate">
+                          {ctx.objective
+                            ? `${t('common.objective')} · ${ctx.objective.name}`
+                            : ctx.result
+                              ? `${t('common.result')} · ${ctx.result.name}`
+                              : ctx.project?.name ?? t('home.clock.loose')}
+                        </span>
                         {ctx.terreno ? (
                           <span
                             className="shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium"
@@ -475,7 +484,11 @@ export function DayTaskClock({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[14px] font-semibold text-ink">{task.title}</p>
                     <p className="truncate text-[12px] text-ink-3">
-                      {ctx.project?.name ?? ctx.result?.name ?? t('home.clock.loose')}
+                      {ctx.objective
+                        ? `${t('common.objective')} · ${ctx.objective.name}`
+                        : ctx.result
+                          ? `${t('common.result')} · ${ctx.result.name}`
+                          : ctx.project?.name ?? t('home.clock.loose')}
                       {' · '}
                       {task.scheduledFor
                         ? t('home.clock.scheduled', { date: task.scheduledFor })

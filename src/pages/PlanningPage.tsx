@@ -147,7 +147,7 @@ export function PlanningPage() {
               Planificación
             </h1>
             <p className="text-[12px] text-ink-3">
-              Proyectos · Resultados producidos · Objetivos · Tareas
+              Proyectos · Resultados · Objetivos · Tareas
             </p>
           </div>
 
@@ -476,7 +476,7 @@ function TasksTab() {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Button onClick={() => setCreating(true)}>
-            + {t('planning.tasks.new')}
+            {t('planning.tasks.new')}
           </Button>
 
           <Button variant="secondary" onClick={() => setFiltersOpen(true)}>

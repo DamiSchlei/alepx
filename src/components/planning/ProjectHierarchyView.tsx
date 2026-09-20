@@ -139,7 +139,7 @@ export function ProjectHierarchyView({
             <Layers className="size-4 text-ink-2" />
             <span>
               <strong className="text-ink font-semibold">{results.length}</strong>{' '}
-              {results.length === 1 ? 'resultado producido' : 'resultados producidos'}
+              {results.length === 1 ? 'resultado' : 'resultados'}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -215,7 +215,7 @@ export function ProjectHierarchyView({
                             color: projectColor,
                           }}
                         >
-                          Resultado producido
+                          Resultado
                         </span>
                         {result.targetDate && (
                           <span className="flex items-center gap-1 text-[11px] text-ink-3">
@@ -324,14 +324,19 @@ export function ProjectHierarchyView({
                                   style={{ backgroundColor: projectColor }}
                                   aria-hidden="true"
                                 />
-                                <Link
-                                  to={`/planning/objectives/${obj.id}`}
-                                  className={`truncate text-[14px] font-semibold hover:underline transition-colors ${
-                                    objDone ? 'line-through text-ink-3' : 'text-ink'
-                                  }`}
-                                >
-                                  {obj.name}
-                                </Link>
+                                <div className="min-w-0">
+                                  <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                                    Objetivo
+                                  </span>
+                                  <Link
+                                    to={`/planning/objectives/${obj.id}`}
+                                    className={`truncate text-[14px] font-semibold hover:underline transition-colors ${
+                                      objDone ? 'line-through text-ink-3' : 'text-ink'
+                                    }`}
+                                  >
+                                    {obj.name}
+                                  </Link>
+                                </div>
                                 <span className="text-[11px] text-ink-3 shrink-0">
                                   ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
                                 </span>

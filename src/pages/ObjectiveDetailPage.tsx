@@ -88,7 +88,7 @@ export function ObjectiveDetailPage() {
   }
 
   const meta = [
-    result?.name,
+    result?.name ? `${t('common.result')} · ${result.name}` : null,
     objective.targetDate ? formatDate(objective.targetDate, locale) : null,
     stageShort(t, stage),
     completed.length > 0 ? t('objectiveDetail.completedCount', { n: completed.length }) : null,
@@ -126,6 +126,9 @@ export function ObjectiveDetailPage() {
             </span>
           </div>
         )}
+        <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">
+          {t('planning.objectives.detailTitle')}
+        </span>
         <h1 className="text-[17px] leading-snug font-semibold text-ink">{objective.name}</h1>
         <p className="mt-0.5 truncate text-[12px] leading-tight text-text-3">{meta}</p>
         {objective.why ? (

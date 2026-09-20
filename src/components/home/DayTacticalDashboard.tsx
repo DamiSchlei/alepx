@@ -145,7 +145,7 @@ export function DayTacticalDashboard({
             className="flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white text-slate-900 font-bold text-[13px] hover:bg-slate-100 active:scale-95 transition-all shadow-md shrink-0"
           >
             <Plus className="size-4" />
-            <span>+ Nueva Tarea Táctica</span>
+            <span>Nueva tarea</span>
           </button>
         </div>
 
@@ -298,7 +298,13 @@ export function DayTacticalDashboard({
                       <div className="flex flex-col min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-[10.5px] font-bold text-ink-3 uppercase tracking-wider truncate">
-                            {ctx.project?.name ?? ctx.result?.name ?? 'Tarea'}
+                            {[
+                              ctx.project?.name,
+                              ctx.result ? `Resultado · ${ctx.result.name}` : null,
+                              ctx.objective ? `Objetivo · ${ctx.objective.name}` : null,
+                            ]
+                              .filter(Boolean)
+                              .join(' · ') || 'Tarea'}
                           </span>
                           <span
                             className="text-[9.5px] font-bold px-1.5 py-0.2 rounded-full"
@@ -317,6 +323,9 @@ export function DayTacticalDashboard({
                         </div>
 
                         <h4 className={`text-[15px] font-bold text-ink leading-snug mt-0.5 ${done ? 'line-through text-ink-3' : ''}`}>
+                          <span className="mr-1.5 text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                            Tarea
+                          </span>
                           {task.title}
                         </h4>
                       </div>

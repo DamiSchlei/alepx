@@ -87,7 +87,7 @@ function FormBody({
 
   return (
     <div className="flex flex-col gap-4">
-      <Field label={t('common.name')}>
+      <Field label={t('planning.objectives.nameLabel')}>
         <Input
           value={name}
           onChange={(e) => setName(e.target.value)}

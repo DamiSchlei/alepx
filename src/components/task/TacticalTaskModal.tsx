@@ -259,7 +259,13 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
                     style={{ backgroundColor: projectColor }}
                   />
                   <span className="text-[11px] font-bold text-ink-3 uppercase tracking-wider truncate">
-                    {ctx.project?.name ?? ctx.result?.name ?? 'Tarea Táctica'}
+                    {[
+                      ctx.project?.name,
+                      ctx.result ? `Resultado · ${ctx.result.name}` : null,
+                      ctx.objective ? `Objetivo · ${ctx.objective.name}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ') || 'Tarea'}
                   </span>
                   <span
                     className="text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0"
@@ -278,7 +284,10 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
                   )}
                 </div>
 
-                <h2 className="text-[18px] sm:text-[20px] font-black text-ink tracking-tight mt-0.5 leading-snug">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">
+                  Tarea
+                </span>
+                <h2 className="text-[18px] sm:text-[20px] font-black text-ink tracking-tight leading-snug">
                   {task.title}
                 </h2>
               </div>
@@ -451,7 +460,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
                   className="flex items-center gap-1 rounded-xl bg-[#111318] px-3.5 py-2 text-[12px] font-bold text-white hover:bg-black disabled:opacity-40 transition-all shrink-0"
                 >
                   <Plus className="size-3.5" />
-                  <span>+ Paso</span>
+                  <span>Paso</span>
                 </button>
               </form>
 
@@ -838,7 +847,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
                   className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#111318] text-white text-[12px] font-bold hover:bg-black transition-all shadow-xs"
                 >
                   <Plus className="size-3.5" />
-                  <span>+ Nuevo Contacto</span>
+                  <span>Nuevo contacto</span>
                 </button>
               </div>
 

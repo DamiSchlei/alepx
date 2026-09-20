@@ -194,7 +194,7 @@ function TaskFormBody({
 
   return (
     <div className="flex flex-col gap-4">
-      <Field label={t('common.title')}>
+      <Field label={t('planning.tasks.nameLabel')}>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
