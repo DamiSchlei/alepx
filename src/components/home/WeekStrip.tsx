@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { cx } from '@/components/ui/primitives'
 import { weekDayKeys } from '@/domain/dates'
 
@@ -6,7 +7,7 @@ function weekdayShort(dayKey: string, localeTag: string): string {
   return new Intl.DateTimeFormat(localeTag, { weekday: 'short' }).format(date)
 }
 
-/** Mon–Sun strip synced to the active day on Home. Día activo: pastilla lila. */
+/** Mon–Sun strip synced to the active day on Home. */
 export function WeekStrip({
   activeDay,
   todayKey,
@@ -18,10 +19,11 @@ export function WeekStrip({
   localeTag: string
   onSelectDay: (dayKey: string) => void
 }) {
+  const { t } = useTranslation()
   const days = weekDayKeys(activeDay)
 
   return (
-    <div className="flex gap-1.5 pt-1" role="list" aria-label="Semana">
+    <div className="flex gap-1.5 pt-1" role="list" aria-label={t('home.granularityWeek')}>
       {days.map((dayKey) => {
         const active = dayKey === activeDay
         const isToday = dayKey === todayKey
@@ -34,36 +36,35 @@ export function WeekStrip({
             onClick={() => onSelectDay(dayKey)}
             aria-current={active ? 'date' : undefined}
             className={cx(
-              'flex min-h-[50px] min-w-0 flex-1 flex-col items-center justify-center rounded-[14px] px-0.5 py-1.5 transition-all active:scale-95',
+              'flex min-h-[52px] min-w-0 flex-1 flex-col items-center justify-center rounded-[16px] px-0.5 py-1.5 transition-colors',
               active
-                ? 'bg-[#f5f0ff] border border-[#7a3fe0] text-[#7a3fe0] shadow-xs'
-                : 'bg-white border border-line text-ink-3 hover:border-line-strong hover:bg-subtle',
+                ? 'border border-violet bg-violet-soft text-violet'
+                : 'border border-line bg-surface text-ink-3 hover:border-line-strong hover:bg-subtle',
             )}
           >
             <span
               className={cx(
-                'text-[10px] font-semibold tracking-wider uppercase',
-                active ? 'text-[#7a3fe0]' : 'text-ink-3',
+                'text-[10px] font-semibold tracking-[0.12em] uppercase',
+                active ? 'text-violet' : 'text-ink-3',
               )}
             >
               {weekdayShort(dayKey, localeTag)}
             </span>
             <span
               className={cx(
-                'mt-0.5 text-[15px] font-bold tabular-nums',
-                active ? 'text-[#7a3fe0]' : 'text-ink',
+                'mt-0.5 text-[15px] font-semibold tabular-nums',
+                active ? 'text-violet' : 'text-ink',
               )}
             >
               {date}
             </span>
-            {isToday ? (
-              <span
-                aria-hidden
-                className={cx('mt-0.5 size-1 rounded-full', active ? 'bg-[#7a3fe0]' : 'bg-[#7a3fe0]/70')}
-              />
-            ) : (
-              <span aria-hidden className="mt-0.5 size-1" />
-            )}
+            <span
+              aria-hidden
+              className={cx(
+                'mt-0.5 size-1 rounded-full',
+                isToday ? 'bg-violet' : 'bg-transparent',
+              )}
+            />
           </button>
         )
       })}

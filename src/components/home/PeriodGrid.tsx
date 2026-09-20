@@ -1,4 +1,5 @@
-import { MiniDayClock, MicroDayClock } from '@/components/home/DayTaskClock'
+import { useTranslation } from 'react-i18next'
+import { MiniDayClock, MicroDayClock } from '@/components/home/AnalogClock'
 import { TaskBlockChip } from '@/components/home/TaskBlock'
 import { cx } from '@/components/ui/primitives'
 import { closedHoursForDay } from '@/data/dayLoad'
@@ -42,14 +43,13 @@ function periodStats(state: AlephState, dayKeys: string[]) {
   return { closedBlocks, onTime, hours }
 }
 
-function formatWeekHeadingSpec(anchorDay: string, localeTag: string): string {
+function formatWeekHeadingSpec(anchorDay: string, localeTag: string, weekLabel: string): string {
   const days = weekDayKeys(anchorDay)
   const first = parseLocal(days[0])
   const last = parseLocal(days[6])
-  const wNum = isoWeekNumber(anchorDay)
   const monthName = new Intl.DateTimeFormat(localeTag, { month: 'short' }).format(last)
   const year = last.getFullYear()
-  return `Semana ${wNum} · ${first.getDate()}–${last.getDate()} ${monthName} ${year}`
+  return `${weekLabel} · ${first.getDate()}–${last.getDate()} ${monthName} ${year}`
 }
 
 export function PeriodGrid({
@@ -65,6 +65,7 @@ export function PeriodGrid({
   localeTag: string
   onOpenDay: (dayKey: string) => void
 }) {
+  const { t } = useTranslation()
   const state = useAleph()
   const locale = state.character.locale
   const dayKeys = periodDayKeys(mode, anchorDay)
@@ -72,23 +73,21 @@ export function PeriodGrid({
   const lead = mode === 'month' ? isoWeekday(dayKeys[0] ?? anchorDay) - 1 : 0
   const monthKey = toDayKey(parseLocal(anchorDay)).slice(0, 7)
 
-  // Total tasks count and temporal progress in period
-  const allPeriodTasks = dayKeys.flatMap((dk) => tasksForDay(state, dk))
-  const completedPeriodTasks = allPeriodTasks.filter((t) => isTaskDone(t.status))
+  const allPeriodTasks = dayKeys.flatMap((dayKey) => tasksForDay(state, dayKey))
+  const completedPeriodTasks = allPeriodTasks.filter((task) => isTaskDone(task.status))
   const periodProgressPercent =
     allPeriodTasks.length > 0
       ? Math.round((completedPeriodTasks.length / allPeriodTasks.length) * 100)
-      : 0
+      : null
 
-  // Project breakdown of completed tasks towards results
   const projectContributions: Record<string, { name: string; color: string; count: number }> = {}
-  completedPeriodTasks.forEach((t) => {
-    const ctx = blockContext(state, t)
+  completedPeriodTasks.forEach((task) => {
+    const ctx = blockContext(state, task)
     const pid = ctx.project?.id ?? 'loose'
     if (!projectContributions[pid]) {
       projectContributions[pid] = {
-        name: ctx.project?.name ?? ctx.result?.name ?? 'Acciones sueltas',
-        color: ctx.projectColor ?? '#7a3fe0',
+        name: ctx.project?.name ?? ctx.result?.name ?? t('home.clock.loose'),
+        color: ctx.projectColor ?? 'var(--color-violet)',
         count: 0,
       }
     }
@@ -97,82 +96,84 @@ export function PeriodGrid({
 
   const title =
     mode === 'week'
-      ? formatWeekHeadingSpec(anchorDay, localeTag)
+      ? formatWeekHeadingSpec(anchorDay, localeTag, t('home.weekNumber', { n: isoWeekNumber(anchorDay) }))
       : new Intl.DateTimeFormat(localeTag, { month: 'long', year: 'numeric' }).format(
           parseLocal(anchorDay),
         )
 
-  // Stats for month: "3 cerradas · 3 a tiempo · 3,5 h"
-  const monthStatsLabel = `${stats.closedBlocks} cerradas · ${stats.onTime} a tiempo · ${formatHours(stats.hours, locale)} h`
+  const monthStatsLabel = t('home.monthStatsLine', {
+    closed: stats.closedBlocks,
+    onTime: stats.onTime,
+    hours: formatHours(stats.hours, locale),
+  })
 
   return (
     <section className="flex flex-col gap-4 pb-24 pt-3">
       <div>
-        <h2 className="text-[20px] font-semibold capitalize text-ink">{title}</h2>
+        <h2 className="text-[20px] font-semibold capitalize tracking-tight text-ink">{title}</h2>
         {mode === 'month' ? (
           <p className="mt-1 text-[13px] font-medium text-ink-3">{monthStatsLabel}</p>
         ) : null}
       </div>
 
-      {/* Barra de Avance Temporal hacia Resultados */}
-      <div className="rounded-[16px] border border-line bg-white p-3.5 shadow-xs flex flex-col gap-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-[13px] font-bold text-ink">
-              {mode === 'week' ? 'Avance de la Semana' : 'Avance del Mes'}
+      <div className="flex flex-col gap-2.5 rounded-[20px] border border-line bg-surface p-4 shadow-paper">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <span className="text-[13px] font-semibold text-ink">
+              {mode === 'week' ? t('home.progressWeek') : t('home.progressMonth')}
             </span>
-            <span className="rounded-full bg-subtle px-2 py-0.5 text-[11px] font-semibold text-ink-3">
-              {completedPeriodTasks.length} de {allPeriodTasks.length} tareas completadas
-            </span>
+            {allPeriodTasks.length > 0 ? (
+              <span className="rounded-full bg-subtle px-2 py-0.5 text-[11px] font-semibold text-ink-3">
+                {t('home.tasksCompleted', {
+                  done: completedPeriodTasks.length,
+                  total: allPeriodTasks.length,
+                })}
+              </span>
+            ) : null}
           </div>
-          <span className="text-[13px] font-bold text-ink tabular-nums">
-            {periodProgressPercent}%
-          </span>
+          {periodProgressPercent !== null ? (
+            <span className="text-[13px] font-semibold tabular-nums text-ink">{periodProgressPercent}%</span>
+          ) : null}
         </div>
 
-        {/* Barra de progreso temporal: cada tarea completada adopta el color del proyecto */}
-        <div className="h-2.5 w-full rounded-full bg-subtle overflow-hidden flex">
+        <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-subtle">
           {allPeriodTasks.length === 0 ? (
             <div className="h-full w-full bg-subtle" />
           ) : (
-            allPeriodTasks.map((t, idx) => {
-              const done = isTaskDone(t.status)
-              const ctx = blockContext(state, t)
+            allPeriodTasks.map((task, index) => {
+              const done = isTaskDone(task.status)
+              const ctx = blockContext(state, task)
               return (
                 <div
-                  key={`bar-${t.id}-${idx}`}
-                  className="h-full transition-all duration-300 border-r border-white/40 last:border-r-0"
+                  key={`bar-${task.id}-${index}`}
+                  className="h-full border-r border-white/40 last:border-r-0"
                   style={{
                     flex: 1,
-                    backgroundColor: done ? (ctx.projectColor || '#7a3fe0') : '#e9ecf2',
+                    backgroundColor: done ? ctx.projectColor || 'var(--color-violet)' : 'var(--color-line)',
                   }}
-                  title={`${t.title} (${done ? 'Completada' : 'Pendiente'})`}
+                  title={task.title}
                 />
               )
             })
           )}
         </div>
 
-        {/* Proyectos activos en este período */}
-        {Object.keys(projectContributions).length > 0 && (
+        {Object.keys(projectContributions).length > 0 ? (
           <div className="flex items-center gap-2 overflow-x-auto pt-0.5">
-            <span className="text-[11px] font-medium text-ink-4 shrink-0">Proyectos avanzando:</span>
-            {Object.values(projectContributions).map((proj) => (
+            <span className="shrink-0 text-[11px] font-medium text-ink-4">{t('home.projectsAdvancing')}</span>
+            {Object.values(projectContributions).map((project) => (
               <span
-                key={proj.name}
-                className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold shrink-0"
-                style={{
-                  backgroundColor: `${proj.color}15`,
-                  color: proj.color,
-                }}
+                key={project.name}
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold"
+                style={{ backgroundColor: `${project.color}18`, color: project.color }}
               >
-                <span className="size-1.5 rounded-full" style={{ backgroundColor: proj.color }} />
-                <span>{proj.name}</span>
-                <span className="opacity-80">({proj.count})</span>
+                <span className="size-1.5 rounded-full" style={{ backgroundColor: project.color }} />
+                <span>{project.name}</span>
+                <span className="opacity-80">({project.count})</span>
               </span>
             ))}
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="grid grid-cols-7 gap-1.5">
@@ -200,9 +201,7 @@ export function PeriodGrid({
       </div>
 
       {mode === 'week' && allPeriodTasks.length === 0 ? (
-        <p className="py-4 text-center text-[14px] text-ink-3">
-          No hay tareas programadas para esta semana.
-        </p>
+        <p className="py-4 text-center text-[14px] text-ink-3">{t('home.emptyWeek')}</p>
       ) : null}
     </section>
   )
@@ -221,12 +220,13 @@ function DayCell({
   muted?: boolean
   onOpen: () => void
 }) {
+  const { t } = useTranslation()
   const state = useAleph()
   const tasks = tasksForDay(state, dayKey)
   const date = Number(dayKey.slice(8, 10))
+  const doneTasks = tasks.filter((task) => isTaskDone(task.status))
 
   if (mode === 'month') {
-    const doneTasks = tasks.filter((t) => isTaskDone(t.status))
     return (
       <button
         type="button"
@@ -234,28 +234,17 @@ function DayCell({
         aria-current={today ? 'date' : undefined}
         aria-label={dayKey}
         className={cx(
-          'flex min-h-[58px] flex-col items-center justify-between rounded-[12px] p-1.5 text-center transition-all hover:bg-subtle active:scale-95',
-          today
-            ? 'bg-[#f5f0ff] border border-[#7a3fe0] text-[#7a3fe0]'
-            : 'border border-line bg-white text-ink',
+          'flex min-h-[58px] flex-col items-center justify-between rounded-[14px] p-1.5 text-center transition-colors hover:bg-subtle',
+          today ? 'border border-violet bg-violet-soft text-violet' : 'border border-line bg-surface text-ink',
           muted && 'opacity-30',
         )}
       >
-        <span
-          className={cx(
-            'text-[13px] font-bold tabular-nums',
-            today ? 'text-[#7a3fe0]' : 'text-ink',
-          )}
-        >
+        <span className={cx('text-[13px] font-semibold tabular-nums', today ? 'text-violet' : 'text-ink')}>
           {date}
         </span>
-
-        {/* Micro Dial del día con las tareas */}
         <div className="my-auto flex items-center justify-center">
           <MicroDayClock tasks={tasks} />
         </div>
-
-        {/* Mini dot count if tasks exist */}
         {tasks.length > 0 ? (
           <span className="text-[9px] font-semibold tabular-nums text-ink-3">
             {doneTasks.length}/{tasks.length}
@@ -267,8 +256,6 @@ function DayCell({
     )
   }
 
-  // Week mode: 7 celdas con Mini Reloj de Día
-  const doneTasks = tasks.filter((t) => isTaskDone(t.status))
   const visible = tasks.slice(0, 3)
   const overflow = tasks.length - visible.length
 
@@ -279,35 +266,29 @@ function DayCell({
       aria-current={today ? 'date' : undefined}
       aria-label={dayKey}
       className={cx(
-        'flex min-h-[6.2rem] flex-col items-stretch gap-1 rounded-[14px] border bg-white p-2 text-left transition-all hover:border-line-strong active:scale-[0.98]',
-        today ? 'bg-[#f5f0ff] border-[#7a3fe0] ring-1 ring-[#7a3fe0]/30' : 'border-line',
+        'flex min-h-[6.2rem] flex-col items-stretch gap-1 rounded-[16px] border bg-surface p-2 text-left transition-colors hover:border-line-strong',
+        today ? 'border-violet bg-violet-soft ring-1 ring-violet/20' : 'border-line',
       )}
     >
-      <div className="flex items-center justify-between pb-1 border-b border-line/50">
-        <span
-          className={cx(
-            'text-[13px] font-bold tabular-nums',
-            today ? 'text-[#7a3fe0]' : 'text-ink',
-          )}
-        >
+      <div className="flex items-center justify-between border-b border-line/60 pb-1">
+        <span className={cx('text-[13px] font-semibold tabular-nums', today ? 'text-violet' : 'text-ink')}>
           {date}
         </span>
         <div className="flex items-center gap-1">
-          {tasks.length > 0 && (
-            <span className="text-[10px] font-semibold text-ink-3 tabular-nums">
+          {tasks.length > 0 ? (
+            <span className="text-[10px] font-semibold tabular-nums text-ink-3">
               {doneTasks.length}/{tasks.length}
             </span>
-          )}
+          ) : null}
           <MiniDayClock tasks={tasks} />
         </div>
       </div>
-
-      <div className="flex flex-col gap-0.5 flex-1 justify-start pt-0.5">
+      <div className="flex flex-1 flex-col justify-start gap-0.5 pt-0.5">
         {visible.map((task) => (
           <TaskBlockChip key={task.id} task={task} />
         ))}
         {overflow > 0 ? (
-          <span className="text-[10px] font-medium text-ink-3">+{overflow} más</span>
+          <span className="text-[10px] font-medium text-ink-3">{t('home.moreCount', { count: overflow })}</span>
         ) : null}
       </div>
     </button>

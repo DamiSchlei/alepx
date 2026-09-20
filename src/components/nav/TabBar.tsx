@@ -37,7 +37,7 @@ export function TabBar({
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4"
       style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}
     >
-      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-line bg-raised/90 p-1.5 shadow-paper backdrop-blur">
+      <div className="pointer-events-auto flex items-center gap-0.5 rounded-full border border-line bg-raised/95 p-1.5 shadow-paper backdrop-blur-md">
         {TABS.map((tab) => {
           const active = tabIsActive(pathname, tab.to)
           return (
@@ -48,8 +48,8 @@ export function TabBar({
               aria-label={t(tab.labelKey)}
               aria-current={active ? 'page' : undefined}
               className={cx(
-                'flex size-11 items-center justify-center rounded-full',
-                active ? 'text-accent' : 'text-ink-3',
+                'flex size-11 items-center justify-center rounded-full transition-colors',
+                active ? 'bg-accent-soft text-accent' : 'text-ink-3 hover:bg-subtle hover:text-ink',
               )}
             >
               <TabIcon id={tab.id} filled={tab.id === 'home' && active} />

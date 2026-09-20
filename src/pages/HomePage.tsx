@@ -47,7 +47,7 @@ export function HomePage() {
   }
 
   return (
-    <div className="flex flex-col pb-24">
+    <div className="flex flex-col pb-8">
       <HomeStickyChrome
         activeDay={activeDay}
         todayKey={todayKey}
