@@ -22,6 +22,7 @@ import {
   Select,
 } from '@/components/ui/primitives'
 import { ConfirmDialog, Sheet } from '@/components/ui/Sheet'
+import { SaberProgressBar } from '@/components/ui/SaberProgressBar'
 import { archiveResult, restoreResult } from '@/data/actions'
 import {
   activeResults,
@@ -30,6 +31,7 @@ import {
   leastActiveAttending,
   pickerObjectives,
   pickerResults,
+  projectOfTask,
   resultsOfProject,
   taskResultStatus,
 } from '@/data/selectors'
@@ -39,7 +41,7 @@ import { STAGE_ORDER } from '@/domain/stage'
 import { skillName } from '@/i18n/labels'
 import type { Project, Result, StageId, Task, TaskStatus } from '@/domain/types'
 
-type PlanningViewMode = 'project' | 'tree' | 'loose_tasks'
+type PlanningViewMode = 'project' | 'tree' | 'tasks'
 
 export function PlanningPage() {
   const { t } = useTranslation()
@@ -177,12 +179,12 @@ export function PlanningPage() {
             <span>Árbol Integral</span>
           </Chip>
           <Chip
-            active={viewMode === 'loose_tasks'}
-            onClick={() => setViewMode('loose_tasks')}
+            active={viewMode === 'tasks'}
+            onClick={() => setViewMode('tasks')}
             className="flex items-center gap-1.5 px-3 py-1 text-[13px]"
           >
             <ListTodo className="size-3.5" />
-            <span>Tareas Sueltas</span>
+            <span>Lista Integral</span>
           </Chip>
         </div>
       </div>
@@ -225,10 +227,10 @@ export function PlanningPage() {
         />
       )}
 
-      {viewMode === 'loose_tasks' && <TasksTab />}
+      {viewMode === 'tasks' && <TasksTab />}
 
       {/* ARCHIVED RESULTS SECTION */}
-      {archived.length > 0 && viewMode !== 'loose_tasks' && (
+      {archived.length > 0 && viewMode !== 'tasks' && (
         <div className="mt-6 border-t border-line/60 pt-4">
           <Button
             variant="ghost"
@@ -351,8 +353,6 @@ export function PlanningPage() {
   )
 }
 
-const isLoose = (task: Task): boolean => !task.objectiveId && !task.resultId
-
 function TasksTab() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -363,6 +363,7 @@ function TasksTab() {
   const [editing, setEditing] = useState<Task | undefined>()
   const [assigning, setAssigning] = useState<Task | undefined>()
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [grouping, setGrouping] = useState<'tree' | 'importance'>('tree')
   const [resultId, setResultId] = useState('')
   const [objectiveId, setObjectiveId] = useState('')
   const [stage, setStage] = useState<StageId | ''>('')
@@ -370,6 +371,7 @@ function TasksTab() {
   const [skillId, setSkillId] = useState('')
   const [before, setBefore] = useState('')
 
+  const projects = allProjects(state)
   const objectives = resultId ? pickerObjectives(state, resultId) : []
   const filterCount = [resultId, objectiveId, stage, status, skillId, before].filter(Boolean).length
 
@@ -386,12 +388,48 @@ function TasksTab() {
         return true
       })
       .sort((a, b) => {
-        const al = isLoose(a) ? 0 : 1
-        const bl = isLoose(b) ? 0 : 1
-        if (al !== bl) return al - bl
         return a.importance - b.importance
       })
   }, [state, resultId, objectiveId, stage, status, skillId, before])
+
+  // Group tasks by project hierarchy
+  const projectTreeGroups = useMemo(() => {
+    const projectMap = new Map<string, Task[]>()
+    const looseTasks: Task[] = []
+
+    for (const task of filtered) {
+      const proj = projectOfTask(state, task)
+      if (proj) {
+        const list = projectMap.get(proj.id) ?? []
+        list.push(task)
+        projectMap.set(proj.id, list)
+      } else {
+        looseTasks.push(task)
+      }
+    }
+
+    const groups: { project: Project; tasks: Task[] }[] = []
+    for (const proj of projects) {
+      const pTasks = projectMap.get(proj.id)
+      if (pTasks && pTasks.length > 0) {
+        groups.push({ project: proj, tasks: pTasks })
+      }
+    }
+
+    return { groups, looseTasks }
+  }, [filtered, state, projects])
+
+  // Group tasks by importance level
+  const importanceGroups = useMemo(() => {
+    const vital = filtered.filter((t) => t.importance === 1)
+    const alta = filtered.filter((t) => t.importance === 2)
+    const media = filtered.filter((t) => t.importance >= 3 || !t.importance)
+    return [
+      { key: 'vital', title: 'Prioridad Vital (Nivel 1)', tasks: vital, tone: '#dc2626' },
+      { key: 'alta', title: 'Prioridad Alta (Nivel 2)', tasks: alta, tone: '#c47a00' },
+      { key: 'media', title: 'Prioridad Normal (Nivel 3)', tasks: media, tone: '#7a3fe0' },
+    ].filter((g) => g.tasks.length > 0)
+  }, [filtered])
 
   const clear = () => {
     setResultId('')
@@ -403,21 +441,64 @@ function TasksTab() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {state.tasks.length > 0 ? (
-        <>
-          <Button onClick={() => setCreating(true)}>{t('planning.tasks.new')}</Button>
-          <div className="flex items-center justify-between gap-2">
-            <Button variant="secondary" onClick={() => setFiltersOpen(true)}>
-              {t('planning.openFilters')}
-              {filterCount > 0 ? ` · ${filterCount}` : ''}
-            </Button>
-            <p className="text-[13px] text-text-3">
-              {t('planning.tasks.count', { count: filtered.length })}
-            </p>
+    <div className="flex flex-col gap-4">
+      {/* GLOBAL MULTI-SABER PROGRESS BANNER */}
+      {state.tasks.length > 0 && (
+        <div className="rounded-2xl border border-line bg-white p-4 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <div>
+              <h3 className="text-[14px] font-bold text-ink">
+                Saberes Conquistados en la Lista
+              </h3>
+              <p className="text-[12px] text-ink-3">
+                Cada tarea aporta su saber propio (Literatura, Arte, Empresa, Suelto) impregnada del color del proyecto.
+              </p>
+            </div>
           </div>
-        </>
-      ) : null}
+          <SaberProgressBar tasks={filtered} showBadges={true} size="md" />
+        </div>
+      )}
+
+      {/* CONTROLS ROW */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <Button onClick={() => setCreating(true)}>
+            + {t('planning.tasks.new')}
+          </Button>
+
+          <Button variant="secondary" onClick={() => setFiltersOpen(true)}>
+            {t('planning.openFilters')}
+            {filterCount > 0 ? ` · ${filterCount}` : ''}
+          </Button>
+        </div>
+
+        {/* GROUPING SWITCHER */}
+        <div className="flex items-center gap-1 rounded-xl bg-subtle p-1 border border-line/60">
+          <button
+            type="button"
+            onClick={() => setGrouping('tree')}
+            className={`px-2.5 py-1 text-[12px] font-medium rounded-lg transition-all ${
+              grouping === 'tree'
+                ? 'bg-white text-ink shadow-xs font-semibold'
+                : 'text-ink-3 hover:text-ink'
+            }`}
+          >
+            Por Árbol de Proyecto
+          </button>
+          <button
+            type="button"
+            onClick={() => setGrouping('importance')}
+            className={`px-2.5 py-1 text-[12px] font-medium rounded-lg transition-all ${
+              grouping === 'importance'
+                ? 'bg-white text-ink shadow-xs font-semibold'
+                : 'text-ink-3 hover:text-ink'
+            }`}
+          >
+            Por Nivel de Importancia
+          </button>
+        </div>
+      </div>
+
       {state.tasks.length === 0 ? (
         <EmptyState
           action={
@@ -434,22 +515,173 @@ function TasksTab() {
         >
           {t('planning.tasks.emptyFiltered')}
         </EmptyState>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {filtered.map((task) => (
-            <li key={task.id}>
-              <TaskRow
-                task={task}
-                onToggle={() => toggle(task)}
-                onExecute={() => execute(task)}
-                onOpen={() => setEditing(task)}
-                onAssign={() => setAssigning(task)}
-                onDelete={() => actions.requestDelete(task)}
-                showProjection
-              />
-            </li>
+      ) : grouping === 'tree' ? (
+        /* HIERARCHICAL TREE VIEW OF ALL TASKS */
+        <div className="flex flex-col gap-4">
+          {projectTreeGroups.groups.map(({ project, tasks }) => (
+            <div
+              key={project.id}
+              className="rounded-2xl border border-line bg-white p-4 shadow-xs"
+              style={{
+                borderLeftWidth: '4px',
+                borderLeftColor: project.color,
+              }}
+            >
+              {/* Project Header */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-line/60">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-3 rounded-full shrink-0"
+                    style={{ backgroundColor: project.color }}
+                  />
+                  <h3 className="text-[15px] font-bold text-ink">{project.name}</h3>
+                  <span
+                    className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: `${project.color}15`,
+                      color: project.color,
+                    }}
+                  >
+                    {tasks.length} {tasks.length === 1 ? 'tarea' : 'tareas'}
+                  </span>
+                </div>
+                <div className="min-w-[200px] flex-1 max-w-xs">
+                  <SaberProgressBar
+                    tasks={tasks}
+                    projectColor={project.color}
+                    showBadges={false}
+                    size="sm"
+                  />
+                </div>
+              </div>
+
+              {/* Tasks list under this project */}
+              <ul className="flex flex-col gap-2">
+                {tasks.map((task) => (
+                  <li key={task.id}>
+                    <TaskRow
+                      task={task}
+                      onToggle={() => toggle(task)}
+                      onExecute={() => execute(task)}
+                      onOpen={() => setEditing(task)}
+                      onAssign={() => setAssigning(task)}
+                      onDelete={() => actions.requestDelete(task)}
+                      showContext={true}
+                      showProjection
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+
+          {/* LOOSE TASKS SECTION */}
+          {projectTreeGroups.looseTasks.length > 0 && (
+            <div
+              className="rounded-2xl border border-line bg-white p-4 shadow-xs"
+              style={{
+                borderLeftWidth: '4px',
+                borderLeftColor: '#c47a00',
+              }}
+            >
+              <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-line/60">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-3 rounded-full shrink-0"
+                    style={{ backgroundColor: '#c47a00' }}
+                  />
+                  <h3 className="text-[15px] font-bold text-ink">Tareas Sueltas</h3>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-[#c47a00]">
+                    {projectTreeGroups.looseTasks.length} tareas
+                  </span>
+                </div>
+                <div className="min-w-[200px] flex-1 max-w-xs">
+                  <SaberProgressBar
+                    tasks={projectTreeGroups.looseTasks}
+                    projectColor="#c47a00"
+                    showBadges={false}
+                    size="sm"
+                  />
+                </div>
+              </div>
+
+              <ul className="flex flex-col gap-2">
+                {projectTreeGroups.looseTasks.map((task) => (
+                  <li key={task.id}>
+                    <TaskRow
+                      task={task}
+                      onToggle={() => toggle(task)}
+                      onExecute={() => execute(task)}
+                      onOpen={() => setEditing(task)}
+                      onAssign={() => setAssigning(task)}
+                      onDelete={() => actions.requestDelete(task)}
+                      showContext={true}
+                      showProjection
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* IMPORTANCE LEVEL VIEW */
+        <div className="flex flex-col gap-4">
+          {importanceGroups.map((group) => (
+            <div
+              key={group.key}
+              className="rounded-2xl border border-line bg-white p-4 shadow-xs"
+              style={{
+                borderLeftWidth: '4px',
+                borderLeftColor: group.tone,
+              }}
+            >
+              <div className="flex items-center justify-between gap-2 pb-2.5 mb-2.5 border-b border-line/60">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="size-2.5 rounded-full shrink-0"
+                    style={{ backgroundColor: group.tone }}
+                  />
+                  <h3 className="text-[14px] font-bold text-ink">{group.title}</h3>
+                  <span
+                    className="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                    style={{
+                      backgroundColor: `${group.tone}15`,
+                      color: group.tone,
+                    }}
+                  >
+                    {group.tasks.length}
+                  </span>
+                </div>
+                <div className="min-w-[160px] max-w-xs flex-1">
+                  <SaberProgressBar
+                    tasks={group.tasks}
+                    projectColor={group.tone}
+                    showBadges={false}
+                    size="sm"
+                  />
+                </div>
+              </div>
+
+              <ul className="flex flex-col gap-2">
+                {group.tasks.map((task) => (
+                  <li key={task.id}>
+                    <TaskRow
+                      task={task}
+                      onToggle={() => toggle(task)}
+                      onExecute={() => execute(task)}
+                      onOpen={() => setEditing(task)}
+                      onAssign={() => setAssigning(task)}
+                      onDelete={() => actions.requestDelete(task)}
+                      showContext={true}
+                      showProjection
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       )}
       {dialog}
       {actions.dialog}

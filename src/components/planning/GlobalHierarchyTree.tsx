@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom'
 import { ChevronDown, ChevronRight, Edit2, Plus } from 'lucide-react'
 import { TaskRow } from '@/components/task/TaskRow'
 import { Button } from '@/components/ui/primitives'
+import { SaberProgressBar } from '@/components/ui/SaberProgressBar'
 import { completeTask, reopenTask } from '@/data/actions'
 import {
   activeObjectivesOfResult,
   resultProgress,
   tasksOfObjective,
+  tasksOfResult,
 } from '@/data/selectors'
 import { useAleph } from '@/data/store'
 import { isTaskDone } from '@/domain/economy'
@@ -160,11 +162,17 @@ export function GlobalHierarchyTree({
                       const isResultCollapsed = collapsedResults.has(result.id)
                       const objectives = activeObjectivesOfResult(state, result.id)
                       const progress = resultProgress(state, result.id)
+                      const projectColor = project.color || '#7a3fe0'
 
                       return (
                         <div
                           key={result.id}
-                          className="rounded-xl border border-line/70 bg-subtle/30 p-2.5"
+                          className="relative overflow-hidden rounded-xl border border-line/70 p-2.5 transition-all hover:border-line-strong"
+                          style={{
+                            background: `linear-gradient(to right, ${projectColor}0e, transparent 60%)`,
+                            borderLeftWidth: '3.5px',
+                            borderLeftColor: projectColor,
+                          }}
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -181,27 +189,47 @@ export function GlobalHierarchyTree({
                               </button>
                               <Link
                                 to={`/planning/results/${result.id}`}
-                                className="truncate text-[14px] font-semibold text-ink hover:text-accent"
+                                className="truncate text-[14px] font-semibold text-ink hover:underline"
                               >
                                 {result.name}
                               </Link>
-                              <span className="text-[11px] text-ink-3 shrink-0">
-                                ({progress.tasksDone}/{progress.tasksTotal} hechos)
+                              <span
+                                className="text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0"
+                                style={{
+                                  backgroundColor: `${projectColor}15`,
+                                  color: projectColor,
+                                }}
+                              >
+                                {progress.tasksDone}/{progress.tasksTotal} hechos
                               </span>
                             </div>
 
                             <Button
                               variant="ghost"
-                              className="text-[11px] text-accent px-2 py-0.5 shrink-0"
+                              className="text-[11px] px-2 py-0.5 shrink-0 hover:bg-black/5"
+                              style={{ color: projectColor }}
                               onClick={() => onNewObjective(result)}
                             >
                               + Objetivo
                             </Button>
                           </div>
 
+                          {/* Multi-saber progress bar for result in tree */}
+                          <div className="mt-1.5">
+                            <SaberProgressBar
+                              tasks={tasksOfResult(state, result.id)}
+                              projectColor={projectColor}
+                              showBadges={true}
+                              size="sm"
+                            />
+                          </div>
+
                           {/* OBJECTIVES */}
                           {!isResultCollapsed && (
-                            <div className="mt-2 flex flex-col gap-2 pl-4 border-l-2 border-line">
+                            <div
+                              className="mt-2.5 flex flex-col gap-2.5 pl-4 border-l-2"
+                              style={{ borderLeftColor: `${projectColor}35` }}
+                            >
                               {objectives.length === 0 ? (
                                 <p className="text-[11px] text-ink-3 italic">
                                   Sin objetivos aún.
@@ -210,24 +238,53 @@ export function GlobalHierarchyTree({
                                 objectives.map((obj) => {
                                   const tasks = tasksOfObjective(state, obj.id)
                                   return (
-                                    <div key={obj.id} className="flex flex-col gap-1">
+                                    <div
+                                      key={obj.id}
+                                      className="flex flex-col gap-1.5 rounded-lg p-2 transition-all border border-line/60"
+                                      style={{
+                                        borderLeftWidth: '3px',
+                                        borderLeftColor: projectColor,
+                                        background: `linear-gradient(to right, ${projectColor}06 0%, #ffffff 45%)`,
+                                      }}
+                                    >
                                       <div className="flex items-center justify-between">
                                         <Link
                                           to={`/planning/objectives/${obj.id}`}
-                                          className="text-[13px] font-medium text-ink hover:text-accent truncate"
+                                          className="text-[13px] font-medium text-ink hover:underline truncate flex items-center gap-1.5"
                                         >
-                                          • {obj.name}
+                                          <span
+                                            className="size-1.5 rounded-full shrink-0"
+                                            style={{ backgroundColor: projectColor }}
+                                          />
+                                          <span>{obj.name}</span>
                                         </Link>
                                         <Button
                                           variant="ghost"
-                                          className="text-[10px] text-accent px-1.5 py-0.5"
+                                          className="text-[10px] px-1.5 py-0.5 font-semibold hover:bg-black/5"
+                                          style={{ color: projectColor }}
                                           onClick={() => onNewTask(result.id, obj.id)}
                                         >
-                                          + Paso
+                                          + Tarea
                                         </Button>
                                       </div>
+
+                                      {/* Objective saber progress */}
                                       {tasks.length > 0 && (
-                                        <div className="flex flex-col gap-1 pl-3">
+                                        <div className="px-1">
+                                          <SaberProgressBar
+                                            tasks={tasks}
+                                            projectColor={projectColor}
+                                            showBadges={true}
+                                            size="sm"
+                                          />
+                                        </div>
+                                      )}
+
+                                      {tasks.length > 0 && (
+                                        <div
+                                          className="flex flex-col gap-1 pl-3 border-l"
+                                          style={{ borderLeftColor: `${projectColor}30` }}
+                                        >
                                           {tasks.map((task) => (
                                             <TaskRow
                                               key={task.id}

@@ -133,13 +133,13 @@ export function DayCarousel({
                 </p>
               </div>
 
-              {/* Center Organ: Visual Day Cell Preview (Semilla + Terrenos) */}
+              {/* Center Organ: Visual Day Cell Preview */}
               <div className="my-3 flex flex-col items-center justify-center py-2">
                 <DayCellPreview tasks={dayTasks} compact={false} />
                 <p className="mt-1 text-[11px] font-semibold text-ink-3 tracking-wider uppercase">
                   {dayTasks.length === 0
-                    ? 'Célula receptiva'
-                    : `${dayTasks.length} ${dayTasks.length === 1 ? 'marca viva' : 'marcas vivas'}`}
+                    ? 'Sin tareas asignadas'
+                    : `${dayTasks.length} ${dayTasks.length === 1 ? 'tarea' : 'tareas'}`}
                 </p>
               </div>
 
@@ -147,7 +147,7 @@ export function DayCarousel({
               <div className="min-h-[72px] flex flex-col justify-center">
                 {dayTasks.length === 0 ? (
                   <div className="rounded-[12px] border border-dashed border-line p-2.5 text-center text-[12px] text-ink-3">
-                    Sin marcas. Tocá el lienzo para sembrar.
+                    Sin tareas. Tocá para planificar el día.
                   </div>
                 ) : (
                   <div className="flex flex-col gap-1">
@@ -182,7 +182,7 @@ export function DayCarousel({
                 )}
               </div>
 
-              {/* Card Actions: Abrir Lienzo & Rápido */}
+              {/* Card Actions: Planificar día & Rápido */}
               <div className="mt-3.5 pt-3 border-t border-line flex items-center gap-2">
                 <button
                   type="button"
@@ -193,7 +193,7 @@ export function DayCarousel({
                   className="flex-1 flex items-center justify-center gap-1.5 rounded-full bg-[#111113] py-2.5 px-3 text-[13px] font-semibold text-white hover:bg-black active:scale-98 transition-all shadow-xs"
                 >
                   <Maximize2 className="size-3.5" />
-                  <span>Abrir lienzo del día</span>
+                  <span>Planificar día</span>
                 </button>
                 <button
                   type="button"
@@ -202,7 +202,7 @@ export function DayCarousel({
                     onQuickAdd(day)
                   }}
                   className="flex size-9 items-center justify-center rounded-full border border-line bg-subtle text-ink hover:border-[#7a3fe0] hover:text-[#7a3fe0] active:scale-95 transition-all shrink-0"
-                  title="Sembrar paso"
+                  title="Añadir tarea"
                 >
                   <Plus className="size-4" />
                 </button>

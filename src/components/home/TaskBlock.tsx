@@ -40,17 +40,19 @@ export function TaskBlock({
     ? `${targetName} · ${hoursFormatted} · ${stageFormatted}`
     : `${hoursFormatted} · ${stageFormatted}`
 
-  return (
-    <div className="relative flex min-h-[56px] overflow-hidden rounded-[16px] border border-line bg-white transition-all hover:border-line-strong">
-      {/* Riel 6px con el color del terreno */}
-      <span
-        aria-hidden
-        className="absolute inset-y-0 left-0 w-1.5"
-        style={{ backgroundColor: ctx.color }}
-      />
+  const projectColor = ctx.projectColor || '#7a3fe0'
 
-      <div className="flex min-w-0 flex-1 items-center justify-between py-2.5 pl-4 pr-2">
-        {/* Left: Título & Meta */}
+  return (
+    <div
+      className="relative flex min-h-[56px] overflow-hidden rounded-[16px] border border-line bg-white transition-all hover:border-line-strong"
+      style={{
+        borderLeftWidth: '3.5px',
+        borderLeftColor: projectColor,
+        background: `linear-gradient(to right, ${projectColor}09 0%, #ffffff 40%)`,
+      }}
+    >
+      <div className="flex min-w-0 flex-1 items-center justify-between py-2.5 pl-3.5 pr-2">
+        {/* Left: Título & Meta con punto del saber propio */}
         <button
           type="button"
           onClick={onOpen}
@@ -64,9 +66,16 @@ export function TaskBlock({
           >
             {task.title}
           </p>
-          <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">
-            {metaLine}
-          </p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            <span
+              className="size-2 rounded-full shrink-0"
+              style={{ backgroundColor: ctx.color }}
+              title={ctx.terreno}
+            />
+            <p className="truncate text-[12px] font-medium leading-tight text-ink-3">
+              {metaLine}
+            </p>
+          </div>
         </button>
 
         {/* Right: Checkbox + Handle */}

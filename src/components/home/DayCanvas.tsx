@@ -25,6 +25,7 @@ import {
   activeResults,
   allProjects,
   objectivesOfResult,
+  projectColorOfResult,
   tasksForDay,
 } from '@/data/selectors'
 import { useAleph } from '@/data/store'
@@ -81,6 +82,14 @@ export function DayCanvas({
   const currentProjectName = projectNames.includes(selectedProject)
     ? selectedProject
     : (projectNames[0] ?? 'La Obra Principal')
+
+  const activeProjectColor = useMemo(() => {
+    const projects = allProjects(state)
+    const p = projects.find(
+      (proj) => proj.name.trim().toLowerCase() === currentProjectName.trim().toLowerCase(),
+    )
+    return p?.color || '#7a3fe0'
+  }, [state, currentProjectName])
 
   const resultsInCurrentProject = useMemo(() => {
     return projectMap.get(currentProjectName) ?? results
@@ -248,12 +257,12 @@ export function DayCanvas({
             </button>
           </div>
 
-          {/* Sembrar paso */}
+          {/* Añadir tarea */}
           <button
             type="button"
             onClick={() => handleOpenSeed()}
             className="flex size-9 items-center justify-center rounded-full bg-[#7a3fe0] text-white hover:bg-[#6832c7] active:scale-95 transition-all shadow-sm"
-            title="Sembrar paso"
+            title="Añadir tarea"
           >
             <Plus className="size-4" />
           </button>
@@ -296,7 +305,13 @@ export function DayCanvas({
               >
                 {/* Indicador y Selector de Proyecto */}
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#f5f0ff] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#7a3fe0]">
+                  <span
+                    className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                    style={{
+                      backgroundColor: `${activeProjectColor}18`,
+                      color: activeProjectColor,
+                    }}
+                  >
                     <FolderGit2 className="size-3" />
                     <span>Proyecto</span>
                   </span>
@@ -304,7 +319,11 @@ export function DayCanvas({
                     <select
                       value={currentProjectName}
                       onChange={(e) => setSelectedProject(e.target.value)}
-                      className="text-[12px] font-bold text-[#7a3fe0] bg-transparent outline-none cursor-pointer border-b border-dashed border-[#7a3fe0]/40"
+                      className="text-[12px] font-bold bg-transparent outline-none cursor-pointer border-b border-dashed"
+                      style={{
+                        color: activeProjectColor,
+                        borderColor: `${activeProjectColor}60`,
+                      }}
                     >
                       {projectNames.map((pName) => (
                         <option key={pName} value={pName}>
@@ -336,7 +355,7 @@ export function DayCanvas({
                           resultsInCurrentProject.some((r) => r.id === t.resultId),
                       ).length
                     }{' '}
-                    pasos para hoy
+                    tareas para hoy
                   </span>
                 </div>
               </motion.div>
@@ -357,7 +376,11 @@ export function DayCanvas({
                 <button
                   type="button"
                   onClick={() => setShowResultForm(true)}
-                  className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] hover:text-[#6832c7] transition-colors bg-[#f5f0ff] px-2.5 py-1 rounded-full"
+                  className="flex items-center gap-1 text-[12px] font-semibold transition-colors px-2.5 py-1 rounded-full"
+                  style={{
+                    backgroundColor: `${activeProjectColor}18`,
+                    color: activeProjectColor,
+                  }}
                 >
                   <Plus className="size-3.5" />
                   <span>Nuevo resultado</span>
@@ -377,7 +400,8 @@ export function DayCanvas({
                     <button
                       type="button"
                       onClick={() => setShowResultForm(true)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-[#7a3fe0] px-4 py-2 text-[13px] font-semibold text-white shadow-xs"
+                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white shadow-xs"
+                      style={{ backgroundColor: activeProjectColor }}
                     >
                       <Plus className="size-4" />
                       <span>Crear primer resultado en este proyecto</span>
@@ -409,7 +433,7 @@ export function DayCanvas({
                 )
               })}
 
-              {/* Pasos autónomos sin resultado asociado */}
+              {/* Tareas sueltas sin resultado asociado */}
               {tasks.filter(
                 (t) =>
                   !t.resultId ||
@@ -419,7 +443,7 @@ export function DayCanvas({
                   <div className="flex items-center justify-between pb-2 border-b border-line/60">
                     <div>
                       <h3 className="text-[14px] font-bold text-ink">
-                        Pasos autónomos del día
+                        Tareas sueltas del día
                       </h3>
                       <p className="text-[11px] text-ink-3">
                         Acciones que caminan de forma libre
@@ -431,7 +455,7 @@ export function DayCanvas({
                       className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] px-2.5 py-1 rounded-full bg-[#f5f0ff]"
                     >
                       <Plus className="size-3" />
-                      <span>Sembrar</span>
+                      <span>+ Tarea</span>
                     </button>
                   </div>
 
@@ -516,7 +540,7 @@ export function DayCanvas({
         )}
       </AnimatePresence>
 
-      {/* MODAL: +SEMBRAR PASO */}
+      {/* MODAL: AÑADIR TAREA */}
       <AnimatePresence>
         {showSeedModal && (
           <motion.div
@@ -533,7 +557,7 @@ export function DayCanvas({
             >
               <div className="flex items-center justify-between pb-3 border-b border-line">
                 <div>
-                  <h3 className="text-[17px] font-bold text-ink">Sembrar paso en el día</h3>
+                  <h3 className="text-[17px] font-bold text-ink">Añadir tarea al día</h3>
                   <p className="text-[12px] text-ink-3">
                     {`${dayName} ${dayNum} de ${monthName}`} · {currentProjectName}
                   </p>
@@ -630,10 +654,10 @@ export function DayCanvas({
                   </div>
                 </div>
 
-                {/* Naturaleza / Tono del paso */}
+                {/* Naturaleza / Enfoque de la tarea */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Tono del paso
+                    Enfoque de la acción
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {TERRENOS.map((terrId) => {
@@ -690,7 +714,7 @@ export function DayCanvas({
                   disabled={!seedTitle.trim()}
                   className="mt-2 w-full rounded-full bg-[#7a3fe0] py-3 text-[14px] font-semibold text-white shadow-sm hover:bg-[#6832c7] active:scale-98 disabled:opacity-40 transition-all"
                 >
-                  Sembrar en este día
+                  Añadir tarea a este día
                 </button>
               </form>
             </motion.div>
@@ -803,22 +827,37 @@ function ResultCellCard({
   onAddStep: (objId?: string) => void
   onAddObjective: () => void
 }) {
+  const state = useAleph()
+  const projectColor = projectColorOfResult(state, result)
   const hours = tasks.reduce(
     (sum, t) => sum + (t.actualHours ?? t.estimatedHours ?? 1),
     0,
   )
 
   return (
-    <div className="relative flex flex-col rounded-[22px] border border-line bg-white/95 p-4 shadow-xs transition-all hover:border-line-strong hover:shadow-md">
+    <div
+      className="relative flex flex-col rounded-[22px] border border-line bg-white/95 p-4 shadow-xs transition-all hover:border-line-strong hover:shadow-md overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, ${projectColor}0a 0%, #ffffff 45%)`,
+        borderLeftWidth: '4px',
+        borderLeftColor: projectColor,
+      }}
+    >
       {/* Header de la Célula de Resultado */}
       <div className="flex items-start justify-between pb-3 border-b border-line/60">
         <div className="min-w-0 flex-1 pr-2">
-          <span className="inline-block rounded-full bg-[#f5f0ff] px-2 py-0.5 text-[10px] font-bold text-[#7a3fe0] uppercase tracking-wider mb-1">
+          <span
+            className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider mb-1"
+            style={{
+              backgroundColor: `${projectColor}18`,
+              color: projectColor,
+            }}
+          >
             Resultado Producido
           </span>
           <h3
             onClick={onZoomResult}
-            className="text-[16px] font-bold text-ink hover:text-[#7a3fe0] cursor-pointer transition-colors leading-tight truncate flex items-center gap-1.5 group"
+            className="text-[16px] font-bold text-ink hover:underline cursor-pointer transition-colors leading-tight truncate flex items-center gap-1.5 group"
           >
             <span>{result.name}</span>
             <Maximize2 className="size-3 text-ink-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -829,7 +868,7 @@ function ResultCellCard({
             </p>
           )}
           <p className="text-[11px] font-medium text-ink-3 mt-1">
-            {objectives.length} objetivos decididos · {tasks.length} pasos hoy ({hours}h)
+            {objectives.length} objetivos decididos · {tasks.length} {tasks.length === 1 ? 'tarea' : 'tareas'} hoy ({hours}h)
           </p>
         </div>
 
@@ -846,10 +885,14 @@ function ResultCellCard({
           <button
             type="button"
             onClick={() => onAddStep()}
-            className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] hover:text-[#6832c7] px-2.5 py-1 rounded-full bg-[#f5f0ff] transition-colors"
+            className="flex items-center gap-1 text-[12px] font-semibold px-2.5 py-1 rounded-full transition-colors"
+            style={{
+              backgroundColor: `${projectColor}16`,
+              color: projectColor,
+            }}
           >
             <Plus className="size-3" />
-            <span>Sembrar</span>
+            <span>+ Tarea</span>
           </button>
         </div>
       </div>
@@ -864,7 +907,8 @@ function ResultCellCard({
             <button
               type="button"
               onClick={onAddObjective}
-              className="text-[11px] font-semibold text-[#7a3fe0] hover:underline"
+              className="text-[11px] font-semibold hover:underline"
+              style={{ color: projectColor }}
             >
               + Decidir otro
             </button>
@@ -882,21 +926,25 @@ function ResultCellCard({
                     onClick={() => onZoomObjective(obj)}
                     className="flex items-center gap-2 min-w-0 text-left flex-1 pr-2"
                   >
-                    <span className="size-2 rounded-full bg-[#7a3fe0] shrink-0" />
-                    <span className="text-[13px] font-medium text-ink truncate group-hover:text-[#7a3fe0]">
+                    <span
+                      className="size-2 rounded-full shrink-0"
+                      style={{ backgroundColor: projectColor }}
+                    />
+                    <span className="text-[13px] font-medium text-ink truncate group-hover:underline">
                       {obj.name}
                     </span>
                     <span className="text-[11px] text-ink-3 shrink-0">
-                      ({objTasks.length} {objTasks.length === 1 ? 'paso' : 'pasos'})
+                      ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
                     </span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => onAddStep(obj.id)}
-                    className="text-[11px] font-semibold text-[#7a3fe0] hover:underline shrink-0"
+                    className="text-[11px] font-semibold hover:underline shrink-0"
+                    style={{ color: projectColor }}
                   >
-                    + Paso
+                    + Tarea
                   </button>
                 </div>
               )
@@ -905,14 +953,14 @@ function ResultCellCard({
         </div>
       )}
 
-      {/* Pasos del día hacia este resultado */}
+      {/* Tareas del día hacia este resultado */}
       <div className="mt-3">
         <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3 block mb-1.5 px-0.5">
-          Pasos para hoy
+          Tareas para hoy
         </span>
         {tasks.length === 0 ? (
           <div className="py-2 px-3 rounded-[10px] bg-subtle/20 border border-dashed border-line text-center text-[12px] text-ink-4">
-            Sin pasos sembrados para hoy.
+            Sin tareas programadas para hoy.
           </div>
         ) : (
           <div className="flex flex-col gap-1.5">
@@ -941,7 +989,7 @@ function ResultCellCard({
           onClick={() => onAddStep()}
           className="text-[#7a3fe0] hover:text-[#6832c7] font-semibold transition-colors"
         >
-          + Sembrar paso
+          + Añadir tarea
         </button>
       </div>
     </div>
@@ -970,6 +1018,8 @@ function ResultZoomModal({
   onAddObjective: () => void
   onZoomObjective: (o: Objective) => void
 }) {
+  const state = useAleph()
+  const projectColor = projectColorOfResult(state, result)
   const totalHours = tasks.reduce(
     (sum, t) => sum + (t.actualHours ?? t.estimatedHours ?? 1),
     0,
@@ -982,11 +1032,23 @@ function ResultZoomModal({
       exit={{ opacity: 0, scale: 0.93 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-xs p-4"
     >
-      <div className="w-full max-w-lg rounded-[24px] border border-line bg-white p-6 shadow-2xl max-h-[88vh] flex flex-col">
+      <div
+        className="w-full max-w-lg rounded-[24px] border border-line bg-white p-6 shadow-2xl max-h-[88vh] flex flex-col relative overflow-hidden"
+        style={{
+          borderTopWidth: '5px',
+          borderTopColor: projectColor,
+        }}
+      >
         {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b border-line">
           <div className="min-w-0 pr-3">
-            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#7a3fe0]">
+            <div
+              className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-md"
+              style={{
+                backgroundColor: `${projectColor}18`,
+                color: projectColor,
+              }}
+            >
               <FolderGit2 className="size-3.5" />
               <span>Proyecto: {result.projectName || 'La Obra Principal'}</span>
             </div>
@@ -1012,10 +1074,10 @@ function ResultZoomModal({
         <div className="my-3 flex items-center justify-between text-[12px] font-medium text-ink-3 bg-subtle p-2.5 rounded-[12px]">
           <span>{objectives.length} objetivos decididos</span>
           <span>·</span>
-          <span>{tasks.length} pasos hoy ({totalHours}h)</span>
+          <span>{tasks.length} tareas hoy ({totalHours}h)</span>
         </div>
 
-        {/* Cuerpo con scroll: Objetivos decididos + Pasos del día */}
+        {/* Cuerpo con scroll: Objetivos decididos + Tareas del día */}
         <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4">
           {/* Objetivos Decididos */}
           <div>
@@ -1026,7 +1088,8 @@ function ResultZoomModal({
               <button
                 type="button"
                 onClick={onAddObjective}
-                className="text-[12px] font-semibold text-[#7a3fe0] hover:text-[#6832c7] flex items-center gap-1"
+                className="text-[12px] font-semibold flex items-center gap-1 hover:underline"
+                style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
                 <span>Decidir objetivo</span>
@@ -1043,12 +1106,15 @@ function ResultZoomModal({
                   <div
                     key={obj.id}
                     onClick={() => onZoomObjective(obj)}
-                    className="flex items-center justify-between rounded-[12px] border border-line bg-subtle/50 px-3 py-2 cursor-pointer hover:border-[#7a3fe0]/40 transition-colors"
+                    className="flex items-center justify-between rounded-[12px] border border-line bg-subtle/50 px-3 py-2 cursor-pointer transition-colors hover:bg-subtle"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <span className="size-2 rounded-full bg-[#7a3fe0] shrink-0" />
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: projectColor }}
+                      />
                       <div className="min-w-0">
-                        <p className="text-[13px] font-bold text-ink truncate">
+                        <p className="text-[13px] font-bold text-ink truncate hover:underline">
                           {obj.name}
                         </p>
                         {obj.doneWhen && (
@@ -1065,25 +1131,26 @@ function ResultZoomModal({
             )}
           </div>
 
-          {/* Pasos programados hoy para este resultado */}
+          {/* Tareas programadas hoy para este resultado */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[12px] font-bold uppercase tracking-wider text-ink-3">
-                Pasos del día para este resultado
+                Tareas del día para este resultado
               </span>
               <button
                 type="button"
                 onClick={onAddStep}
-                className="text-[12px] font-semibold text-[#7a3fe0] hover:text-[#6832c7] flex items-center gap-1"
+                className="text-[12px] font-semibold flex items-center gap-1 hover:underline"
+                style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
-                <span>Sembrar paso</span>
+                <span>+ Tarea</span>
               </button>
             </div>
 
             {tasks.length === 0 ? (
               <div className="p-4 rounded-[12px] border border-dashed border-line text-center text-[12px] text-ink-3">
-                Sin pasos programados para hoy en este resultado.
+                Sin tareas programadas para hoy en este resultado.
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
@@ -1104,10 +1171,11 @@ function ResultZoomModal({
           <button
             type="button"
             onClick={onAddStep}
-            className="flex items-center gap-1.5 text-[13px] font-semibold text-[#7a3fe0]"
+            className="flex items-center gap-1.5 text-[13px] font-semibold hover:underline"
+            style={{ color: projectColor }}
           >
             <Plus className="size-4" />
-            <span>Sembrar paso para hoy</span>
+            <span>Añadir tarea para hoy</span>
           </button>
           <button
             type="button"
@@ -1230,22 +1298,22 @@ function ObjectiveZoomModal({
 
         {/* Resumen */}
         <div className="my-3 flex items-center justify-between text-[12px] font-medium text-ink-3 bg-subtle p-2.5 rounded-[12px]">
-          <span>Pasos programados hoy: {tasks.length}</span>
+          <span>Tareas programadas hoy: {tasks.length}</span>
           <span>Dedicación: {totalHours} h</span>
         </div>
 
-        {/* Lista de pasos */}
+        {/* Lista de tareas */}
         <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-2">
           {tasks.length === 0 ? (
             <div className="py-8 text-center text-ink-3">
-              <p className="text-[14px]">No hay pasos para este objetivo hoy.</p>
+              <p className="text-[14px]">No hay tareas para este objetivo hoy.</p>
               <button
                 type="button"
                 onClick={onAddStep}
                 className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#7a3fe0] px-4 py-2 text-[13px] font-semibold text-white shadow-xs"
               >
                 <Plus className="size-4" />
-                <span>Sembrar primer paso</span>
+                <span>Añadir primera tarea</span>
               </button>
             </div>
           ) : (
@@ -1299,7 +1367,7 @@ function ObjectiveZoomModal({
             className="flex items-center gap-1.5 text-[13px] font-semibold text-[#7a3fe0]"
           >
             <Plus className="size-4" />
-            <span>Sembrar paso para este objetivo</span>
+            <span>Añadir tarea para este objetivo</span>
           </button>
           <button
             type="button"
@@ -1342,7 +1410,7 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="mt-3 text-[13px] leading-relaxed text-ink-2">
-          Una obra no se divide en casilleros o departamentos aislados. Cada paso que das hacia tus <strong>proyectos y objetivos decididos</strong> se mueve en tres dimensiones vivas:
+          Tus proyectos avanzan mediante acciones cotidianas. Cada tarea que realizás hacia tus <strong>proyectos y objetivos</strong> nutre tres dimensiones fundamentales:
         </p>
 
         <div className="mt-4 space-y-3">
@@ -1361,7 +1429,7 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
             <div>
               <h4 className="text-[13px] font-bold text-ink">Arte (El roce interno)</h4>
               <p className="text-[12px] text-ink-2 mt-0.5">
-                El paso que atraviesa la postura y el límite propio: sostener el precio, superar el rechazo, quién estás siendo.
+                La acción que atraviesa la postura y el límite propio: sostener el precio, superar el rechazo, quién estás siendo.
               </p>
             </div>
           </div>

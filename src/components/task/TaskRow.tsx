@@ -16,10 +16,12 @@ export function TaskCheckbox({
   done,
   onToggle,
   label,
+  color = '#7a3fe0',
 }: {
   done: boolean
   onToggle: () => void
   label: string
+  color?: string
 }) {
   return (
     <button
@@ -33,8 +35,9 @@ export function TaskCheckbox({
       <span
         className={cx(
           'flex size-[22px] items-center justify-center rounded-[6px] border-2 transition-colors',
-          done ? 'border-[#7a3fe0] bg-[#7a3fe0] text-white' : 'border-line-strong',
+          done ? 'text-white' : 'border-line-strong',
         )}
+        style={done ? { backgroundColor: color, borderColor: color } : undefined}
       >
         {done ? (
           <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -84,6 +87,8 @@ export function TaskRow({
   const todayKey = toDayKey(new Date())
 
   const tInfo = TERRENO_MAP[task.terreno ?? 'literatura']
+  const projectColor = ctx.projectColor || '#7a3fe0'
+  const projectName = ctx.project?.name || contextResult?.projectName
 
   const putInThisWeek = () => {
     updateTask(task.id, {
@@ -104,10 +109,26 @@ export function TaskRow({
   if (task.dueAt && !done) metaParts.push(formatDate(task.dueAt, locale))
 
   return (
-    <div className={cx('relative flex overflow-hidden rounded-[16px] border border-line bg-white transition-all hover:border-line-strong', className)}>
-      <span aria-hidden className="absolute inset-y-0 left-0 w-1.5" style={{ background: ctx.color }} />
+    <div
+      className={cx(
+        'relative flex overflow-hidden rounded-[16px] border border-line bg-white transition-all hover:border-line-strong hover:shadow-xs',
+        className,
+      )}
+      style={{
+        borderLeftWidth: '3.5px',
+        borderLeftColor: projectColor,
+        background: done
+          ? undefined
+          : `linear-gradient(to right, ${projectColor}08 0%, #ffffff 35%)`,
+      }}
+    >
       {hideCheckbox ? null : (
-        <TaskCheckbox done={done} onToggle={onToggle} label="Completar tarea" />
+        <TaskCheckbox
+          done={done}
+          onToggle={onToggle}
+          label="Completar tarea"
+          color={tInfo.color}
+        />
       )}
       <button
         type="button"
@@ -119,7 +140,7 @@ export function TaskRow({
           onOpen && 'cursor-pointer',
         )}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
           <p
             className={cx(
               'line-clamp-1 text-[15px] font-medium leading-snug',
@@ -128,14 +149,32 @@ export function TaskRow({
           >
             {task.title}
           </p>
-          {/* Tinte discreto del paso */}
+
+          {/* Color propio del saber/terreno con etiqueta distinguible */}
           <span
-            className="size-2 rounded-full shrink-0"
-            style={{ backgroundColor: tInfo.color }}
-            aria-hidden="true"
-          />
+            className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 transition-colors"
+            style={{
+              backgroundColor: `${tInfo.color}16`,
+              color: tInfo.color,
+              border: `1px solid ${tInfo.color}32`,
+            }}
+            title={`Saber de la tarea: ${tInfo.label}`}
+          >
+            <span
+              className="size-1.5 rounded-full shrink-0"
+              style={{ backgroundColor: tInfo.color }}
+              aria-hidden="true"
+            />
+            <span>{tInfo.label}</span>
+          </span>
         </div>
+
         <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">
+          {showContext && projectName && !loose && (
+            <span className="font-semibold mr-1" style={{ color: projectColor }}>
+              [{projectName}]
+            </span>
+          )}
           {metaParts.join(' · ')}
         </p>
       </button>

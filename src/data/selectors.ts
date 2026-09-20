@@ -31,20 +31,36 @@ import type {
   Task,
   Terreno,
 } from '@/domain/types'
-import { terrenoColor } from '@/domain/terrenos'
+import { terrenoColor, TERRENO_MAP } from '@/domain/terrenos'
+
+export const DEFAULT_PROJECT_PALETTE = [
+  '#7a3fe0', // violet
+  '#2563eb', // blue
+  '#059669', // emerald
+  '#d97706', // amber
+  '#e11d48', // rose
+  '#0891b2', // cyan
+  '#4f46e5', // indigo
+  '#475569', // slate
+]
 
 export function allProjects(state: AlephState): Project[] {
   const defined = state.projects ?? []
   const definedNames = new Set(defined.map((p) => p.name.trim().toLowerCase()))
-  const synthesized: Project[] = [...defined]
+  const synthesized: Project[] = defined.map((p, idx) => ({
+    ...p,
+    color: p.color || DEFAULT_PROJECT_PALETTE[idx % DEFAULT_PROJECT_PALETTE.length],
+  }))
 
   for (const r of state.results) {
     const pName = r.projectName?.trim()
     if (pName && !definedNames.has(pName.toLowerCase())) {
       definedNames.add(pName.toLowerCase())
+      const colorIndex = synthesized.length % DEFAULT_PROJECT_PALETTE.length
       synthesized.push({
         id: `proj_${pName.toLowerCase().replace(/\s+/g, '_')}`,
         name: pName,
+        color: DEFAULT_PROJECT_PALETTE[colorIndex],
         createdAt: new Date().toISOString(),
       })
     }
@@ -62,6 +78,118 @@ export function allProjects(state: AlephState): Project[] {
   }
 
   return synthesized
+}
+
+export function projectOfResult(
+  state: AlephState,
+  resultOrProjectName?: Result | { projectName?: string } | string,
+): Project | undefined {
+  if (!resultOrProjectName) return undefined
+  const name =
+    typeof resultOrProjectName === 'string'
+      ? resultOrProjectName.trim().toLowerCase()
+      : (resultOrProjectName.projectName?.trim() || 'La Obra Principal').toLowerCase()
+
+  const projects = allProjects(state)
+  return projects.find((p) => p.name.trim().toLowerCase() === name)
+}
+
+export function projectColorOfResult(
+  state: AlephState,
+  resultOrProjectName?: Result | { projectName?: string } | string,
+  fallback = '#7a3fe0',
+): string {
+  const project = projectOfResult(state, resultOrProjectName)
+  return project?.color || fallback
+}
+
+export function projectOfObjective(
+  state: AlephState,
+  objectiveOrId?: Objective | string,
+): Project | undefined {
+  if (!objectiveOrId) return undefined
+  const obj =
+    typeof objectiveOrId === 'string' ? objectiveById(state, objectiveOrId) : objectiveOrId
+  if (!obj?.resultId) return undefined
+  const res = resultById(state, obj.resultId)
+  return projectOfResult(state, res)
+}
+
+export function projectColorOfObjective(
+  state: AlephState,
+  objectiveOrId?: Objective | string,
+  fallback = '#7a3fe0',
+): string {
+  const proj = projectOfObjective(state, objectiveOrId)
+  return proj?.color || fallback
+}
+
+export function projectOfTask(state: AlephState, task?: Task): Project | undefined {
+  if (!task) return undefined
+  const result =
+    resultById(state, task.resultId) ??
+    (task.objectiveId ? resultById(state, objectiveById(state, task.objectiveId)?.resultId) : undefined)
+  return projectOfResult(state, result)
+}
+
+export function projectColorOfTask(
+  state: AlephState,
+  task?: Task,
+  fallback = '#7a3fe0',
+): string {
+  const proj = projectOfTask(state, task)
+  return proj?.color || fallback
+}
+
+export interface SaberItem {
+  id: Terreno | 'suelto'
+  label: string
+  color: string
+  tasksCount: number
+  hours: number
+  percentOfTotal: number
+}
+
+export function saberBreakdownOfTasks(tasks: Task[]): SaberItem[] {
+  const live = tasks.filter((t) => t.status !== 'cancelled')
+  const done = live.filter((t) => isTaskDone(t.status))
+  if (done.length === 0) return []
+
+  const totalDone = done.length
+  const counts: Record<string, { count: number; hours: number }> = {}
+
+  for (const t of done) {
+    const key = t.terreno ?? 'suelto'
+    if (!counts[key]) counts[key] = { count: 0, hours: 0 }
+    counts[key].count += 1
+    counts[key].hours += t.actualHours ?? t.estimatedHours ?? 1
+  }
+
+  const result: SaberItem[] = []
+  for (const [key, data] of Object.entries(counts)) {
+    if (key === 'suelto') {
+      result.push({
+        id: 'suelto',
+        label: 'Suelto',
+        color: '#c47a00',
+        tasksCount: data.count,
+        hours: data.hours,
+        percentOfTotal: Math.round((data.count / totalDone) * 100),
+      })
+    } else {
+      const terrKey = key as Terreno
+      result.push({
+        id: terrKey,
+        label: TERRENO_MAP[terrKey]?.label ?? key,
+        color: TERRENO_MAP[terrKey]?.color ?? '#7a3fe0',
+        tasksCount: data.count,
+        hours: data.hours,
+        percentOfTotal: Math.round((data.count / totalDone) * 100),
+      })
+    }
+  }
+
+  return result.sort((a, b) => b.tasksCount - a.tasksCount)
 }
 
 export function resultsOfProject(state: AlephState, projectName: string): Result[] {
@@ -238,6 +366,8 @@ export interface BlockContext {
   pillar: Pillar | undefined
   terreno: Terreno | undefined
   color: string
+  project: Project | undefined
+  projectColor: string
   stage: StageId
   hours: number
   timeRange: { start?: string; end?: string }
@@ -255,6 +385,8 @@ export function blockContext(state: AlephState, task: Task): BlockContext {
   const objective = objectiveById(state, task.objectiveId)
   const result =
     resultById(state, task.resultId) ?? resultById(state, objective?.resultId)
+  const project = projectOfResult(state, result)
+  const projectColor = project?.color || '#7a3fe0'
   const kind: BlockKind = objective
     ? 'anchored'
     : result
@@ -269,6 +401,8 @@ export function blockContext(state: AlephState, task: Task): BlockContext {
     pillar,
     terreno: task.terreno,
     color,
+    project,
+    projectColor,
     stage: task.stage,
     hours: task.actualHours ?? task.estimatedHours,
     timeRange: {

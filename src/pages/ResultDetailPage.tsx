@@ -1,11 +1,13 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Folder } from 'lucide-react'
 import { ObjectiveFormSheet } from '@/components/planning/ObjectiveForm'
 import { ResultFormSheet } from '@/components/planning/ResultForm'
 import { TaskRow } from '@/components/task/TaskRow'
 import { Button, EmptyState, Page, SectionTitle, cx } from '@/components/ui/primitives'
 import { ConfirmDialog } from '@/components/ui/Sheet'
+import { SaberProgressBar } from '@/components/ui/SaberProgressBar'
 import { SortableList } from '@/components/ui/SortableList'
 import { RowMenu } from '@/components/ui/RowMenu'
 import { archiveResult, completeTask, reopenTask, reorderObjectives, restoreResult } from '@/data/actions'
@@ -14,8 +16,10 @@ import {
   activeObjectivesOfResult,
   completedObjectivesOfResult,
   deriveObjectiveStage,
+  projectColorOfResult,
   resultById,
   tasksOfObjective,
+  tasksOfResult,
 } from '@/data/selectors'
 import { useAleph } from '@/data/store'
 import { formatDate } from '@/i18n/format'
@@ -26,9 +30,11 @@ import type { Objective, Task } from '@/domain/types'
 function ObjectiveRow({
   objective,
   handle,
+  projectColor = '#7a3fe0',
 }: {
   objective: Objective
   handle?: ReactNode
+  projectColor?: string
 }) {
   const { t } = useTranslation()
   const state = useAleph()
@@ -47,18 +53,30 @@ function ObjectiveRow({
   const meta = [
     objective.targetDate ? formatDate(objective.targetDate, locale) : null,
     !done ? stageShort(t, deriveObjectiveStage(state, objective.id)) : t(`objectiveStatus.${objective.status}`),
-    `${tasks.length} ${tasks.length === 1 ? 'paso' : 'pasos'}`,
+    `${tasks.length} ${tasks.length === 1 ? 'tarea' : 'tareas'}`,
   ]
     .filter(Boolean)
     .join(' · ')
 
   return (
-    <div className="flex flex-col gap-2 rounded-[16px] border border-line bg-subtle p-3">
+    <div
+      className="flex flex-col gap-2 rounded-[16px] border border-line bg-white p-3.5 shadow-xs transition-all"
+      style={{
+        borderLeftWidth: '3.5px',
+        borderLeftColor: projectColor,
+        background: `linear-gradient(to right, ${projectColor}08 0%, #ffffff 40%)`,
+      }}
+    >
       <div className="flex items-center justify-between">
         <Link
           to={`/planning/objectives/${objective.id}`}
-          className="flex min-w-0 flex-1 items-center gap-2 text-left"
+          className="flex min-w-0 flex-1 items-center gap-2 text-left hover:underline"
         >
+          <span
+            className="size-2 rounded-full shrink-0"
+            style={{ backgroundColor: projectColor }}
+            aria-hidden="true"
+          />
           {done ? (
             <span className="flex size-6 shrink-0 items-center justify-center rounded-[6px] bg-[#0f9f6e] text-white">
               <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -67,7 +85,7 @@ function ObjectiveRow({
             </span>
           ) : null}
           <div className="min-w-0 flex-1">
-            <p className={cx('line-clamp-1 text-[16px] font-semibold leading-snug', done ? 'text-ink-3' : 'text-ink')}>
+            <p className={cx('line-clamp-1 text-[16px] font-semibold leading-snug', done ? 'text-ink-3 line-through' : 'text-ink')}>
               {objective.name}
             </p>
             <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">{meta}</p>
@@ -79,9 +97,24 @@ function ObjectiveRow({
         {handle ? <div className="opacity-40 pl-1">{handle}</div> : null}
       </div>
 
+      {/* Progress bar of saberes within this objective */}
+      {tasks.length > 0 && (
+        <div className="px-0.5">
+          <SaberProgressBar
+            tasks={tasks}
+            projectColor={projectColor}
+            showBadges={true}
+            size="sm"
+          />
+        </div>
+      )}
+
       {/* Pasos con etiqueta de terreno y CTA "Poner en esta semana" */}
       {tasks.length > 0 ? (
-        <div className="flex flex-col gap-1.5 pt-1">
+        <div
+          className="flex flex-col gap-1.5 pt-1 pl-3 border-l-2"
+          style={{ borderLeftColor: `${projectColor}35` }}
+        >
           {tasks.map((task) => (
             <TaskRow
               key={task.id}
@@ -92,7 +125,7 @@ function ObjectiveRow({
           ))}
         </div>
       ) : (
-        <p className="px-1 py-1 text-[13px] text-ink-3">Sin pasos definidos.</p>
+        <p className="px-1 py-1 text-[13px] text-ink-3">Sin tareas definidas.</p>
       )}
     </div>
   )
@@ -106,6 +139,7 @@ export function ResultDetailPage() {
   const result = resultById(state, resultId)
   const active = result ? activeObjectivesOfResult(state, result.id) : []
   const completed = result ? completedObjectivesOfResult(state, result.id) : []
+  const resultTasks = result ? tasksOfResult(state, result.id) : []
   const [edit, setEdit] = useState(false)
   const [addObjective, setAddObjective] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
@@ -135,6 +169,8 @@ export function ResultDetailPage() {
     .filter(Boolean)
     .join(' · ')
 
+  const projectColor = projectColorOfResult(state, result)
+
   return (
     <Page className="flex flex-col gap-4 pt-2 pb-24">
       <div className="flex items-center justify-between gap-2">
@@ -159,16 +195,32 @@ export function ResultDetailPage() {
         )}
       </div>
 
-      {/* Obra con riel neutro */}
-      <header className="relative overflow-hidden rounded-[16px] border border-line bg-white py-3 pr-3 pl-4">
-        <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 bg-[#9aa0ae]" />
+      {/* Obra impregnada del color del proyecto */}
+      <header
+        className="relative overflow-hidden rounded-[16px] border border-line bg-white py-3.5 pr-3 pl-4 transition-all"
+        style={{
+          background: `linear-gradient(135deg, ${projectColor}12 0%, #ffffff 50%)`,
+          borderLeftWidth: '4px',
+          borderLeftColor: projectColor,
+        }}
+      >
+        <span
+          aria-hidden
+          className="absolute inset-y-0 left-0 w-1"
+          style={{ backgroundColor: projectColor }}
+        />
         <div className="pl-1">
-          {result.projectName && (
-            <p className="text-[12px] font-bold uppercase tracking-wider text-[#7a3fe0] mb-0.5">
-              Proyecto: {result.projectName}
-            </p>
-          )}
-          <h1 className="line-clamp-2 text-[18px] font-bold leading-snug text-ink">{result.name}</h1>
+          <div
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider mb-1"
+            style={{
+              backgroundColor: `${projectColor}18`,
+              color: projectColor,
+            }}
+          >
+            <Folder className="size-3" />
+            <span>Proyecto: {result.projectName || 'La Obra Principal'}</span>
+          </div>
+          <h1 className="line-clamp-2 text-[19px] font-bold leading-snug text-ink">{result.name}</h1>
           <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">
             Resultado concreto · {meta}
           </p>
@@ -177,6 +229,30 @@ export function ResultDetailPage() {
           ) : null}
         </div>
       </header>
+
+      {/* Obra multi-saber progress */}
+      {resultTasks.length > 0 && (
+        <div
+          className="rounded-[16px] border border-line bg-white p-3.5 shadow-xs"
+          style={{
+            borderLeftWidth: '4px',
+            borderLeftColor: projectColor,
+          }}
+        >
+          <div className="flex items-center justify-between text-[12px] font-semibold text-ink mb-1.5">
+            <span>Dominio de Saberes Conquistados</span>
+            <span style={{ color: projectColor }}>
+              {resultTasks.filter((t) => isTaskDone(t.status)).length}/{resultTasks.length} tareas completadas
+            </span>
+          </div>
+          <SaberProgressBar
+            tasks={resultTasks}
+            projectColor={projectColor}
+            showBadges={true}
+            size="md"
+          />
+        </div>
+      )}
 
       <div>
         <SectionTitle
@@ -187,14 +263,19 @@ export function ResultDetailPage() {
                 disabled={atLimit}
                 aria-label="Nuevo objetivo"
                 onClick={() => setAddObjective(true)}
-                className="flex size-9 items-center justify-center rounded-full border border-line text-[#7a3fe0] hover:bg-[#f5f0ff] disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                className="flex size-9 items-center justify-center rounded-full border disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                style={{
+                  borderColor: `${projectColor}45`,
+                  color: projectColor,
+                  backgroundColor: `${projectColor}10`,
+                }}
               >
                 +
               </button>
             )
           }
         >
-          Objetivos y Pasos
+          Objetivos y Tareas
         </SectionTitle>
         {atLimit && !isArchived ? (
           <p className="mb-3 text-[13px] leading-relaxed text-amber">{t('planning.objectives.limitReached')}</p>
@@ -212,7 +293,13 @@ export function ResultDetailPage() {
             {(id, handle) => {
               const objective = active.find((o) => o.id === id)
               if (!objective) return null
-              return <ObjectiveRow objective={objective} handle={handle} />
+              return (
+                <ObjectiveRow
+                  objective={objective}
+                  handle={handle}
+                  projectColor={projectColor}
+                />
+              )
             }}
           </SortableList>
         )}
@@ -224,7 +311,10 @@ export function ResultDetailPage() {
           <ul className="flex flex-col gap-2">
             {completed.map((objective) => (
               <li key={objective.id}>
-                <ObjectiveRow objective={objective} />
+                <ObjectiveRow
+                  objective={objective}
+                  projectColor={projectColor}
+                />
               </li>
             ))}
           </ul>

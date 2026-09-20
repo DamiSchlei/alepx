@@ -7,14 +7,16 @@ import { TaskFormSheet } from '@/components/planning/TaskForm'
 import { TaskRow } from '@/components/task/TaskRow'
 import { useTaskCompletion } from '@/components/task/useTaskCompletion'
 import { useTaskActions } from '@/components/task/useTaskActions'
-import { Button, Chip, EmptyState, Page, ProgressBar, cx } from '@/components/ui/primitives'
+import { Button, Chip, EmptyState, Page, cx } from '@/components/ui/primitives'
 import { ConfirmDialog } from '@/components/ui/Sheet'
 import { RowMenu } from '@/components/ui/RowMenu'
+import { SaberProgressBar } from '@/components/ui/SaberProgressBar'
 import { archiveObjective, setObjectiveStatus } from '@/data/actions'
 import {
   deriveObjectiveStage,
   objectiveById,
   objectiveProgress,
+  projectOfObjective,
   resultById,
   tasksOfObjective,
 } from '@/data/selectors'
@@ -36,6 +38,8 @@ export function ObjectiveDetailPage() {
   const locale = state.character.locale
   const objective = objectiveById(state, objectiveId)
   const result = objective ? resultById(state, objective.resultId) : undefined
+  const project = objective ? projectOfObjective(state, objective) : undefined
+  const projectColor = project?.color || '#7a3fe0'
   const { toggle, execute, dialog: completionDialog } = useTaskCompletion()
   const actions = useTaskActions()
   const [edit, setEdit] = useState(false)
@@ -111,6 +115,17 @@ export function ObjectiveDetailPage() {
       </div>
 
       <header>
+        {project && (
+          <div className="flex items-center gap-1.5 mb-1">
+            <span
+              className="size-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: projectColor }}
+            />
+            <span className="text-[12px] font-semibold" style={{ color: projectColor }}>
+              {project.name}
+            </span>
+          </div>
+        )}
         <h1 className="text-[17px] leading-snug font-semibold text-ink">{objective.name}</h1>
         <p className="mt-0.5 truncate text-[12px] leading-tight text-text-3">{meta}</p>
         {objective.why ? (
@@ -118,12 +133,26 @@ export function ObjectiveDetailPage() {
         ) : null}
       </header>
 
-      {percent && progress.ratio && progress.ratio > 0 ? (
-        <div className="flex items-center gap-3">
-          <ProgressBar className="flex-1" ratio={progress.ratio} />
-          <span className="text-[13px] tabular-nums text-accent">{percent}</span>
+      {all.length > 0 && (
+        <div
+          className="rounded-xl border border-line bg-white p-3.5 shadow-xs"
+          style={{
+            borderLeftWidth: '3.5px',
+            borderLeftColor: projectColor,
+          }}
+        >
+          <div className="flex items-center justify-between text-[12px] font-semibold text-ink mb-1.5">
+            <span>Progreso de Saberes Conquistados</span>
+            <span style={{ color: projectColor }}>{percent ?? '0%'}</span>
+          </div>
+          <SaberProgressBar
+            tasks={all}
+            projectColor={projectColor}
+            showBadges={true}
+            size="md"
+          />
         </div>
-      ) : null}
+      )}
 
       <div className="flex flex-wrap gap-2">
         {STATUS_OPTIONS.map((status) => (
