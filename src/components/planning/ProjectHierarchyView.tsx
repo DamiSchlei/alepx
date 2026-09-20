@@ -96,24 +96,14 @@ export function ProjectHierarchyView({
           className="absolute inset-y-0 left-0 w-1.5"
           style={{ backgroundColor: accentColor }}
         />
-        <div className="flex items-start justify-between gap-3 pl-1">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span
-                className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
-                style={{ backgroundColor: accentColor }}
-              >
-                Proyecto
-              </span>
-              <button
-                type="button"
-                onClick={() => onEditProject(project)}
-                className="flex items-center gap-1 rounded-lg border border-line/70 bg-surface/70 px-2 py-0.5 text-[11px] font-medium text-ink-2 hover:bg-white hover:border-accent/60 hover:text-accent transition-all cursor-pointer"
-              >
-                <Edit2 className="size-3" />
-                <span>Editar Proyecto</span>
-              </button>
-            </div>
+        <div className="flex flex-col gap-3 pl-1">
+          <div className="min-w-0">
+            <span
+              className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
+              style={{ backgroundColor: accentColor }}
+            >
+              Proyecto
+            </span>
             <h2 className="mt-1.5 text-[20px] font-bold text-ink leading-tight">
               {project.name}
             </h2>
@@ -123,14 +113,23 @@ export function ProjectHierarchyView({
               </p>
             )}
           </div>
-
-          <Button
-            onClick={() => onNewResult(project.name)}
-            className="shrink-0 flex items-center gap-1.5 shadow-sm text-[13px] px-3 py-1.5"
-          >
-            <Plus className="size-4" />
-            <span>Nuevo Resultado</span>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => onEditProject(project)}
+              className="flex items-center gap-1 rounded-lg border border-line/70 bg-surface/70 px-2.5 py-1.5 text-[12px] font-medium text-ink-2 hover:bg-white hover:border-accent/60 hover:text-accent transition-all"
+            >
+              <Edit2 className="size-3.5" />
+              <span>Editar</span>
+            </button>
+            <Button
+              onClick={() => onNewResult(project.name)}
+              className="flex items-center gap-1.5 shadow-sm text-[13px] px-3 py-1.5"
+            >
+              <Plus className="size-4" />
+              <span>Nuevo Resultado</span>
+            </Button>
+          </div>
         </div>
 
         {/* METRICS ROW */}

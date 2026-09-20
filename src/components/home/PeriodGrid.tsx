@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { MiniDayClock, MicroDayClock } from '@/components/home/AnalogClock'
+import { MicroDayClock } from '@/components/home/AnalogClock'
 import { TaskBlockChip } from '@/components/home/TaskBlock'
 import { cx } from '@/components/ui/primitives'
 import { closedHoursForDay } from '@/data/dayLoad'
@@ -270,18 +270,15 @@ function DayCell({
         today ? 'border-violet bg-violet-soft ring-1 ring-violet/20' : 'border-line',
       )}
     >
-      <div className="flex items-center justify-between border-b border-line/60 pb-1">
+      <div className="flex flex-col items-center gap-0.5 border-b border-line/60 pb-1">
         <span className={cx('text-[13px] font-semibold tabular-nums', today ? 'text-violet' : 'text-ink')}>
           {date}
         </span>
-        <div className="flex items-center gap-1">
-          {tasks.length > 0 ? (
-            <span className="text-[10px] font-semibold tabular-nums text-ink-3">
-              {doneTasks.length}/{tasks.length}
-            </span>
-          ) : null}
-          <MiniDayClock tasks={tasks} />
-        </div>
+        {tasks.length > 0 ? (
+          <span className="text-[9px] font-semibold tabular-nums text-ink-3">
+            {doneTasks.length}/{tasks.length}
+          </span>
+        ) : null}
       </div>
       <div className="flex flex-1 flex-col justify-start gap-0.5 pt-0.5">
         {visible.map((task) => (

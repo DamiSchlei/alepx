@@ -195,46 +195,50 @@ export function DayCanvas({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#fbfbfa] text-ink overflow-hidden select-none">
       {/* Top Floating Navigation Bar */}
-      <header className="shrink-0 flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur-md border-b border-line z-20">
-        <div className="flex items-center gap-2.5">
+      <header className="shrink-0 flex flex-col gap-2 px-3 py-2.5 bg-white/90 backdrop-blur-md border-b border-line z-20">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onClose}
             aria-label="Volver al carrusel"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line bg-subtle text-ink-2 hover:text-ink hover:border-line-strong active:scale-95 transition-all text-[13px] font-medium"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line bg-subtle text-ink-2 hover:text-ink hover:border-line-strong active:scale-95 transition-all text-[13px] font-medium shrink-0"
           >
             <ArrowLeft className="size-4" />
             <span>Carrusel</span>
           </button>
-          <div>
-            <h1 className="text-[15px] font-bold capitalize leading-tight flex items-center gap-1.5">
-              <span>{`${dayName} ${dayNum} de ${monthName}`}</span>
-              {isToday && (
-                <span className="rounded-full bg-[#f5f0ff] px-2 py-0.5 text-[10px] font-semibold text-[#7a3fe0]">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-[15px] font-bold capitalize leading-tight truncate">
+              {`${dayName} ${dayNum} de ${monthName}`}
+              {isToday ? (
+                <span className="ml-1.5 rounded-full bg-[#f5f0ff] px-2 py-0.5 text-[10px] font-semibold text-[#7a3fe0]">
                   Hoy
                 </span>
-              )}
+              ) : null}
             </h1>
-            <p className="text-[11px] font-medium text-ink-3">
+            <p className="text-[11px] font-medium text-ink-3 truncate">
               {formatHours(planned, locale)} h cargadas · {formatHours(free, locale)} h libres
             </p>
           </div>
-        </div>
-
-        {/* Action icons & view switcher */}
-        <div className="flex items-center gap-2">
-          {/* Botón de la Filosofía del Recorrido (explicación de los 3 movimientos) */}
           <button
             type="button"
             onClick={() => setShowPhilosophyModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-line bg-white text-ink-2 hover:text-[#7a3fe0] hover:border-[#7a3fe0]/40 text-[12px] font-medium transition-all shadow-2xs"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink-2 hover:text-[#7a3fe0] hover:border-[#7a3fe0]/40 transition-all"
             title="Ver filosofía del recorrido"
+            aria-label="El Recorrido"
           >
             <Sparkles className="size-3.5 text-[#7a3fe0]" />
-            <span className="hidden sm:inline">El Recorrido</span>
           </button>
+          <button
+            type="button"
+            onClick={() => handleOpenSeed()}
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#7a3fe0] text-white hover:bg-[#6832c7] active:scale-95 transition-all shadow-sm"
+            title="Añadir tarea"
+          >
+            <Plus className="size-4" />
+          </button>
+        </div>
 
-          {/* View switcher */}
+        <div className="flex justify-center">
           <div className="flex rounded-full bg-subtle p-0.5 border border-line">
             <button
               type="button"
@@ -273,16 +277,6 @@ export function DayCanvas({
               <span>Táctica</span>
             </button>
           </div>
-
-          {/* Añadir tarea */}
-          <button
-            type="button"
-            onClick={() => handleOpenSeed()}
-            className="flex size-9 items-center justify-center rounded-full bg-[#7a3fe0] text-white hover:bg-[#6832c7] active:scale-95 transition-all shadow-sm"
-            title="Añadir tarea"
-          >
-            <Plus className="size-4" />
-          </button>
         </div>
       </header>
 
@@ -383,7 +377,7 @@ export function DayCanvas({
               </motion.div>
             </div>
 
-            {/* SECCIÓN: RESULTADOS PRODUCIDOS DENTRO DEL PROYECTO */}
+            {/* SECCIÓN: RESULTADOS DENTRO DEL PROYECTO */}
             <div className="w-full z-10 flex flex-col gap-4">
               <div className="flex items-center justify-between px-1">
                 <div>
