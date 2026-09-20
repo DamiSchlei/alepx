@@ -658,6 +658,47 @@
     "delete": "Eliminar",
     "save": "Guardar cambios"
   },
+  "taskView": {
+    "label": "Plantilla",
+    "title": "Cómo se trabaja esta tarea",
+    "hint": "Elegí una plantilla para esta tarea. Después la podés cambiar desde el desplegable.",
+    "onePerTask": "Una vista por tarea.",
+    "choose": "Elegir plantilla",
+    "empty": "Vacía",
+    "items": "{{count}} ítems",
+    "minutes": "{{count}} min",
+    "footer": "Esta tarea queda con una plantilla.",
+    "templates": {
+      "checklist": {
+        "name": "Lista",
+        "hint": "Pasos concretos para terminar."
+      },
+      "time": {
+        "name": "Tiempo",
+        "hint": "Horas, foco y lo que ya dedicaste."
+      },
+      "metrics": {
+        "name": "Variables",
+        "hint": "Números que querés mover."
+      },
+      "money": {
+        "name": "Dinero",
+        "hint": "Ingresos, gastos y saldo."
+      },
+      "contacts": {
+        "name": "Contactos",
+        "hint": "Gente de esta tarea."
+      },
+      "workDone": {
+        "name": "Trabajo hecho",
+        "hint": "Lo que quedó hecho y los entregables."
+      },
+      "mindmap": {
+        "name": "Mapa",
+        "hint": "Ideas y cómo se conectan."
+      }
+    }
+  },
   "objectiveDetail": {
     "stageLabel": "Etapa: {{stage}}",
     "progress": "Progreso",

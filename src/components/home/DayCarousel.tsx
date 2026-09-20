@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DayTaskClock } from './DayTaskClock'
 import { cx } from '@/components/ui/primitives'
@@ -43,16 +43,17 @@ export function DayCarousel({
     return list
   }, [todayKey])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
     const el = container.querySelector<HTMLElement>(`[data-day="${activeDay}"]`)
     if (!el) return
     programmatic.current = true
-    el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    const left = el.offsetLeft - (container.clientWidth - el.offsetWidth) / 2
+    container.scrollTo({ left: Math.max(0, left), behavior: 'auto' })
     const release = window.setTimeout(() => {
       programmatic.current = false
-    }, 420)
+    }, 80)
     return () => window.clearTimeout(release)
   }, [activeDay])
 
@@ -76,8 +77,12 @@ export function DayCarousel({
       if (closest && closest !== activeDay) onSelectDay(closest)
     }
 
+    container.addEventListener('scrollend', syncFromScroll)
     container.addEventListener('scroll', syncFromScroll, { passive: true })
-    return () => container.removeEventListener('scroll', syncFromScroll)
+    return () => {
+      container.removeEventListener('scrollend', syncFromScroll)
+      container.removeEventListener('scroll', syncFromScroll)
+    }
   }, [activeDay, onSelectDay])
 
   return (
@@ -101,10 +106,10 @@ export function DayCarousel({
               data-day={day}
               onClick={() => onSelectDay(day)}
               className={cx(
-                'w-[88%] max-w-[400px] shrink-0 snap-center rounded-[28px] border bg-surface p-5 transition-all',
+                'w-[92%] max-w-[400px] shrink-0 snap-center rounded-[28px] border bg-surface p-5 transition-all',
                 selected
-                  ? 'border-violet shadow-[var(--shadow-day)] ring-4 ring-violet/10'
-                  : 'border-line opacity-70 shadow-paper',
+                  ? 'relative z-10 border-violet shadow-[var(--shadow-day)] ring-4 ring-violet/10'
+                  : 'z-0 border-line opacity-70 shadow-paper',
               )}
             >
               <header className="mb-3 flex items-baseline gap-2">
@@ -119,15 +124,17 @@ export function DayCarousel({
               </header>
 
               {nearby ? (
-                <DayTaskClock
-                  tasks={dayTasks}
-                  activeDay={day}
-                  todayKey={todayKey}
-                  localeTag={localeTag}
-                  compact={!selected}
-                  onOpenCanvas={selected ? () => onOpenCanvas(day) : undefined}
-                  onQuickAdd={selected ? () => onQuickAdd(day) : undefined}
-                />
+                <div className={selected ? undefined : 'pointer-events-none'}>
+                  <DayTaskClock
+                    tasks={dayTasks}
+                    activeDay={day}
+                    todayKey={todayKey}
+                    localeTag={localeTag}
+                    compact={!selected}
+                    onOpenCanvas={selected ? () => onOpenCanvas(day) : undefined}
+                    onQuickAdd={selected ? () => onQuickAdd(day) : undefined}
+                  />
+                </div>
               ) : (
                 <div className="h-[236px]" />
               )}

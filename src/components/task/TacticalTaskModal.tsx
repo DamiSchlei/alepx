@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   X,
   CheckCircle2,
@@ -6,8 +7,6 @@ import {
   Coins,
   BarChart3,
   Users,
-  FileCheck2,
-  BrainCircuit,
   Plus,
   Trash2,
   ExternalLink,
@@ -21,6 +20,7 @@ import {
   Calendar,
 } from 'lucide-react'
 import { MindMapCanvas } from './MindMapCanvas'
+import { TaskTemplatePicker, TaskTemplateTrigger } from './TaskTemplatePicker'
 import { useFeedback } from '@/app/FeedbackProvider'
 import {
   addTaskCheckItem,
@@ -43,12 +43,14 @@ import {
 } from '@/data/actions'
 import { startExecution, useFocusSession } from '@/data/focusSession'
 import { blockContext } from '@/data/selectors'
-import { useAleph } from '@/data/store'
+import { getState, useAleph } from '@/data/store'
 import { toDayKey } from '@/domain/dates'
 import { isTaskDone } from '@/domain/economy'
 import { TERRENO_MAP } from '@/domain/terrenos'
+import { resolveTaskViewTemplate } from '@/domain/taskView'
 import type {
   ContactCategory,
+  TaskViewTemplate,
   ThoughtMap,
 } from '@/domain/types'
 
@@ -57,21 +59,16 @@ interface TacticalTaskModalProps {
   onClose: () => void
 }
 
-type TacticalTab =
-  | 'checklist'
-  | 'time'
-  | 'metrics'
-  | 'money'
-  | 'contacts'
-  | 'workDone'
-  | 'mindmap'
-
 export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
+  const { t } = useTranslation()
   const state = useAleph()
   const feedback = useFeedback()
   const focusSession = useFocusSession()
-
-  const [activeTab, setActiveTab] = useState<TacticalTab>('checklist')
+  const [pickerOpen, setPickerOpen] = useState(() => {
+    if (!taskId) return false
+    const current = getState().tasks.find((item) => item.id === taskId)
+    return current ? resolveTaskViewTemplate(current) === null : true
+  })
 
   // New item draft states
   const [newCheckText, setNewCheckText] = useState('')
@@ -108,6 +105,9 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
     if (!taskId) return null
     return state.tasks.find((t) => t.id === taskId) ?? null
   }, [state.tasks, taskId])
+
+  const resolvedTemplate = task ? resolveTaskViewTemplate(task) : null
+  const activeTemplate: TaskViewTemplate = resolvedTemplate ?? 'checklist'
 
   if (!task) return null
 
@@ -385,104 +385,34 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           )
         })()}
 
-        {/* Tactical Navigation Tabs */}
-        <div className="flex items-center gap-1 px-4 py-2 border-b border-line bg-subtle/50 overflow-x-auto shrink-0 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setActiveTab('checklist')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all shrink-0 ${
-              activeTab === 'checklist'
-                ? 'bg-white shadow-xs text-purple-700 border border-purple-200/80'
-                : 'text-ink-3 hover:text-ink hover:bg-white/50'
-            }`}
-          >
-            <CheckCircle2 className="size-3.5" />
-            <span>Checklist ({checklist.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('time')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all shrink-0 ${
-              activeTab === 'time'
-                ? 'bg-white shadow-xs text-purple-700 border border-purple-200/80'
-                : 'text-ink-3 hover:text-ink hover:bg-white/50'
-            }`}
-          >
-            <Clock className="size-3.5" />
-            <span>Tiempo ({Math.round(actualHours * 60)}m)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('metrics')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all shrink-0 ${
-              activeTab === 'metrics'
-                ? 'bg-white shadow-xs text-purple-700 border border-purple-200/80'
-                : 'text-ink-3 hover:text-ink hover:bg-white/50'
-            }`}
-          >
-            <BarChart3 className="size-3.5" />
-            <span>Variables ({task.metrics?.length || 0})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('money')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all shrink-0 ${
-              activeTab === 'money'
-                ? 'bg-white shadow-xs text-purple-700 border border-purple-200/80'
-                : 'text-ink-3 hover:text-ink hover:bg-white/50'
-            }`}
-          >
-            <Coins className="size-3.5" />
-            <span>Dinero ({transactions.length})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('contacts')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all shrink-0 ${
-              activeTab === 'contacts'
-                ? 'bg-white shadow-xs text-purple-700 border border-purple-200/80'
-                : 'text-ink-3 hover:text-ink hover:bg-white/50'
-            }`}
-          >
-            <Users className="size-3.5" />
-            <span>Contactos ({task.contacts?.length || 0})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('workDone')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all shrink-0 ${
-              activeTab === 'workDone'
-                ? 'bg-white shadow-xs text-purple-700 border border-purple-200/80'
-                : 'text-ink-3 hover:text-ink hover:bg-white/50'
-            }`}
-          >
-            <FileCheck2 className="size-3.5" />
-            <span>Trabajo realizado ({task.workLogs?.length || 0})</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('mindmap')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-bold transition-all shrink-0 ${
-              activeTab === 'mindmap'
-                ? 'bg-white shadow-xs text-purple-700 border border-purple-200/80'
-                : 'text-ink-3 hover:text-ink hover:bg-white/50'
-            }`}
-          >
-            <BrainCircuit className="size-3.5" />
-            <span>Mapa de pensamiento</span>
-          </button>
+        {/* One template per task: dropdown opens the visor */}
+        <div className="flex items-center justify-between gap-3 border-b border-line bg-subtle/40 px-4 py-2.5 sm:px-5">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-ink-3">
+              {t('taskView.label')}
+            </p>
+            <p className="truncate text-[12px] text-ink-3">{t('taskView.onePerTask')}</p>
+          </div>
+          <TaskTemplateTrigger
+            template={resolvedTemplate}
+            open={pickerOpen}
+            onClick={() => setPickerOpen((open) => !open)}
+          />
         </div>
 
-        {/* Tab Content Container */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6">
-          {/* TAB 1: CHECKLIST */}
-          {activeTab === 'checklist' && (
+          {pickerOpen ? (
+            <TaskTemplatePicker
+              task={task}
+              selected={resolvedTemplate}
+              onSelect={(template) => {
+                updateTask(task.id, { viewTemplate: template })
+                setPickerOpen(false)
+              }}
+            />
+          ) : (
+            <>
+          {activeTemplate === 'checklist' && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -578,7 +508,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           )}
 
           {/* TAB 2: MEDIDA DE TIEMPO */}
-          {activeTab === 'time' && (
+          {activeTemplate === 'time' && (
             <div className="flex flex-col gap-5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-line">
                 <div>
@@ -663,7 +593,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           )}
 
           {/* TAB 3: VARIABLES & MÉTRICAS */}
-          {activeTab === 'metrics' && (
+          {activeTemplate === 'metrics' && (
             <div className="flex flex-col gap-4">
               <div>
                 <h3 className="text-[14px] font-bold text-ink">Registro de Variables y Métricas Producidas</h3>
@@ -761,7 +691,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           )}
 
           {/* TAB 4: DINERO / FINANZAS */}
-          {activeTab === 'money' && (
+          {activeTemplate === 'money' && (
             <div className="flex flex-col gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-slate-50 rounded-2xl border border-line">
                 <div>
@@ -895,7 +825,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           )}
 
           {/* TAB 5: CONTACTOS (CLIENTES, PROVEEDORES, PARTNERS) */}
-          {activeTab === 'contacts' && (
+          {activeTemplate === 'contacts' && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -1139,7 +1069,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           )}
 
           {/* TAB 6: TRABAJO REALIZADO & ENTREGABLES */}
-          {activeTab === 'workDone' && (
+          {activeTemplate === 'workDone' && (
             <div className="flex flex-col gap-4">
               <div>
                 <h3 className="text-[14px] font-bold text-ink">Bitácora de Trabajo Realizado & Entregables</h3>
@@ -1221,7 +1151,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           )}
 
           {/* TAB 7: MAPA DE PENSAMIENTOS (MIND MAP) */}
-          {activeTab === 'mindmap' && (
+          {activeTemplate === 'mindmap' && (
             <div className="flex flex-col gap-3">
               <div>
                 <h3 className="text-[14px] font-bold text-ink">Mapa de Pensamientos & Lluvia Táctica</h3>
@@ -1236,14 +1166,14 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
               />
             </div>
           )}
+            </>
+          )}
         </div>
 
         {/* Modal Bottom Actions */}
         <div className="flex items-center justify-between p-3.5 sm:p-4 bg-slate-50 border-t border-line shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-[12px] text-ink-3">
-              Modo táctico de la tarea
-            </span>
+            <span className="text-[12px] text-ink-3">{t('taskView.footer')}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -1252,7 +1182,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
               onClick={onClose}
               className="px-4 py-2 rounded-xl bg-[#111318] text-white text-[12.5px] font-bold hover:bg-black transition-all shadow-xs"
             >
-              Listo
+              {t('common.close')}
             </button>
           </div>
         </div>

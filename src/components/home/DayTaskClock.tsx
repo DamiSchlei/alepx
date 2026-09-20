@@ -29,6 +29,7 @@ import {
   type ClockPlacement,
 } from '@/domain/clockHours'
 import { isTaskDone } from '@/domain/economy'
+import { resolveTaskViewTemplate } from '@/domain/taskView'
 import { TERRENO_MAP } from '@/domain/terrenos'
 import type { Task } from '@/domain/types'
 
@@ -304,6 +305,7 @@ export function DayTaskClock({
                 const isExecuting = focusSession.activeTaskId === task.id
                 const color = ctx.projectColor || ctx.color || 'var(--color-violet)'
                 const terrenoInfo = TERRENO_MAP[ctx.terreno ?? 'literatura']
+                const viewTemplate = resolveTaskViewTemplate(task)
                 const dedicatedText = task.actualHours
                   ? t('home.clock.minutesDedicated', { count: Math.round(task.actualHours * 60) })
                   : isExecuting
@@ -356,6 +358,11 @@ export function DayTaskClock({
                             style={{ backgroundColor: `${terrenoInfo.color}18`, color: terrenoInfo.color }}
                           >
                             {t(`terrenos.${ctx.terreno}`)}
+                          </span>
+                        ) : null}
+                        {viewTemplate ? (
+                          <span className="shrink-0 rounded-full bg-violet-soft px-1.5 py-px text-[10px] font-medium text-violet">
+                            {t(`taskView.templates.${viewTemplate}.name`)}
                           </span>
                         ) : null}
                         {dedicatedText ? (
@@ -497,7 +504,11 @@ export function DayTaskClock({
       </Sheet>
 
       {selectedTacticalTaskId ? (
-        <TacticalTaskModal taskId={selectedTacticalTaskId} onClose={() => setSelectedTacticalTaskId(null)} />
+        <TacticalTaskModal
+          key={selectedTacticalTaskId}
+          taskId={selectedTacticalTaskId}
+          onClose={() => setSelectedTacticalTaskId(null)}
+        />
       ) : null}
     </div>
   )

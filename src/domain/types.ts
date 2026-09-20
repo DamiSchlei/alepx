@@ -150,6 +150,15 @@ export interface TaskWorkDone {
 
 export type ContactCategory = 'client' | 'supplier' | 'partner'
 
+export type TaskViewTemplate =
+  | 'checklist'
+  | 'time'
+  | 'metrics'
+  | 'money'
+  | 'contacts'
+  | 'workDone'
+  | 'mindmap'
+
 export interface TaskContact {
   id: string
   name: string
@@ -219,6 +228,9 @@ export interface Task {
   workLogs?: TaskWorkDone[]
   contacts?: TaskContact[]
   thoughtMap?: ThoughtMap
+
+  /** How this task is worked and shown. One template per task. */
+  viewTemplate?: TaskViewTemplate
 }
 
 export interface Comment {

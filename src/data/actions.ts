@@ -30,6 +30,7 @@ import type {
   TaskContact,
   TaskMetric,
   TaskMoneyTransaction,
+  TaskViewTemplate,
   TaskWorkDone,
   Terreno,
   ThoughtMap,
@@ -422,6 +423,7 @@ export interface TaskInput {
   workLogs?: TaskWorkDone[]
   contacts?: TaskContact[]
   thoughtMap?: ThoughtMap
+  viewTemplate?: TaskViewTemplate
 }
 
 /**
@@ -466,6 +468,7 @@ export function createTask(input: TaskInput): Task {
     workLogs: input.workLogs,
     contacts: input.contacts,
     thoughtMap: input.thoughtMap,
+    viewTemplate: input.viewTemplate,
   }
   setState((s) => ({ ...s, tasks: [...s.tasks, task] }))
   return task

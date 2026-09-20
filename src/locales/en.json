@@ -658,6 +658,47 @@
     "delete": "Delete",
     "save": "Save changes"
   },
+  "taskView": {
+    "label": "Template",
+    "title": "How this task is worked",
+    "hint": "Pick one template for this task. You can change it later from the dropdown.",
+    "onePerTask": "One view per task.",
+    "choose": "Choose template",
+    "empty": "Empty",
+    "items": "{{count}} items",
+    "minutes": "{{count}} min",
+    "footer": "This task keeps one template.",
+    "templates": {
+      "checklist": {
+        "name": "Checklist",
+        "hint": "Concrete steps to finish."
+      },
+      "time": {
+        "name": "Time",
+        "hint": "Hours, focus, and time already spent."
+      },
+      "metrics": {
+        "name": "Variables",
+        "hint": "Numbers you want to move."
+      },
+      "money": {
+        "name": "Money",
+        "hint": "Income, spend, and balance."
+      },
+      "contacts": {
+        "name": "Contacts",
+        "hint": "People tied to this task."
+      },
+      "workDone": {
+        "name": "Work done",
+        "hint": "What landed, plus deliverables."
+      },
+      "mindmap": {
+        "name": "Map",
+        "hint": "Ideas and how they connect."
+      }
+    }
+  },
   "objectiveDetail": {
     "stageLabel": "Stage: {{stage}}",
     "progress": "Progress",

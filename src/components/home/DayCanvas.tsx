@@ -830,6 +830,7 @@ export function DayCanvas({
       {/* Tactical Task Modal */}
       {selectedTacticalTaskId && (
         <TacticalTaskModal
+          key={selectedTacticalTaskId}
           taskId={selectedTacticalTaskId}
           onClose={() => setSelectedTacticalTaskId(null)}
         />
