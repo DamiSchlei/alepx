@@ -178,6 +178,8 @@
     "title": "Inicio",
     "todayJump": "Hoy",
     "workload": "{{planned}} / {{cap}} h",
+    "freeForWork": "{{n}} h libres para la obra",
+    "capFull": "Capacidad completa",
     "overCap": "Son {{planned}} h para un día de {{cap}}.",
     "composerCta": "Anotar",
     "hoursDown": "Bajar horas",

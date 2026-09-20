@@ -142,6 +142,11 @@ export function formatWeekHeading(anchorKey: string, locale: 'en' | 'es'): strin
   return locale === 'en' ? `Week ${n} · ${range}` : `Semana ${n} · ${range}`
 }
 
+/** Monday of the ISO week `weeks` away from `dayKey`. */
+export function shiftIsoWeek(dayKey: string, weeks: number): string {
+  return toDayKey(startOfWeek(addDays(dayKey, weeks * 7)))
+}
+
 /**
  * Matching weekdays from today through the horizon, never past dates.
  * Caps at `cap` (20 for series). ISO weekdays: 1=Mon … 7=Sun.
