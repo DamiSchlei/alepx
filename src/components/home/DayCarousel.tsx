@@ -1,6 +1,7 @@
-import { useRef, useEffect, useMemo } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DayTaskClock } from './DayTaskClock'
+import { cx } from '@/components/ui/primitives'
 import { tasksForDay } from '@/data/selectors'
 import { useAleph } from '@/data/store'
 import { addDays, parseLocal, toDayKey } from '@/domain/dates'
@@ -14,7 +15,12 @@ interface DayCarouselProps {
   onQuickAdd: (dayKey: string) => void
 }
 
-const BUFFER_DAYS = 21 // 21 days backward, 21 days forward
+const BUFFER_DAYS = 21
+
+function dayDistance(a: string, b: string): number {
+  const ms = parseLocal(a).getTime() - parseLocal(b).getTime()
+  return Math.round(ms / 86_400_000)
+}
 
 export function DayCarousel({
   activeDay,
@@ -24,9 +30,11 @@ export function DayCarousel({
   onOpenCanvas,
   onQuickAdd,
 }: DayCarouselProps) {
+  const { t } = useTranslation()
   const state = useAleph()
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const programmatic = useRef(false)
 
-  // Generate buffer of days around todayKey
   const days = useMemo(() => {
     const list: string[] = []
     for (let i = -BUFFER_DAYS; i <= BUFFER_DAYS; i++) {
@@ -35,107 +43,105 @@ export function DayCarousel({
     return list
   }, [todayKey])
 
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    const el = container.querySelector<HTMLElement>(`[data-day="${activeDay}"]`)
+    if (!el) return
+    programmatic.current = true
+    const left = el.offsetLeft - (container.clientWidth - el.offsetWidth) / 2
+    container.scrollTo({ left: Math.max(0, left), behavior: 'auto' })
+    const release = window.setTimeout(() => {
+      programmatic.current = false
+    }, 80)
+    return () => window.clearTimeout(release)
+  }, [activeDay])
 
-  // Scroll active day into view smoothly
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
-    const el = container.querySelector(`[data-day="${activeDay}"]`)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
-    }
-  }, [activeDay])
 
-  const shiftDay = (direction: -1 | 1) => {
-    const next = toDayKey(addDays(activeDay, direction))
-    onSelectDay(next)
-  }
+    const syncFromScroll = () => {
+      if (programmatic.current) return
+      const center = container.scrollLeft + container.clientWidth / 2
+      let closest = activeDay
+      let closestDist = Number.POSITIVE_INFINITY
+      for (const node of container.querySelectorAll<HTMLElement>('[data-day]')) {
+        const mid = node.offsetLeft + node.offsetWidth / 2
+        const dist = Math.abs(mid - center)
+        if (dist < closestDist) {
+          closestDist = dist
+          closest = node.dataset.day ?? closest
+        }
+      }
+      if (closest && closest !== activeDay) onSelectDay(closest)
+    }
+
+    container.addEventListener('scrollend', syncFromScroll)
+    container.addEventListener('scroll', syncFromScroll, { passive: true })
+    return () => {
+      container.removeEventListener('scrollend', syncFromScroll)
+      container.removeEventListener('scroll', syncFromScroll)
+    }
+  }, [activeDay, onSelectDay])
 
   return (
-    <div className="relative flex flex-col py-1">
-      {/* Track with side chevrons */}
-      <div className="relative w-full">
-        {/* Subtle side navigation chevrons */}
-        <button
-          type="button"
-          onClick={() => shiftDay(-1)}
-          aria-label="Día anterior"
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 flex size-8 items-center justify-center rounded-full bg-white/95 shadow-sm border border-line text-ink-2 hover:text-ink active:scale-90 transition-all sm:left-2"
-        >
-          <ChevronLeft className="size-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => shiftDay(1)}
-          aria-label="Día siguiente"
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 flex size-8 items-center justify-center rounded-full bg-white/95 shadow-sm border border-line text-ink-2 hover:text-ink active:scale-90 transition-all sm:right-2"
-        >
-          <ChevronRight className="size-4" />
-        </button>
-
-        {/* Infinite Horizontal Card Track */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto px-6 py-2 scrollbar-none snap-x snap-mandatory"
-          style={{ scrollSnapType: 'x mandatory' }}
-        >
+    <div className="relative flex flex-col pt-3">
+      <div
+        ref={scrollContainerRef}
+        className="no-scrollbar flex snap-x snap-mandatory items-start gap-3 overflow-x-auto px-[6%] py-1"
+      >
         {days.map((day) => {
-          const isSelected = day === activeDay
+          const selected = day === activeDay
           const isToday = day === todayKey
-          const dayTasks = tasksForDay(state, day)
+          const nearby = Math.abs(dayDistance(day, activeDay)) <= 1
+          const dayTasks = nearby ? tasksForDay(state, day) : []
           const dateObj = parseLocal(day)
           const weekday = new Intl.DateTimeFormat(localeTag, { weekday: 'short' }).format(dateObj)
           const dayNum = dateObj.getDate()
 
           return (
-            <div
+            <article
               key={day}
               data-day={day}
               onClick={() => onSelectDay(day)}
-              className={`shrink-0 w-[84vw] max-w-[340px] rounded-[24px] border-2 bg-white p-5 snap-center transition-all cursor-pointer flex flex-col justify-between select-none ${
-                isSelected
-                  ? 'border-[#7a3fe0] shadow-lg ring-4 ring-[#7a3fe0]/10 scale-[1.01]'
-                  : 'border-line hover:border-line-strong shadow-xs opacity-85 hover:opacity-100'
-              }`}
+              className={cx(
+                'w-[92%] max-w-[400px] shrink-0 snap-center rounded-[28px] border bg-surface p-5 transition-all',
+                selected
+                  ? 'relative z-10 border-violet shadow-[var(--shadow-day)] ring-4 ring-violet/10'
+                  : 'z-0 border-line opacity-70 shadow-paper',
+              )}
             >
-              {/* Card Header */}
-              <div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[20px] font-bold text-ink capitalize">
-                      {weekday} {dayNum}
-                    </span>
-                    {isToday && (
-                      <span className="rounded-full bg-[#f5f0ff] px-2 py-0.5 text-[11px] font-bold text-[#7a3fe0]">
-                        Hoy
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
+              <header className="mb-3 flex items-baseline gap-2">
+                <h3 className="text-[20px] font-semibold capitalize tracking-tight text-ink">
+                  {weekday} {dayNum}
+                </h3>
+                {isToday ? (
+                  <span className="rounded-full bg-violet-soft px-2 py-0.5 text-[11px] font-semibold text-violet">
+                    {t('common.today')}
+                  </span>
+                ) : null}
+              </header>
 
-              {/* Reloj y Gestor de Tareas */}
-              <div className="mt-1 flex-1 flex flex-col justify-center">
-                <DayTaskClock
-                  tasks={dayTasks}
-                  activeDay={day}
-                  todayKey={todayKey}
-                  localeTag={localeTag}
-                  onOpenCanvas={() => onOpenCanvas(day)}
-                  onQuickAdd={() => onQuickAdd(day)}
-                />
-              </div>
-            </div>
+              {nearby ? (
+                <div className={selected ? undefined : 'pointer-events-none'}>
+                  <DayTaskClock
+                    tasks={dayTasks}
+                    activeDay={day}
+                    todayKey={todayKey}
+                    localeTag={localeTag}
+                    compact={!selected}
+                    onOpenCanvas={selected ? () => onOpenCanvas(day) : undefined}
+                    onQuickAdd={selected ? () => onQuickAdd(day) : undefined}
+                  />
+                </div>
+              ) : (
+                <div className="h-[236px]" />
+              )}
+            </article>
           )
         })}
-        </div>
       </div>
-
-      {/* Helper caption */}
-      <p className="text-center text-[12px] text-ink-3">
-        Deslizá horizontalmente para recorrer el tiempo · Abrí un día para ver su lienzo
-      </p>
     </div>
   )
 }

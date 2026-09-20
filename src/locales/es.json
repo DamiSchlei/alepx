@@ -108,6 +108,11 @@
     "health": "Salud",
     "work": "Trabajo"
   },
+  "terrenos": {
+    "literatura": "Literatura",
+    "arte": "Arte",
+    "empresa": "Empresa"
+  },
   "home": {
     "hint": "Completá tareas para ganar XP y dinero.",
     "proposePlaceholder": "Anotá un paso…",
@@ -204,7 +209,49 @@
     "viewerTitleToday": "Tareas · hoy",
     "viewerEmpty": "No hay tareas en este día.",
     "viewerSeeAll": "Ver las {{n}}",
-    "addTask": "Agregar tarea"
+    "addTask": "Agregar tarea",
+    "progressWeek": "Avance de la semana",
+    "progressMonth": "Avance del mes",
+    "tasksCompleted": "{{done}} de {{total}} tareas hechas",
+    "projectsAdvancing": "Proyectos en movimiento",
+    "emptyWeek": "No hay tareas programadas para esta semana.",
+    "moreCount": "+{{count}} más",
+    "monthStatsLine": "{{closed}} cerradas · {{onTime}} a tiempo · {{hours}} h",
+    "clock": {
+      "am": "AM",
+      "pm": "PM",
+      "amHours": "12h AM",
+      "pmHours": "12h PM",
+      "activeHours": "{{count}}h activo",
+      "inactiveHours": "{{count}}h inactivo",
+      "available": "Libre",
+      "inactive": "Inactivo",
+      "inProgress": "{{title}} · en curso",
+      "hourRange": "{{start}}:00–{{end}}:00",
+      "newTaskPlaceholder": "Nueva tarea para este día…",
+      "addTask": "+ Tarea",
+      "fromPlanning": "Traer de Planificación",
+      "fromPlanningTitle": "Traer tareas de Planificación",
+      "fromPlanningHint": "Sumá tareas pendientes a la agenda de este día.",
+      "searchBacklog": "Buscar en proyectos y backlog…",
+      "backlogEmpty": "No hay más tareas pendientes para agendar.",
+      "addToDay": "Sumar al día",
+      "scheduled": "Agendada: {{date}}",
+      "unscheduled": "Sin agendar",
+      "openPlanning": "Abrir Planificación",
+      "planDay": "Planificar el día",
+      "emptyTasks": "Este día está abierto. Anotá una tarea y arrancá.",
+      "loose": "Suelto",
+      "execute": "Ejecutar",
+      "executing": "En curso",
+      "done": "Lista",
+      "reopen": "Reabrir tarea",
+      "complete": "Completar tarea",
+      "openTactical": "Abrir táctica",
+      "taskCount": "{{count}} tareas",
+      "minutesDedicated": "{{count}} min",
+      "elapsed": "{{time}} en curso"
+    }
   },
   "planning": {
     "title": "Planificación",
@@ -411,7 +458,15 @@
     "skillStreak": "En racha",
     "thisWeek": "Esta semana",
     "resultOverall": "Avance total",
-    "hoy": "Hoy"
+    "hoy": "Hoy",
+    "craftLog": "Registro de obra",
+    "weekMovedOne": "Esta semana moviste {{name}}.",
+    "weekMovedTwo": "Esta semana moviste {{a}} y {{b}}.",
+    "weekMovedMany": "Esta semana moviste {{list}} y {{last}}.",
+    "rhythmTitle": "Ritmo de marcas",
+    "markDayCta": "Ir a marcar el día",
+    "prevWeek": "Semana anterior",
+    "nextWeek": "Semana siguiente"
   },
   "journal": {
     "title": "Bitácora",
@@ -602,6 +657,47 @@
     "blockedPlaceholder": "Anotá el obstáculo…",
     "delete": "Eliminar",
     "save": "Guardar cambios"
+  },
+  "taskView": {
+    "label": "Plantilla",
+    "title": "Cómo se trabaja esta tarea",
+    "hint": "Elegí una plantilla para esta tarea. Después la podés cambiar desde el desplegable.",
+    "onePerTask": "Una vista por tarea.",
+    "choose": "Elegir plantilla",
+    "empty": "Vacía",
+    "items": "{{count}} ítems",
+    "minutes": "{{count}} min",
+    "footer": "Esta tarea queda con una plantilla.",
+    "templates": {
+      "checklist": {
+        "name": "Lista",
+        "hint": "Pasos concretos para terminar."
+      },
+      "time": {
+        "name": "Tiempo",
+        "hint": "Horas, foco y lo que ya dedicaste."
+      },
+      "metrics": {
+        "name": "Variables",
+        "hint": "Números que querés mover."
+      },
+      "money": {
+        "name": "Dinero",
+        "hint": "Ingresos, gastos y saldo."
+      },
+      "contacts": {
+        "name": "Contactos",
+        "hint": "Gente de esta tarea."
+      },
+      "workDone": {
+        "name": "Trabajo hecho",
+        "hint": "Lo que quedó hecho y los entregables."
+      },
+      "mindmap": {
+        "name": "Mapa",
+        "hint": "Ideas y cómo se conectan."
+      }
+    }
   },
   "objectiveDetail": {
     "stageLabel": "Etapa: {{stage}}",

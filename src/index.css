@@ -1,17 +1,17 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Aleph Paper — surfaces */
-  --color-bg: #ffffff;
-  --color-subtle: #f6f7f9;
+  /* Aleph Paper — page is quiet gray so white day cards lift */
+  --color-bg: #f4f5f8;
+  --color-subtle: #eceef3;
   --color-surface: #ffffff;
-  --color-surface-2: #f6f7f9;
+  --color-surface-2: #f7f8fb;
   --color-raised: #ffffff;
 
   /* Legacy surface ladder remapped to paper (bg-ink-* call sites) */
   --color-ink-950: #ffffff;
   --color-ink-900: #ffffff;
-  --color-ink-800: #f6f7f9;
+  --color-ink-800: #f4f5f8;
   --color-ink-700: #e6e8ee;
   --color-ink-600: #d0d4dc;
 
@@ -53,6 +53,14 @@
 
   --color-backdrop: rgb(17 17 19 / 0.36);
   --shadow-paper: 0 8px 24px rgb(17 17 19 / 0.06);
+  --shadow-day: 0 18px 40px rgb(17 17 19 / 0.08);
+
+  --color-clock-face: #ffffff;
+  --color-clock-ring: #e6e8ee;
+  --color-clock-tick: #d0d4dc;
+  --color-clock-hand: #111113;
+  --color-clock-inactive: #9aa0ae;
+  --color-clock-free: #eceef3;
 
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-display: 'Fraunces', 'Newsreader', ui-serif, Georgia, serif;

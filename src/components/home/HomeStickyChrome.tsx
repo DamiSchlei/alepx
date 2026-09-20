@@ -92,27 +92,27 @@ export function HomeStickyChrome({
   return (
     <div
       ref={ref}
-      className="isolate sticky z-20 -mx-4 border-b border-line bg-bg px-4 pt-1 pb-3"
-      style={{ top: 'env(safe-area-inset-top, 0px)', backgroundColor: 'var(--color-bg)' }}
+      className="isolate sticky z-20 -mx-4 border-b border-line/80 bg-bg/90 px-4 pt-1 pb-3 backdrop-blur-md"
+      style={{ top: 'env(safe-area-inset-top, 0px)' }}
     >
       <div className="flex items-start gap-2">
         <button
           type="button"
           aria-label={t('home.prevPeriod')}
           onClick={onPrev}
-          className="flex size-11 shrink-0 items-center justify-center rounded-2xl text-[18px] text-ink-2 hover:bg-subtle"
+          className="flex size-11 shrink-0 items-center justify-center rounded-2xl text-[22px] text-ink-2 hover:bg-subtle"
         >
           ‹
         </button>
-        <div className="min-w-0 flex-1 pt-1">
-          <h2 className="truncate text-[18px] font-semibold capitalize text-ink">{line1}</h2>
-          {line2 ? <p className="mt-0.5 truncate text-[12px] text-text-3">{line2}</p> : null}
+        <div className="min-w-0 flex-1 pt-1 text-center">
+          <h2 className="truncate text-[20px] font-semibold capitalize tracking-tight text-ink">{line1}</h2>
+          {line2 ? <p className="mt-0.5 truncate text-[12px] text-ink-3">{line2}</p> : null}
         </div>
         <button
           type="button"
           aria-label={t('home.nextPeriod')}
           onClick={onNext}
-          className="flex size-11 shrink-0 items-center justify-center rounded-2xl text-[18px] text-ink-2 hover:bg-subtle"
+          className="flex size-11 shrink-0 items-center justify-center rounded-2xl text-[22px] text-ink-2 hover:bg-subtle"
         >
           ›
         </button>
@@ -123,20 +123,20 @@ export function HomeStickyChrome({
           <button
             type="button"
             onClick={onHoy}
-            className="min-h-11 shrink-0 rounded-full px-3 text-[14px] font-medium text-accent"
+            className="min-h-11 shrink-0 rounded-full px-3 text-[14px] font-semibold text-violet"
           >
             {t('home.todayJump')}
           </button>
         ) : null}
-        <div className="flex min-w-0 flex-1 rounded-2xl border border-line-strong bg-subtle p-0.5">
+        <div className="flex min-w-0 flex-1 rounded-2xl border border-line bg-subtle p-0.5">
           {modes.map((mode) => (
             <button
               key={mode}
               type="button"
               onClick={() => onGranularity(mode)}
               className={cx(
-                'min-h-11 min-w-0 flex-1 rounded-xl px-2 text-[14px] font-medium',
-                granularity === mode ? 'bg-bg text-ink shadow-sm' : 'text-ink-3',
+                'min-h-11 min-w-0 flex-1 rounded-xl px-2 text-[14px] font-medium transition-colors',
+                granularity === mode ? 'bg-surface text-ink shadow-sm' : 'text-ink-3 hover:text-ink',
               )}
             >
               {mode === 'day'

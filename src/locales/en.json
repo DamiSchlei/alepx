@@ -108,6 +108,11 @@
     "health": "Health",
     "work": "Work"
   },
+  "terrenos": {
+    "literatura": "Literature",
+    "arte": "Art",
+    "empresa": "Enterprise"
+  },
   "home": {
     "hint": "Complete tasks to earn XP and money.",
     "proposePlaceholder": "Jot down a step…",
@@ -204,7 +209,49 @@
     "viewerTitleToday": "Tasks · today",
     "viewerEmpty": "No tasks on this day.",
     "viewerSeeAll": "See all {{n}}",
-    "addTask": "Add task"
+    "addTask": "Add task",
+    "progressWeek": "Week progress",
+    "progressMonth": "Month progress",
+    "tasksCompleted": "{{done}} of {{total}} tasks done",
+    "projectsAdvancing": "Projects moving",
+    "emptyWeek": "No tasks scheduled this week.",
+    "moreCount": "+{{count}} more",
+    "monthStatsLine": "{{closed}} closed · {{onTime}} on time · {{hours}} h",
+    "clock": {
+      "am": "AM",
+      "pm": "PM",
+      "amHours": "12h AM",
+      "pmHours": "12h PM",
+      "activeHours": "{{count}}h active",
+      "inactiveHours": "{{count}}h idle",
+      "available": "Open",
+      "inactive": "Idle",
+      "inProgress": "{{title}} · in progress",
+      "hourRange": "{{start}}:00–{{end}}:00",
+      "newTaskPlaceholder": "New task for this day…",
+      "addTask": "Add",
+      "fromPlanning": "Bring from Planning",
+      "fromPlanningTitle": "Bring tasks from Planning",
+      "fromPlanningHint": "Add pending tasks to this day's agenda.",
+      "searchBacklog": "Search projects and backlog…",
+      "backlogEmpty": "No more pending tasks to schedule.",
+      "addToDay": "Add to day",
+      "scheduled": "Scheduled: {{date}}",
+      "unscheduled": "Unscheduled",
+      "openPlanning": "Open Planning",
+      "planDay": "Plan the day",
+      "emptyTasks": "Nothing on this day yet. Name a task and start.",
+      "loose": "Loose",
+      "execute": "Start",
+      "executing": "In progress",
+      "done": "Done",
+      "reopen": "Reopen task",
+      "complete": "Complete task",
+      "openTactical": "Open tactics",
+      "taskCount": "{{count}} tasks",
+      "minutesDedicated": "{{count}} min",
+      "elapsed": "{{time}} elapsed"
+    }
   },
   "planning": {
     "title": "Planning",
@@ -411,7 +458,15 @@
     "skillStreak": "On a streak",
     "thisWeek": "This week",
     "resultOverall": "Overall progress",
-    "hoy": "Today"
+    "hoy": "Today",
+    "craftLog": "Work log",
+    "weekMovedOne": "This week you moved {{name}}.",
+    "weekMovedTwo": "This week you moved {{a}} and {{b}}.",
+    "weekMovedMany": "This week you moved {{list}} and {{last}}.",
+    "rhythmTitle": "Mark rhythm",
+    "markDayCta": "Go mark the day",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week"
   },
   "journal": {
     "title": "Journal",
@@ -602,6 +657,47 @@
     "blockedPlaceholder": "Note the obstacle…",
     "delete": "Delete",
     "save": "Save changes"
+  },
+  "taskView": {
+    "label": "Template",
+    "title": "How this task is worked",
+    "hint": "Pick one template for this task. You can change it later from the dropdown.",
+    "onePerTask": "One view per task.",
+    "choose": "Choose template",
+    "empty": "Empty",
+    "items": "{{count}} items",
+    "minutes": "{{count}} min",
+    "footer": "This task keeps one template.",
+    "templates": {
+      "checklist": {
+        "name": "Checklist",
+        "hint": "Concrete steps to finish."
+      },
+      "time": {
+        "name": "Time",
+        "hint": "Hours, focus, and time already spent."
+      },
+      "metrics": {
+        "name": "Variables",
+        "hint": "Numbers you want to move."
+      },
+      "money": {
+        "name": "Money",
+        "hint": "Income, spend, and balance."
+      },
+      "contacts": {
+        "name": "Contacts",
+        "hint": "People tied to this task."
+      },
+      "workDone": {
+        "name": "Work done",
+        "hint": "What landed, plus deliverables."
+      },
+      "mindmap": {
+        "name": "Map",
+        "hint": "Ideas and how they connect."
+      }
+    }
   },
   "objectiveDetail": {
     "stageLabel": "Stage: {{stage}}",

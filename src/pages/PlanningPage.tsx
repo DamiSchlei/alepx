@@ -356,6 +356,7 @@ export function PlanningPage() {
       {/* TACTICAL TASK MODAL FOR HIERARCHY VIEWS */}
       {selectedTacticalTaskId && (
         <TacticalTaskModal
+          key={selectedTacticalTaskId}
           taskId={selectedTacticalTaskId}
           onClose={() => setSelectedTacticalTaskId(null)}
         />
@@ -796,6 +797,7 @@ function TasksTab() {
       />
       {selectedTacticalTaskId && (
         <TacticalTaskModal
+          key={selectedTacticalTaskId}
           taskId={selectedTacticalTaskId}
           onClose={() => setSelectedTacticalTaskId(null)}
         />
