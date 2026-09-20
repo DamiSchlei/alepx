@@ -2,15 +2,9 @@ import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { DayCanvas } from '@/components/home/DayCanvas'
 import { DayCarousel } from '@/components/home/DayCarousel'
-import { HomeStickyChrome, type HomeGranularity } from '@/components/home/HomeStickyChrome'
-import { PeriodGrid } from '@/components/home/PeriodGrid'
-import { weekStartKeyOf } from '@/data/dayLoad'
+import { HomeStickyChrome } from '@/components/home/HomeStickyChrome'
 import { useAleph } from '@/data/store'
-import { addDays, addMonths, startOfMonth, toDayKey } from '@/domain/dates'
-
-function sameMonth(a: string, b: string): boolean {
-  return toDayKey(startOfMonth(a)) === toDayKey(startOfMonth(b))
-}
+import { shiftIsoWeek, toDayKey } from '@/domain/dates'
 
 export function HomePage() {
   const { i18n } = useTranslation()
@@ -19,81 +13,34 @@ export function HomePage() {
   const localeTag = i18n.language?.startsWith('en') ? 'en-US' : 'es-AR'
   const locale = character.locale
 
-  const [granularity, setGranularity] = useState<HomeGranularity>('day')
   const [activeDay, setActiveDay] = useState(todayKey)
   const [canvasOpenDay, setCanvasOpenDay] = useState<string | null>(null)
-
-  const showHoy =
-    granularity === 'day'
-      ? activeDay !== todayKey
-      : granularity === 'week'
-        ? weekStartKeyOf(activeDay) !== weekStartKeyOf(todayKey)
-        : !sameMonth(activeDay, todayKey)
 
   const jumpTo = useCallback((dayKey: string) => {
     setActiveDay(dayKey)
   }, [])
-
-  const setMode = (mode: HomeGranularity) => {
-    setGranularity(mode)
-  }
-
-  const shiftPeriod = (direction: -1 | 1) => {
-    let next = activeDay
-    if (granularity === 'day') next = toDayKey(addDays(activeDay, direction))
-    else if (granularity === 'week') next = toDayKey(addDays(activeDay, direction * 7))
-    else next = toDayKey(addMonths(activeDay, direction))
-    jumpTo(next)
-  }
 
   return (
     <div className="flex flex-col pb-8">
       <HomeStickyChrome
         activeDay={activeDay}
         todayKey={todayKey}
-        granularity={granularity}
         locale={locale}
         localeTag={localeTag}
-        showHoy={showHoy}
-        onGranularity={setMode}
-        onHoy={() => {
-          setGranularity('day')
-          jumpTo(todayKey)
-        }}
-        onPrev={() => shiftPeriod(-1)}
-        onNext={() => shiftPeriod(1)}
-        onSelectDay={(dayKey) => {
-          setGranularity('day')
-          jumpTo(dayKey)
-        }}
+        showHoy={activeDay !== todayKey}
+        onHoy={() => jumpTo(todayKey)}
+        onPrev={() => jumpTo(shiftIsoWeek(activeDay, -1))}
+        onNext={() => jumpTo(shiftIsoWeek(activeDay, 1))}
+        onSelectDay={jumpTo}
       />
 
-      {granularity === 'day' ? (
-        <div className="flex flex-col">
-          {/* Carrusel Infinito de Días */}
-          <DayCarousel
-            activeDay={activeDay}
-            todayKey={todayKey}
-            localeTag={localeTag}
-            onSelectDay={jumpTo}
-            onOpenCanvas={(dayKey) => setCanvasOpenDay(dayKey)}
-            onQuickAdd={(dayKey) => setCanvasOpenDay(dayKey)}
-          />
-        </div>
-      ) : (
-        <PeriodGrid
-          mode={granularity}
-          anchorDay={activeDay}
-          todayKey={todayKey}
-          localeTag={localeTag}
-          onOpenDay={(dayKey) => {
-            setGranularity('day')
-            jumpTo(dayKey)
-          }}
-        />
-      )}
+      <DayCarousel
+        activeDay={activeDay}
+        todayKey={todayKey}
+        localeTag={localeTag}
+        onOpenCanvas={(dayKey) => setCanvasOpenDay(dayKey)}
+      />
 
-      {/* Lienzo Amplio del Día (Pantalla completa con Células / Semillas) */}
       {canvasOpenDay && (
         <DayCanvas
           dayKey={canvasOpenDay}

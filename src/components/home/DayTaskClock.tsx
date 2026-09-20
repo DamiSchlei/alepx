@@ -1,33 +1,25 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import {
-  ArrowRight,
   BellOff,
   Check,
-  FolderSync,
   LayoutGrid,
   Play,
   Plus,
-  Search,
   SlidersHorizontal,
   Sun,
   Moon,
 } from 'lucide-react'
 import { AnalogClock, type AnalogClockSlot } from '@/components/home/AnalogClock'
 import { TacticalTaskModal } from '@/components/task/TacticalTaskModal'
-import { Button, cx } from '@/components/ui/primitives'
-import { Sheet } from '@/components/ui/Sheet'
+import { cx } from '@/components/ui/primitives'
 import { useFeedback } from '@/app/FeedbackProvider'
-import { captureLooseTask, completeTask, reopenTask, updateTask } from '@/data/actions'
+import { captureLooseTask, completeTask, reopenTask } from '@/data/actions'
+import { freeHoursForDay, plannedHoursForDay } from '@/data/dayLoad'
 import { startExecution, useFocusSession } from '@/data/focusSession'
 import { blockContext } from '@/data/selectors'
 import { useAleph } from '@/data/store'
-import {
-  classifyClockHour,
-  countActiveInactiveHours,
-  type ClockPlacement,
-} from '@/domain/clockHours'
+import { classifyClockHour, type ClockPlacement } from '@/domain/clockHours'
 import { isTaskDone } from '@/domain/economy'
 import { resolveTaskViewTemplate } from '@/domain/taskView'
 import { TERRENO_MAP } from '@/domain/terrenos'
@@ -80,6 +72,7 @@ export function DayTaskClock({
   tasks,
   activeDay,
   todayKey,
+  localeTag,
   compact = false,
   onOpenCanvas,
 }: DayTaskClockProps) {
@@ -87,7 +80,6 @@ export function DayTaskClock({
   const state = useAleph()
   const feedback = useFeedback()
   const focusSession = useFocusSession()
-  const navigate = useNavigate()
 
   const [now, setNow] = useState(() => new Date())
   const isToday = activeDay === todayKey
@@ -97,8 +89,6 @@ export function DayTaskClock({
   const [newTaskTitle, setNewTaskTitle] = useState('')
   const [hoveredHour, setHoveredHour] = useState<number | null>(null)
   const [selectedTacticalTaskId, setSelectedTacticalTaskId] = useState<string | null>(null)
-  const [showBacklogPicker, setShowBacklogPicker] = useState(false)
-  const [backlogSearch, setBacklogSearch] = useState('')
 
   useEffect(() => {
     if (!isToday) return
@@ -108,14 +98,9 @@ export function DayTaskClock({
 
   const currentDecimalHour = now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600
 
-  const backlogTasks = useMemo(() => {
-    const currentIds = new Set(tasks.map((task) => task.id))
-    return state.tasks.filter((task) => {
-      if (currentIds.has(task.id) || isTaskDone(task.status)) return false
-      if (!backlogSearch.trim()) return true
-      return task.title.toLowerCase().includes(backlogSearch.toLowerCase())
-    })
-  }, [state.tasks, tasks, backlogSearch])
+  const cap = state.character.dailyHourCap ?? 5
+  const plannedHours = plannedHoursForDay(state, activeDay)
+  const freeHours = freeHoursForDay(cap, plannedHours)
 
   const placements = useMemo<ClockPlacement[]>(() => {
     const next: ClockPlacement[] = []
@@ -159,11 +144,6 @@ export function DayTaskClock({
     })
   }, [period, placements, isPastDay, isToday, currentDecimalHour])
 
-  const hoursStats = useMemo(
-    () => countActiveInactiveHours(placements, isPastDay, isToday, currentDecimalHour),
-    [placements, isPastDay, isToday, currentDecimalHour],
-  )
-
   const analogSlots: AnalogClockSlot[] = hourlySlots.map((slot) => ({
     index: slot.index,
     actualHour: slot.actualHour,
@@ -177,6 +157,14 @@ export function DayTaskClock({
   const hourHandAngle = (currentHour12 / 12) * 360
   const minuteHandAngle = ((now.getMinutes() + now.getSeconds() / 60) / 60) * 360
   const hovered = hourlySlots.find((slot) => slot.actualHour === hoveredHour)
+  const showCivilClock = isToday && isPeriodCurrent
+  const civilTime = isToday
+    ? new Intl.DateTimeFormat(localeTag, {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      }).format(now)
+    : undefined
 
   const hoveredLabel = hovered
     ? hovered.executing
@@ -207,7 +195,7 @@ export function DayTaskClock({
 
   return (
     <div className="flex w-full min-w-0 flex-col items-center select-none">
-      <div className="mb-3 flex w-full flex-wrap items-center justify-between gap-2">
+      <div className="mb-3 flex w-full items-center justify-center">
         <div className="flex items-center rounded-full border border-line bg-subtle p-0.5">
           {(['AM', 'PM'] as const).map((value) => {
             const active = period === value
@@ -231,27 +219,18 @@ export function DayTaskClock({
             )
           })}
         </div>
-        <div className="flex items-center gap-1.5 text-[11px] font-semibold">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-mint/20 bg-mint-soft px-2.5 py-1 text-mint">
-            <span className="size-1.5 rounded-full bg-mint" />
-            {t('home.clock.activeHours', { count: hoursStats.activeHours })}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-subtle px-2.5 py-1 text-ink-3">
-            <span className="size-1.5 rounded-full bg-ink-4" />
-            {t('home.clock.inactiveHours', { count: hoursStats.inactiveHours })}
-          </span>
-        </div>
       </div>
 
       <div className="relative flex items-center justify-center">
         <AnalogClock
           slots={analogSlots}
-          showHands={isToday && isPeriodCurrent}
+          showHands={showCivilClock}
           hourAngle={hourHandAngle}
           minuteAngle={minuteHandAngle}
           period={period}
           hoveredHour={hoveredHour}
           onHoverHour={compact ? undefined : setHoveredHour}
+          civilTime={civilTime}
         />
         {!compact && hoveredHour !== null && hoveredLabel ? (
           <div className="pointer-events-none absolute bottom-1 rounded-full bg-ink/90 px-2.5 py-1 text-[10px] font-semibold text-white shadow-paper">
@@ -259,6 +238,12 @@ export function DayTaskClock({
           </div>
         ) : null}
       </div>
+
+      <p className="mt-3 text-center text-[13px] font-medium text-ink-2">
+        {t('home.workload', { planned: plannedHours, cap })}
+        {' · '}
+        {freeHours > 0 ? t('home.freeForWork', { n: freeHours }) : t('home.capFull')}
+      </p>
 
       {compact ? (
         <p className="mt-3 text-[13px] font-medium text-ink-3">
@@ -277,20 +262,10 @@ export function DayTaskClock({
             <button
               type="submit"
               disabled={!newTaskTitle.trim()}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-2xl bg-ink text-white transition-colors hover:bg-ink-2 disabled:pointer-events-none disabled:opacity-40"
-              title={t('home.clock.addTask')}
-              aria-label={t('home.clock.addTask')}
+              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-2xl bg-ink px-3 text-[13px] font-semibold text-white transition-colors hover:bg-ink-2 disabled:pointer-events-none disabled:opacity-40"
             >
               <Plus className="size-4 stroke-[2.5]" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowBacklogPicker(true)}
-              className="inline-flex size-11 shrink-0 items-center justify-center rounded-2xl border border-violet/20 bg-violet-soft text-violet transition-colors hover:bg-violet/10"
-              title={t('home.clock.fromPlanning')}
-              aria-label={t('home.clock.fromPlanning')}
-            >
-              <FolderSync className="size-4" />
+              {t('home.clock.addTask')}
             </button>
           </form>
 
@@ -434,88 +409,6 @@ export function DayTaskClock({
           ) : null}
         </div>
       )}
-
-      <Sheet
-        open={showBacklogPicker}
-        onClose={() => setShowBacklogPicker(false)}
-        title={t('home.clock.fromPlanningTitle')}
-        footer={
-          <div className="flex items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setShowBacklogPicker(false)
-                navigate('/planning')
-              }}
-              className="inline-flex items-center gap-1 text-[13px] font-semibold text-violet"
-            >
-              {t('home.clock.openPlanning')}
-              <ArrowRight className="size-3.5" />
-            </button>
-            <Button variant="secondary" onClick={() => setShowBacklogPicker(false)}>
-              {t('common.close')}
-            </Button>
-          </div>
-        }
-      >
-        <p className="mb-3 text-[13px] text-ink-3">{t('home.clock.fromPlanningHint')}</p>
-        <div className="relative mb-3">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-4" />
-          <input
-            type="text"
-            value={backlogSearch}
-            onChange={(event) => setBacklogSearch(event.target.value)}
-            placeholder={t('home.clock.searchBacklog')}
-            className="min-h-11 w-full rounded-2xl border border-line bg-subtle pl-9 pr-3 text-[14px] text-ink outline-none placeholder:text-ink-4 focus:border-violet focus:bg-white"
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          {backlogTasks.length === 0 ? (
-            <p className="py-8 text-center text-[13px] text-ink-3">{t('home.clock.backlogEmpty')}</p>
-          ) : (
-            backlogTasks.map((task) => {
-              const ctx = blockContext(state, task)
-              const color = ctx.projectColor || 'var(--color-violet)'
-              return (
-                <div
-                  key={task.id}
-                  className="flex items-center justify-between gap-2 rounded-2xl border border-line bg-white p-3"
-                  style={{ borderLeftWidth: '3.5px', borderLeftColor: color }}
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] font-semibold text-ink">{task.title}</p>
-                    <p className="truncate text-[12px] text-ink-3">
-                      {ctx.objective
-                        ? `${t('common.objective')} · ${ctx.objective.name}`
-                        : ctx.result
-                          ? `${t('common.result')} · ${ctx.result.name}`
-                          : ctx.project?.name ?? t('home.clock.loose')}
-                      {' · '}
-                      {task.scheduledFor
-                        ? t('home.clock.scheduled', { date: task.scheduledFor })
-                        : t('home.clock.unscheduled')}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateTask(task.id, {
-                        scheduledFor: activeDay,
-                        dueAt: activeDay,
-                        stage: 'execution',
-                      })
-                    }}
-                    className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-mint px-2.5 py-1.5 text-[12px] font-semibold text-white"
-                  >
-                    <Plus className="size-3 stroke-[2.5]" />
-                    {t('home.clock.addToDay')}
-                  </button>
-                </div>
-              )
-            })
-          )}
-        </div>
-      </Sheet>
 
       {selectedTacticalTaskId ? (
         <TacticalTaskModal

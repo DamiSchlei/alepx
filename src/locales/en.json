@@ -178,6 +178,8 @@
     "title": "Home",
     "todayJump": "Today",
     "workload": "{{planned}} / {{cap}} h",
+    "freeForWork": "{{n}} h free for the work",
+    "capFull": "At capacity",
     "overCap": "That's {{planned}} h for a {{cap}} h day.",
     "composerCta": "Add",
     "hoursDown": "Decrease hours",

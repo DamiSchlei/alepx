@@ -20,6 +20,7 @@ export function AnalogClock({
   period,
   hoveredHour,
   onHoverHour,
+  civilTime,
   size = 236,
 }: {
   slots: AnalogClockSlot[]
@@ -29,6 +30,7 @@ export function AnalogClock({
   period: 'AM' | 'PM'
   hoveredHour: number | null
   onHoverHour?: (hour: number | null) => void
+  civilTime?: string
   size?: number
 }) {
   const center = size / 2
@@ -39,15 +41,17 @@ export function AnalogClock({
   const minuteHand = polarToCartesian(center, center, 64, minuteAngle)
   const numerals = [12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
   const pin = period === 'AM' ? 'var(--color-amber)' : 'var(--color-violet)'
+  const taskSlots = slots.filter((slot) => slot.stateType === 'active')
 
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      className="overflow-visible"
-      aria-hidden
-    >
+    <div className="relative inline-flex items-center justify-center">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="overflow-visible"
+        aria-hidden
+      >
       <circle
         cx={center}
         cy={center}
@@ -75,7 +79,18 @@ export function AnalogClock({
         )
       })}
 
-      {slots.map((slot) => {
+      <circle
+        cx={center}
+        cy={center}
+        r={contourRadius}
+        fill="none"
+        stroke="var(--color-clock-ring)"
+        strokeWidth={contourStroke}
+        strokeDasharray="3.5 5.5"
+        opacity="0.85"
+      />
+
+      {taskSlots.map((slot) => {
         const startAngle = slot.index * 30
         const endAngle = (slot.index + 1) * 30
         const hovered = hoveredHour === slot.actualHour
@@ -147,7 +162,13 @@ export function AnalogClock({
           <circle cx={center} cy={center} r={1.4} fill="var(--color-clock-face)" />
         </g>
       )}
-    </svg>
+      </svg>
+      {civilTime ? (
+        <span className="pointer-events-none absolute left-1/2 top-[58%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-clock-face)]/90 px-2 py-0.5 text-[11px] font-semibold tabular-nums tracking-tight text-ink">
+          {civilTime}
+        </span>
+      ) : null}
+    </div>
   )
 }
 

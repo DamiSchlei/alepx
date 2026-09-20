@@ -6,6 +6,7 @@ import {
   monthDayKeys,
   startOfMonth,
   startOfWeek,
+  shiftIsoWeek,
   toDayKey,
   weekRangeLabel,
 } from './dates'
@@ -59,5 +60,13 @@ describe('week labels', () => {
     expect(formatWeekHeading('2026-09-17', 'es')).toMatch(/^Semana 38 · /)
     expect(formatWeekHeading('2026-09-17', 'en')).toMatch(/^Week 38 · /)
     expect(formatWeekHeading('2026-09-17', 'es')).toContain('2026')
+  })
+})
+
+describe('shiftIsoWeek', () => {
+  it('lands on Monday of the previous and next ISO week', () => {
+    // 2026-09-20 is Sunday of week 38
+    expect(shiftIsoWeek('2026-09-20', -1)).toBe('2026-09-07')
+    expect(shiftIsoWeek('2026-09-20', 1)).toBe('2026-09-21')
   })
 })
