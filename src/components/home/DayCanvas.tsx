@@ -11,8 +11,11 @@ import {
   Target,
   Maximize2,
   FolderGit2,
+  SlidersHorizontal,
 } from 'lucide-react'
 import { DayTaskViewer } from '@/components/home/DayTaskViewer'
+import { DayTacticalDashboard } from '@/components/home/DayTacticalDashboard'
+import { TacticalTaskModal } from '@/components/task/TacticalTaskModal'
 import { ResultFormSheet } from '@/components/planning/ResultForm'
 import {
   completeTask,
@@ -98,7 +101,8 @@ export function DayCanvas({
   const planned = plannedHoursForDay(state, dayKey)
   const free = freeHoursForDay(cap, planned)
 
-  const [viewMode, setViewMode] = useState<'canvas' | 'list'>('canvas')
+  const [viewMode, setViewMode] = useState<'canvas' | 'list' | 'tactical'>('canvas')
+  const [selectedTacticalTaskId, setSelectedTacticalTaskId] = useState<string | null>(null)
   const [zoomedResult, setZoomedResult] = useState<Result | null>(null)
   const [zoomedObjective, setZoomedObjective] = useState<Objective | null>(null)
   const [zoomedObjectiveResultName, setZoomedObjectiveResultName] = useState<string>('')
@@ -255,6 +259,18 @@ export function DayCanvas({
               <LayoutList className="size-3.5" />
               <span>Lista</span>
             </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('tactical')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium transition-all ${
+                viewMode === 'tactical'
+                  ? 'bg-white shadow-xs text-purple-700 font-bold'
+                  : 'text-ink-3 hover:text-ink'
+              }`}
+            >
+              <SlidersHorizontal className="size-3.5" />
+              <span>Táctica</span>
+            </button>
           </div>
 
           {/* Añadir tarea */}
@@ -271,7 +287,14 @@ export function DayCanvas({
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto relative">
-        {viewMode === 'list' ? (
+        {viewMode === 'tactical' ? (
+          <DayTacticalDashboard
+            tasks={tasks}
+            dayKey={dayKey}
+            onOpenTacticalModal={(taskId) => setSelectedTacticalTaskId(taskId)}
+            onQuickAddTask={() => handleOpenSeed()}
+          />
+        ) : viewMode === 'list' ? (
           <div className="max-w-md mx-auto p-4">
             <DayTaskViewer
               activeDay={dayKey}
@@ -429,6 +452,7 @@ export function DayCanvas({
                     }}
                     onAddStep={(objId) => handleOpenSeed(res.id, objId)}
                     onAddObjective={() => handleOpenNewObjective(res)}
+                    onOpenTacticalTask={(taskId) => setSelectedTacticalTaskId(taskId)}
                   />
                 )
               })}
@@ -473,6 +497,7 @@ export function DayCanvas({
                           key={t.id}
                           task={t}
                           onToggle={() => handleToggleTask(t)}
+                          onOpenTactical={() => setSelectedTacticalTaskId(t.id)}
                         />
                       ))}
                   </div>
@@ -801,6 +826,14 @@ export function DayCanvas({
           onClose={() => setShowResultForm(false)}
         />
       )}
+
+      {/* Tactical Task Modal */}
+      {selectedTacticalTaskId && (
+        <TacticalTaskModal
+          taskId={selectedTacticalTaskId}
+          onClose={() => setSelectedTacticalTaskId(null)}
+        />
+      )}
     </div>
   )
 }
@@ -817,6 +850,7 @@ function ResultCellCard({
   onZoomObjective,
   onAddStep,
   onAddObjective,
+  onOpenTacticalTask,
 }: {
   result: Result
   objectives: Objective[]
@@ -826,6 +860,7 @@ function ResultCellCard({
   onZoomObjective: (o: Objective) => void
   onAddStep: (objId?: string) => void
   onAddObjective: () => void
+  onOpenTacticalTask?: (taskId: string) => void
 }) {
   const state = useAleph()
   const projectColor = projectColorOfResult(state, result)
@@ -969,6 +1004,7 @@ function ResultCellCard({
                 key={t.id}
                 task={t}
                 onToggle={() => onToggleTask(t)}
+                onOpenTactical={() => onOpenTacticalTask?.(t.id)}
               />
             ))}
           </div>
@@ -1196,15 +1232,17 @@ function ResultZoomModal({
 function TaskStepRow({
   task,
   onToggle,
+  onOpenTactical,
 }: {
   task: Task
   onToggle: () => void
+  onOpenTactical?: () => void
 }) {
   const done = isTaskDone(task.status)
   const tInfo = TERRENO_MAP[task.terreno ?? 'literatura']
 
   return (
-    <div className="flex items-center justify-between gap-2 rounded-[12px] border border-line/60 bg-subtle/40 px-3 py-2 transition-colors hover:bg-subtle/80">
+    <div className="group flex items-center justify-between gap-2 rounded-[12px] border border-line/60 bg-subtle/40 px-3 py-2 transition-colors hover:bg-subtle/80">
       <div className="flex items-center gap-2.5 min-w-0 flex-1">
         <button
           type="button"
@@ -1226,17 +1264,31 @@ function TaskStepRow({
         />
 
         <span
-          className={`text-[13px] font-medium truncate ${
+          onClick={onOpenTactical}
+          className={`text-[13px] font-medium truncate cursor-pointer hover:text-purple-700 transition-colors ${
             done ? 'line-through text-ink-3' : 'text-ink'
           }`}
+          title="Abrir estudio táctico"
         >
           {task.title}
         </span>
       </div>
 
-      <span className="text-[11px] font-semibold text-ink-3 shrink-0">
-        {task.actualHours ?? task.estimatedHours}h
-      </span>
+      <div className="flex items-center gap-1.5 shrink-0">
+        {onOpenTactical && (
+          <button
+            type="button"
+            onClick={onOpenTactical}
+            className="opacity-0 group-hover:opacity-100 p-1 text-ink-3 hover:text-purple-700 rounded transition-all"
+            title="Abrir táctica y producción"
+          >
+            <SlidersHorizontal className="size-3" />
+          </button>
+        )}
+        <span className="text-[11px] font-semibold text-ink-3">
+          {task.actualHours ?? task.estimatedHours}h
+        </span>
+      </div>
     </div>
   )
 }

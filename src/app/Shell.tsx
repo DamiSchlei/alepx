@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { FocusExecutionModal } from '@/components/home/FocusExecutionModal'
 import { JournalBubble } from '@/components/journal/JournalBubble'
 import { AccountMenu } from '@/components/nav/AccountMenu'
 import { TabBar } from '@/components/nav/TabBar'
@@ -21,6 +22,7 @@ export function Shell() {
         <Outlet />
       </main>
       <JournalBubble />
+      <FocusExecutionModal />
       <TabBar characterOpen={accountOpen} onCharacterClick={() => setAccountOpen(true)} />
       <AccountMenu open={accountOpen} onClose={() => setAccountOpen(false)} />
     </div>

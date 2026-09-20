@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
+import { Play, BellOff } from 'lucide-react'
 import { cx } from '@/components/ui/primitives'
+import { startExecution, useFocusSession } from '@/data/focusSession'
 import { blockContext } from '@/data/selectors'
 import { useAleph } from '@/data/store'
 import { isTaskDone } from '@/domain/economy'
@@ -20,21 +22,27 @@ export function TaskBlock({
   handle,
   onToggle,
   onOpen,
+  dayKey,
 }: {
   task: Task
   handle?: ReactNode
   onToggle: () => void
   onOpen: () => void
   showGroupLabel?: boolean
+  dayKey?: string
 }) {
   const state = useAleph()
+  const focusSession = useFocusSession()
   const locale = state.character.locale
   const ctx = blockContext(state, task)
   const done = isTaskDone(task.status)
+  const isExecuting = focusSession.activeTaskId === task.id
 
   // Meta: Objetivo/Proyecto decidido · horas · etapa (el riel porta el tono)
   const targetName = ctx.objective?.name || ctx.result?.name
-  const hoursFormatted = `${formatHours(ctx.hours, locale)} h`
+  const hoursFormatted = task.actualHours
+    ? `${Math.round(task.actualHours * 60)}m dedicados`
+    : `${formatHours(ctx.hours, locale)} h`
   const stageFormatted = STAGE_LABELS[ctx.stage] ?? 'Ejecución'
   const metaLine = targetName
     ? `${targetName} · ${hoursFormatted} · ${stageFormatted}`
@@ -44,11 +52,18 @@ export function TaskBlock({
 
   return (
     <div
-      className="relative flex min-h-[56px] overflow-hidden rounded-[16px] border border-line bg-white transition-all hover:border-line-strong"
+      className={cx(
+        'relative flex min-h-[56px] overflow-hidden rounded-[16px] border transition-all hover:border-line-strong',
+        isExecuting
+          ? 'border-amber-300 bg-amber-50/40 ring-1 ring-amber-300'
+          : 'border-line bg-white',
+      )}
       style={{
         borderLeftWidth: '3.5px',
         borderLeftColor: projectColor,
-        background: `linear-gradient(to right, ${projectColor}09 0%, #ffffff 40%)`,
+        background: isExecuting
+          ? undefined
+          : `linear-gradient(to right, ${projectColor}09 0%, #ffffff 40%)`,
       }}
     >
       <div className="flex min-w-0 flex-1 items-center justify-between py-2.5 pl-3.5 pr-2">
@@ -78,8 +93,37 @@ export function TaskBlock({
           </div>
         </button>
 
-        {/* Right: Checkbox + Handle */}
-        <div className="flex items-center gap-1 shrink-0">
+        {/* Right: Botón Ejecutar + Checkbox + Handle */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {!done && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                startExecution(task, dayKey || new Date().toISOString().slice(0, 10))
+              }}
+              className={cx(
+                'flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition-all active:scale-95 shadow-xs',
+                isExecuting
+                  ? 'bg-amber-500 text-white animate-pulse'
+                  : 'bg-[#111318] text-white hover:bg-black',
+              )}
+              title="Ejecutar en No Molestar y dedicar tiempo real"
+            >
+              {isExecuting ? (
+                <>
+                  <BellOff className="size-3" />
+                  <span>En curso</span>
+                </>
+              ) : (
+                <>
+                  <Play className="size-3 fill-current" />
+                  <span>Ejecutar</span>
+                </>
+              )}
+            </button>
+          )}
+
           <button
             type="button"
             role="checkbox"
@@ -89,7 +133,7 @@ export function TaskBlock({
               e.stopPropagation()
               onToggle()
             }}
-            className="flex size-11 shrink-0 items-center justify-center"
+            className="flex size-10 shrink-0 items-center justify-center"
           >
             <span
               className={cx(

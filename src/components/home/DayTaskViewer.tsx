@@ -157,6 +157,7 @@ export function DayTaskViewer({
                           handle={handle}
                           onToggle={() => toggle(task)}
                           onOpen={() => setEditing(task)}
+                          dayKey={activeDay}
                         />
                       )
                     }}

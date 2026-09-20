@@ -31,6 +31,7 @@ interface ProjectHierarchyViewProps {
   onNewObjective: (result: Result) => void
   onNewTask: (resultId: string, objectiveId?: string) => void
   onEditProject: (project: Project) => void
+  onOpenTactical?: (taskId: string) => void
 }
 
 export function ProjectHierarchyView({
@@ -40,6 +41,7 @@ export function ProjectHierarchyView({
   onNewObjective,
   onNewTask,
   onEditProject,
+  onOpenTactical,
 }: ProjectHierarchyViewProps) {
   const state = useAleph()
   const locale = state.character.locale
@@ -374,6 +376,8 @@ export function ProjectHierarchyView({
                                     key={task.id}
                                     task={task}
                                     onToggle={() => handleToggleTask(task)}
+                                    onOpenTactical={() => onOpenTactical?.(task.id)}
+                                    onOpen={() => onOpenTactical?.(task.id)}
                                     showContext={false}
                                   />
                                 ))}

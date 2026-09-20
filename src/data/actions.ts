@@ -27,7 +27,12 @@ import type {
   StageId,
   Task,
   TaskCheckItem,
+  TaskContact,
+  TaskMetric,
+  TaskMoneyTransaction,
+  TaskWorkDone,
   Terreno,
+  ThoughtMap,
 } from '@/domain/types'
 
 const now = () => new Date().toISOString()
@@ -412,6 +417,11 @@ export interface TaskInput {
   seriesId?: string
   seriesWeekdays?: number[]
   dayOrder?: number
+  metrics?: TaskMetric[]
+  moneyTransactions?: TaskMoneyTransaction[]
+  workLogs?: TaskWorkDone[]
+  contacts?: TaskContact[]
+  thoughtMap?: ThoughtMap
 }
 
 /**
@@ -451,6 +461,11 @@ export function createTask(input: TaskInput): Task {
     status: 'pending',
     rewardApplied: false,
     createdAt: now(),
+    metrics: input.metrics,
+    moneyTransactions: input.moneyTransactions,
+    workLogs: input.workLogs,
+    contacts: input.contacts,
+    thoughtMap: input.thoughtMap,
   }
   setState((s) => ({ ...s, tasks: [...s.tasks, task] }))
   return task
@@ -580,6 +595,222 @@ export function captureLooseTask(
 
 export function updateTask(id: string, patch: Partial<Omit<Task, 'id'>>): void {
   setState((s) => ({ ...s, tasks: s.tasks.map((t) => (t.id === id ? { ...t, ...patch } : t)) }))
+}
+
+// ---------------------------------------------------------------- tactical task actions
+
+export function addTaskMetric(
+  taskId: string,
+  metric: { name: string; value: number; target?: number; unit?: string },
+): TaskMetric {
+  const item: TaskMetric = {
+    id: newId('metric'),
+    name: metric.name.trim(),
+    value: metric.value,
+    target: metric.target,
+    unit: metric.unit?.trim() || undefined,
+  }
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, metrics: [...(t.metrics || []), item] }
+        : t,
+    ),
+  }))
+  return item
+}
+
+export function updateTaskMetric(
+  taskId: string,
+  metricId: string,
+  patch: Partial<TaskMetric>,
+): void {
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) => {
+      if (t.id !== taskId) return t
+      return {
+        ...t,
+        metrics: (t.metrics || []).map((m) =>
+          m.id === metricId ? { ...m, ...patch } : m,
+        ),
+      }
+    }),
+  }))
+}
+
+export function removeTaskMetric(taskId: string, metricId: string): void {
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, metrics: (t.metrics || []).filter((m) => m.id !== metricId) }
+        : t,
+    ),
+  }))
+}
+
+export function addTaskMoneyTransaction(
+  taskId: string,
+  tx: { type: 'income' | 'expense'; amount: number; concept: string; currency?: string; date?: string },
+): TaskMoneyTransaction {
+  const item: TaskMoneyTransaction = {
+    id: newId('tx'),
+    type: tx.type,
+    amount: Math.abs(tx.amount),
+    concept: tx.concept.trim(),
+    currency: tx.currency || '$',
+    date: tx.date || toDayKey(new Date()),
+  }
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, moneyTransactions: [...(t.moneyTransactions || []), item] }
+        : t,
+    ),
+  }))
+  return item
+}
+
+export function removeTaskMoneyTransaction(taskId: string, txId: string): void {
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, moneyTransactions: (t.moneyTransactions || []).filter((tx) => tx.id !== txId) }
+        : t,
+    ),
+  }))
+}
+
+export function addTaskWorkLog(
+  taskId: string,
+  log: { summary: string; deliverableUrl?: string },
+): TaskWorkDone {
+  const item: TaskWorkDone = {
+    id: newId('work'),
+    summary: log.summary.trim(),
+    deliverableUrl: log.deliverableUrl?.trim() || undefined,
+    createdAt: now(),
+  }
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, workLogs: [...(t.workLogs || []), item] }
+        : t,
+    ),
+  }))
+  return item
+}
+
+export function removeTaskWorkLog(taskId: string, logId: string): void {
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, workLogs: (t.workLogs || []).filter((w) => w.id !== logId) }
+        : t,
+    ),
+  }))
+}
+
+export function addTaskContact(
+  taskId: string,
+  contact: Omit<TaskContact, 'id'>,
+): TaskContact {
+  const item: TaskContact = {
+    id: newId('contact'),
+    name: contact.name.trim(),
+    role: contact.role?.trim() || undefined,
+    organization: contact.organization?.trim() || undefined,
+    category: contact.category,
+    phone: contact.phone?.trim() || undefined,
+    email: contact.email?.trim() || undefined,
+    status: contact.status?.trim() || undefined,
+    notes: contact.notes?.trim() || undefined,
+  }
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, contacts: [...(t.contacts || []), item] }
+        : t,
+    ),
+  }))
+  return item
+}
+
+export function updateTaskContact(
+  taskId: string,
+  contactId: string,
+  patch: Partial<TaskContact>,
+): void {
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) => {
+      if (t.id !== taskId) return t
+      return {
+        ...t,
+        contacts: (t.contacts || []).map((c) =>
+          c.id === contactId ? { ...c, ...patch } : c,
+        ),
+      }
+    }),
+  }))
+}
+
+export function removeTaskContact(taskId: string, contactId: string): void {
+  setState((s) => ({
+    ...s,
+    tasks: s.tasks.map((t) =>
+      t.id === taskId
+        ? { ...t, contacts: (t.contacts || []).filter((c) => c.id !== contactId) }
+        : t,
+    ),
+  }))
+}
+
+export function updateTaskThoughtMap(taskId: string, thoughtMap: ThoughtMap): void {
+  updateTask(taskId, { thoughtMap })
+}
+
+export function addRecordedTimeToTask(taskId: string, additionalHours: number): void {
+  const task = getState().tasks.find((t) => t.id === taskId)
+  if (!task) return
+  const currentActual = task.actualHours ?? 0
+  updateTask(taskId, { actualHours: Math.round((currentActual + additionalHours) * 100) / 100 })
+}
+
+export function toggleTaskCheckItem(taskId: string, itemId: string): void {
+  const task = getState().tasks.find((t) => t.id === taskId)
+  if (!task) return
+  const checklist = (task.checklist || []).map((item) =>
+    item.id === itemId ? { ...item, done: !item.done } : item,
+  )
+  updateTask(taskId, { checklist })
+}
+
+export function addTaskCheckItem(taskId: string, text: string): TaskCheckItem | null {
+  const trimmed = text.trim()
+  if (!trimmed) return null
+  const item: TaskCheckItem = {
+    id: newId('check'),
+    text: trimmed,
+    done: false,
+  }
+  const task = getState().tasks.find((t) => t.id === taskId)
+  if (!task) return null
+  updateTask(taskId, { checklist: [...(task.checklist || []), item] })
+  return item
+}
+
+export function removeTaskCheckItem(taskId: string, itemId: string): void {
+  const task = getState().tasks.find((t) => t.id === taskId)
+  if (!task) return
+  updateTask(taskId, { checklist: (task.checklist || []).filter((item) => item.id !== itemId) })
 }
 
 export function cancelTask(id: string): void {

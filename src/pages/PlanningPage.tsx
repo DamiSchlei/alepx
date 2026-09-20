@@ -10,6 +10,7 @@ import { ProjectHierarchyView } from '@/components/planning/ProjectHierarchyView
 import { ResultFormSheet } from '@/components/planning/ResultForm'
 import { TaskFormSheet } from '@/components/planning/TaskForm'
 import { AssignSheet } from '@/components/task/AssignSheet'
+import { TacticalTaskModal } from '@/components/task/TacticalTaskModal'
 import { TaskRow } from '@/components/task/TaskRow'
 import { useTaskActions } from '@/components/task/useTaskActions'
 import { useTaskCompletion } from '@/components/task/useTaskCompletion'
@@ -94,6 +95,7 @@ export function PlanningPage() {
   const [capOpen, setCapOpen] = useState(false)
   const [archiveId, setArchiveId] = useState<string | null>(null)
   const [showArchived, setShowArchived] = useState(false)
+  const [selectedTacticalTaskId, setSelectedTacticalTaskId] = useState<string | null>(null)
 
   // Project modal handlers
   const handleNewProject = () => {
@@ -211,6 +213,7 @@ export function PlanningPage() {
             onNewObjective={handleNewObjective}
             onNewTask={handleNewTask}
             onEditProject={handleEditProject}
+            onOpenTactical={(taskId) => setSelectedTacticalTaskId(taskId)}
           />
         </div>
       )}
@@ -224,6 +227,7 @@ export function PlanningPage() {
           onNewTask={handleNewTask}
           onNewProject={handleNewProject}
           onEditProject={handleEditProject}
+          onOpenTactical={(taskId) => setSelectedTacticalTaskId(taskId)}
         />
       )}
 
@@ -349,6 +353,13 @@ export function PlanningPage() {
           setArchiveId(null)
         }}
       />
+      {/* TACTICAL TASK MODAL FOR HIERARCHY VIEWS */}
+      {selectedTacticalTaskId && (
+        <TacticalTaskModal
+          taskId={selectedTacticalTaskId}
+          onClose={() => setSelectedTacticalTaskId(null)}
+        />
+      )}
     </Page>
   )
 }
@@ -362,6 +373,7 @@ function TasksTab() {
   const [creating, setCreating] = useState(false)
   const [editing, setEditing] = useState<Task | undefined>()
   const [assigning, setAssigning] = useState<Task | undefined>()
+  const [selectedTacticalTaskId, setSelectedTacticalTaskId] = useState<string | null>(null)
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [grouping, setGrouping] = useState<'tree' | 'importance'>('tree')
   const [resultId, setResultId] = useState('')
@@ -564,6 +576,7 @@ function TasksTab() {
                       onToggle={() => toggle(task)}
                       onExecute={() => execute(task)}
                       onOpen={() => setEditing(task)}
+                      onOpenTactical={() => setSelectedTacticalTaskId(task.id)}
                       onAssign={() => setAssigning(task)}
                       onDelete={() => actions.requestDelete(task)}
                       showContext={true}
@@ -613,6 +626,7 @@ function TasksTab() {
                       onToggle={() => toggle(task)}
                       onExecute={() => execute(task)}
                       onOpen={() => setEditing(task)}
+                      onOpenTactical={() => setSelectedTacticalTaskId(task.id)}
                       onAssign={() => setAssigning(task)}
                       onDelete={() => actions.requestDelete(task)}
                       showContext={true}
@@ -671,6 +685,7 @@ function TasksTab() {
                       onToggle={() => toggle(task)}
                       onExecute={() => execute(task)}
                       onOpen={() => setEditing(task)}
+                      onOpenTactical={() => setSelectedTacticalTaskId(task.id)}
                       onAssign={() => setAssigning(task)}
                       onDelete={() => actions.requestDelete(task)}
                       showContext={true}
@@ -779,6 +794,12 @@ function TasksTab() {
         task={assigning}
         onClose={() => setAssigning(undefined)}
       />
+      {selectedTacticalTaskId && (
+        <TacticalTaskModal
+          taskId={selectedTacticalTaskId}
+          onClose={() => setSelectedTacticalTaskId(null)}
+        />
+      )}
     </div>
   )
 }

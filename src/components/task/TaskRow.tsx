@@ -1,26 +1,58 @@
 import type { ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
+import {
+  BarChart3,
+  BellOff,
+  Brain,
+  Calendar,
+  Check,
+  Coins,
+  Play,
+  Plus,
+  SlidersHorizontal,
+  Users,
+  X,
+} from 'lucide-react'
 import { cx } from '@/components/ui/primitives'
 import { RowMenu } from '@/components/ui/RowMenu'
-import { updateTask } from '@/data/actions'
-import { useAleph } from '@/data/store'
+import { useFeedback } from '@/app/FeedbackProvider'
+import { completeTask, reopenTask, updateTask } from '@/data/actions'
+import { startExecution, useFocusSession } from '@/data/focusSession'
 import { blockContext, objectiveById, resultById } from '@/data/selectors'
+import { useAleph } from '@/data/store'
 import { toDayKey } from '@/domain/dates'
 import { isTaskDone } from '@/domain/economy'
-import { STAGE_LABELS } from '@/domain/stage'
 import { TERRENO_MAP } from '@/domain/terrenos'
-import { formatDate, formatHours } from '@/i18n/format'
+import { formatDate } from '@/i18n/format'
 import type { Task } from '@/domain/types'
+
+export interface TaskRowProps {
+  task: Task
+  onToggle?: () => void
+  onOpen?: () => void
+  onOpenTactical?: () => void
+  onAssign?: () => void
+  onExecute?: () => void
+  onReturn?: () => void
+  onDelete?: () => void
+  onScheduleToday?: () => void
+  handle?: ReactNode
+  showContext?: boolean
+  showProjection?: boolean
+  hideCheckbox?: boolean
+  className?: string
+  activeDay?: string
+  compact?: boolean
+}
 
 export function TaskCheckbox({
   done,
   onToggle,
-  label,
+  label = 'Completar tarea',
   color = '#7a3fe0',
 }: {
   done: boolean
   onToggle: () => void
-  label: string
+  label?: string
   color?: string
 }) {
   return (
@@ -30,170 +62,337 @@ export function TaskCheckbox({
       aria-checked={done}
       aria-label={label}
       onClick={onToggle}
-      className="flex size-11 shrink-0 items-center justify-center rounded-2xl transition-colors hover:bg-subtle"
+      className={`size-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-transform active:scale-90 ${
+        done ? 'border-transparent text-white shadow-xs' : 'border-line-strong hover:border-ink bg-white'
+      }`}
+      style={{ backgroundColor: done ? color : undefined }}
+      title={done ? 'Reabrir tarea' : 'Completar tarea'}
     >
-      <span
-        className={cx(
-          'flex size-[22px] items-center justify-center rounded-[6px] border-2 transition-colors',
-          done ? 'text-white' : 'border-line-strong',
-        )}
-        style={done ? { backgroundColor: color, borderColor: color } : undefined}
-      >
-        {done ? (
-          <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        ) : null}
-      </span>
+      {done && <Check className="size-3.5 stroke-[3]" />}
     </button>
   )
+}
+
+function formatStopwatch(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  if (m > 0) return `${m}m ${s}s`
+  return `${s}s`
 }
 
 export function TaskRow({
   task,
   onToggle,
   onOpen,
-  onAssign: _onAssign,
-  onExecute: _onExecute,
-  onReturn: _onReturn,
+  onOpenTactical,
+  onExecute,
   onDelete,
   handle,
   showContext = true,
   hideCheckbox = false,
   className,
-}: {
-  task: Task
-  onToggle: () => void
-  onOpen?: () => void
-  onAssign?: () => void
-  onExecute?: () => void
-  onReturn?: () => void
-  onDelete?: () => void
-  handle?: ReactNode
-  showContext?: boolean
-  showProjection?: boolean
-  hideCheckbox?: boolean
-  className?: string
-}) {
-  const navigate = useNavigate()
+  activeDay,
+  compact = false,
+}: TaskRowProps) {
   const state = useAleph()
+  const feedback = useFeedback()
+  const session = useFocusSession()
   const locale = state.character.locale
+  const todayKey = toDayKey(new Date())
+  const effectiveDay = activeDay || todayKey
+
   const done = isTaskDone(task.status)
+  const isExecuting = session.activeTaskId === task.id
   const ctx = blockContext(state, task)
   const result = resultById(state, task.resultId)
   const objective = objectiveById(state, task.objectiveId)
-  const contextResult = result ?? resultById(state, objective?.resultId)
+  const contextResult = result ?? (task.objectiveId ? resultById(state, objective?.resultId) : undefined)
   const loose = !task.objectiveId && !task.resultId
-  const todayKey = toDayKey(new Date())
 
   const tInfo = TERRENO_MAP[task.terreno ?? 'literatura']
   const projectColor = ctx.projectColor || '#7a3fe0'
   const projectName = ctx.project?.name || contextResult?.projectName
 
-  const putInThisWeek = () => {
+  const isScheduledToday = task.scheduledFor === todayKey || task.dueAt === todayKey
+
+  // Tactical data counts
+  const checklist = task.checklist || []
+  const doneChecklist = checklist.filter((c) => c.done).length
+  const transactions = task.moneyTransactions || []
+  const inc = transactions.filter((t) => t.type === 'income').reduce((a, b) => a + b.amount, 0)
+  const exp = transactions.filter((t) => t.type === 'expense').reduce((a, b) => a + b.amount, 0)
+  const netBalance = inc - exp
+  const contactsCount = task.contacts?.length || 0
+  const metricsCount = task.metrics?.length || 0
+  const hasMindMap = Boolean(task.thoughtMap?.nodes?.length)
+
+  const dedicatedText = task.actualHours
+    ? `${Math.round(task.actualHours * 60)}m dedicados`
+    : isExecuting
+      ? `${formatStopwatch(session.elapsedSeconds)} en curso`
+      : null
+
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle()
+      return
+    }
+    if (done) {
+      reopenTask(task.id)
+    } else {
+      const outcome = completeTask(task.id)
+      if (outcome) feedback.celebrate(outcome)
+    }
+  }
+
+  const handleExecute = () => {
+    if (onExecute) {
+      onExecute()
+      return
+    }
+    startExecution(task, effectiveDay)
+  }
+
+  const handleOpenDetails = () => {
+    if (onOpenTactical) {
+      onOpenTactical()
+    } else if (onOpen) {
+      onOpen()
+    }
+  }
+
+  const handlePutInToday = (e: React.MouseEvent) => {
+    e.stopPropagation()
     updateTask(task.id, {
       scheduledFor: todayKey,
       dueAt: todayKey,
       stage: 'execution',
     })
-    navigate('/')
   }
 
-  const metaParts: string[] = [`${formatHours(task.actualHours ?? task.estimatedHours, locale)} h`]
-  if (showContext) {
-    if (loose) metaParts.push('Suelto')
-    else if (contextResult?.name) metaParts.push(contextResult.name)
-    if (objective?.name) metaParts.push(objective.name)
+  const handleRemoveFromToday = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    updateTask(task.id, {
+      scheduledFor: undefined,
+      dueAt: undefined,
+    })
   }
-  if (!loose && !done) metaParts.push(STAGE_LABELS[task.stage] ?? 'Ejecución')
-  if (task.dueAt && !done) metaParts.push(formatDate(task.dueAt, locale))
 
   return (
     <div
       className={cx(
-        'relative flex overflow-hidden rounded-[16px] border border-line bg-white transition-all hover:border-line-strong hover:shadow-xs',
+        'group relative flex items-center justify-between gap-2.5 rounded-2xl border transition-all p-2.5 sm:p-3 select-none',
+        isExecuting
+          ? 'bg-amber-50/80 border-amber-300 ring-1 ring-amber-300'
+          : done
+            ? 'bg-surface/50 border-line/70 opacity-80'
+            : 'bg-white border-line hover:border-line-strong hover:shadow-xs',
         className,
       )}
       style={{
-        borderLeftWidth: '3.5px',
+        borderLeftWidth: '4px',
         borderLeftColor: projectColor,
-        background: done
-          ? undefined
-          : `linear-gradient(to right, ${projectColor}08 0%, #ffffff 35%)`,
       }}
     >
-      {hideCheckbox ? null : (
-        <TaskCheckbox
-          done={done}
-          onToggle={onToggle}
-          label="Completar tarea"
-          color={tInfo.color}
-        />
-      )}
-      <button
-        type="button"
-        onClick={onOpen}
-        disabled={!onOpen}
-        className={cx(
-          'min-h-11 min-w-0 flex-1 py-2.5 pr-1 text-left',
-          hideCheckbox && 'pl-4',
-          onOpen && 'cursor-pointer',
+      {/* LEFT: Checkbox + Title + Badges */}
+      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        {!hideCheckbox && (
+          <TaskCheckbox
+            done={done}
+            onToggle={handleToggle}
+            label="Completar tarea"
+            color={projectColor}
+          />
         )}
-      >
-        <div className="flex flex-wrap items-center gap-1.5">
-          <p
-            className={cx(
-              'line-clamp-1 text-[15px] font-medium leading-snug',
-              done ? 'text-ink-3 line-through' : 'text-ink',
-            )}
-          >
-            {task.title}
-          </p>
 
-          {/* Color propio del saber/terreno con etiqueta distinguible */}
-          <span
-            className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 transition-colors"
-            style={{
-              backgroundColor: `${tInfo.color}16`,
-              color: tInfo.color,
-              border: `1px solid ${tInfo.color}32`,
-            }}
-            title={`Saber de la tarea: ${tInfo.label}`}
-          >
+        <div
+          className="flex flex-col min-w-0 flex-1 cursor-pointer"
+          onClick={handleOpenDetails}
+          title="Abrir estudio táctico y detalles"
+        >
+          {/* Title Row */}
+          <div className="flex items-center gap-2">
             <span
-              className="size-1.5 rounded-full shrink-0"
-              style={{ backgroundColor: tInfo.color }}
-              aria-hidden="true"
-            />
-            <span>{tInfo.label}</span>
-          </span>
-        </div>
-
-        <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">
-          {showContext && projectName && !loose && (
-            <span className="font-semibold mr-1" style={{ color: projectColor }}>
-              [{projectName}]
+              className={cx(
+                'text-[13px] sm:text-[14px] font-semibold leading-tight truncate transition-colors group-hover:text-[#7a3fe0]',
+                done ? 'line-through text-ink-3' : 'text-ink',
+              )}
+            >
+              {task.title}
             </span>
-          )}
-          {metaParts.join(' · ')}
-        </p>
-      </button>
+          </div>
 
-      {/* CTA: Poner en esta semana */}
-      {!done && (!task.scheduledFor || task.scheduledFor < todayKey) ? (
+          {/* Context, Terreno & Schedule Badges */}
+          <div className="flex flex-wrap items-center gap-1.5 mt-1">
+            {/* Project / Result indicator */}
+            {showContext && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-ink-3 truncate max-w-[130px] sm:max-w-[180px]">
+                <span
+                  className="size-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: projectColor }}
+                />
+                <span className="truncate">{projectName ?? (loose ? 'Suelto' : 'La Obra')}</span>
+              </span>
+            )}
+
+            {/* Terreno Pill */}
+            {tInfo && (
+              <span
+                className="inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full shrink-0"
+                style={{
+                  backgroundColor: `${tInfo.color}15`,
+                  color: tInfo.color,
+                }}
+              >
+                <span>{tInfo.label}</span>
+              </span>
+            )}
+
+            {/* SYNC WITH HOME / SCHEDULE BADGE */}
+            {isScheduledToday ? (
+              <span className="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                <span>☀️ En Home (Hoy)</span>
+                <button
+                  type="button"
+                  onClick={handleRemoveFromToday}
+                  className="hover:text-rose-600 transition-colors ml-0.5"
+                  title="Quitar de Home hoy"
+                >
+                  <X className="size-2.5" />
+                </button>
+              </span>
+            ) : task.scheduledFor ? (
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 shrink-0">
+                <Calendar className="size-2.5" />
+                <span>{formatDate(task.scheduledFor, locale)}</span>
+                <button
+                  type="button"
+                  onClick={handlePutInToday}
+                  className="text-indigo-600 font-bold hover:underline ml-1"
+                  title="Mover a hoy"
+                >
+                  Mover a hoy
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={handlePutInToday}
+                className="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 active:scale-95 transition-all shrink-0"
+                title="Agendar esta tarea para que aparezca en el Home de hoy"
+              >
+                <Plus className="size-2.5 stroke-[3]" />
+                <span>Poner en Home</span>
+              </button>
+            )}
+
+            {/* Real Time Dedicated Badge */}
+            {dedicatedText && (
+              <span
+                className={`inline-flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 rounded-full tabular-nums ${
+                  isExecuting
+                    ? 'bg-amber-100 text-amber-900 animate-pulse'
+                    : 'bg-purple-50 text-purple-700'
+                }`}
+              >
+                <span>⏱️ {dedicatedText}</span>
+              </span>
+            )}
+
+            {/* Tactical Micro-badges */}
+            {!compact && checklist.length > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+                <Check className="size-2.5" />
+                <span>{doneChecklist}/{checklist.length}</span>
+              </span>
+            )}
+
+            {!compact && transactions.length > 0 && (
+              <span
+                className={`inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                  netBalance >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+                }`}
+              >
+                <Coins className="size-2.5" />
+                <span>{netBalance >= 0 ? `+$${netBalance.toLocaleString()}` : `-$${Math.abs(netBalance).toLocaleString()}`}</span>
+              </span>
+            )}
+
+            {!compact && contactsCount > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700">
+                <Users className="size-2.5" />
+                <span>{contactsCount}</span>
+              </span>
+            )}
+
+            {!compact && metricsCount > 0 && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-800">
+                <BarChart3 className="size-2.5" />
+                <span>{metricsCount}</span>
+              </span>
+            )}
+
+            {!compact && hasMindMap && (
+              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-50 text-cyan-700">
+                <Brain className="size-2.5" />
+                <span>Mapa</span>
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT: Tactical Modal Button + Ejecutar Button */}
+      <div className="flex items-center gap-1.5 shrink-0">
+        {/* Sliders button: Opens tactical details */}
         <button
           type="button"
-          onClick={putInThisWeek}
-          className="self-center shrink-0 mr-1 rounded-full border border-line bg-subtle px-2.5 py-1 text-[12px] font-medium text-ink-2 hover:border-[#7a3fe0] hover:text-[#7a3fe0] active:scale-95 transition-all"
+          onClick={handleOpenDetails}
+          className="p-1.5 rounded-xl text-ink-3 hover:text-[#7a3fe0] hover:bg-purple-50 transition-colors"
+          title="Abrir estudio táctico (variables, dinero, contactos, mapas)"
         >
-          Poner en esta semana
+          <SlidersHorizontal className="size-4" />
         </button>
-      ) : null}
 
-      {onDelete ? (
-        <RowMenu items={[{ label: 'Eliminar', tone: 'danger', onClick: onDelete }]} />
-      ) : null}
-      {handle ? <div className="opacity-30 pr-1">{handle}</div> : null}
+        {/* Ejecutar button */}
+        {!done && (
+          <button
+            type="button"
+            onClick={handleExecute}
+            className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition-all active:scale-95 shadow-xs ${
+              isExecuting
+                ? 'bg-amber-500 text-white animate-pulse'
+                : 'bg-[#111318] text-white hover:bg-black'
+            }`}
+            title="Iniciar tarea sin límite preestablecido (No Molestar)"
+          >
+            {isExecuting ? (
+              <>
+                <BellOff className="size-3" />
+                <span>En curso</span>
+              </>
+            ) : (
+              <>
+                <Play className="size-3 fill-current" />
+                <span>Ejecutar</span>
+              </>
+            )}
+          </button>
+        )}
+
+        {done && (
+          <span className="text-[11px] font-medium text-emerald-600 flex items-center gap-0.5 px-1">
+            <Check className="size-3.5 stroke-[2.5]" />
+            <span>Lista</span>
+          </span>
+        )}
+
+        {onDelete && (
+          <RowMenu items={[{ label: 'Eliminar', tone: 'danger', onClick: onDelete }]} />
+        )}
+
+        {handle && <div className="opacity-40 pl-0.5">{handle}</div>}
+      </div>
     </div>
   )
 }

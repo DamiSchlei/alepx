@@ -124,6 +124,58 @@ export interface TaskCheckItem {
   done: boolean
 }
 
+export interface TaskMetric {
+  id: string
+  name: string
+  value: number
+  target?: number
+  unit?: string
+}
+
+export interface TaskMoneyTransaction {
+  id: string
+  type: 'income' | 'expense'
+  amount: number
+  currency?: string
+  concept: string
+  date: string
+}
+
+export interface TaskWorkDone {
+  id: string
+  summary: string
+  deliverableUrl?: string
+  createdAt: string
+}
+
+export type ContactCategory = 'client' | 'supplier' | 'partner'
+
+export interface TaskContact {
+  id: string
+  name: string
+  role?: string
+  organization?: string
+  category: ContactCategory
+  phone?: string
+  email?: string
+  status?: string
+  notes?: string
+}
+
+export interface ThoughtNode {
+  id: string
+  parentId?: string
+  text: string
+  color?: string
+  notes?: string
+  isKeyIdea?: boolean
+}
+
+export interface ThoughtMap {
+  centralIdea?: string
+  nodes: ThoughtNode[]
+}
+
 export interface Task {
   id: string
   title: string
@@ -160,6 +212,13 @@ export interface Task {
   moneyGranted?: number
   rewardApplied: boolean
   createdAt: string
+
+  /** Tactical execution & production support */
+  metrics?: TaskMetric[]
+  moneyTransactions?: TaskMoneyTransaction[]
+  workLogs?: TaskWorkDone[]
+  contacts?: TaskContact[]
+  thoughtMap?: ThoughtMap
 }
 
 export interface Comment {

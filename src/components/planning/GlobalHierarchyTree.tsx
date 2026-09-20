@@ -23,6 +23,7 @@ interface GlobalHierarchyTreeProps {
   onNewTask: (resultId: string, objectiveId?: string) => void
   onNewProject: () => void
   onEditProject?: (project: Project) => void
+  onOpenTactical?: (taskId: string) => void
 }
 
 export function GlobalHierarchyTree({
@@ -33,6 +34,7 @@ export function GlobalHierarchyTree({
   onNewTask,
   onNewProject,
   onEditProject,
+  onOpenTactical,
 }: GlobalHierarchyTreeProps) {
   const state = useAleph()
   const [collapsedProjects, setCollapsedProjects] = useState<Set<string>>(new Set())
@@ -290,6 +292,8 @@ export function GlobalHierarchyTree({
                                               key={task.id}
                                               task={task}
                                               onToggle={() => handleToggleTask(task)}
+                                              onOpenTactical={() => onOpenTactical?.(task.id)}
+                                              onOpen={() => onOpenTactical?.(task.id)}
                                               showContext={false}
                                             />
                                           ))}

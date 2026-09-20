@@ -1,11 +1,9 @@
 import { useRef, useEffect, useMemo } from 'react'
-import { ChevronLeft, ChevronRight, Maximize2, Plus } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { DayTaskClock } from './DayTaskClock'
-import { freeHoursForDay, plannedHoursForDay } from '@/data/dayLoad'
 import { tasksForDay } from '@/data/selectors'
 import { useAleph } from '@/data/store'
 import { addDays, parseLocal, toDayKey } from '@/domain/dates'
-import { formatHours } from '@/i18n/format'
 
 interface DayCarouselProps {
   activeDay: string
@@ -27,8 +25,6 @@ export function DayCarousel({
   onQuickAdd,
 }: DayCarouselProps) {
   const state = useAleph()
-  const locale = state.character.locale
-  const cap = state.character.dailyHourCap ?? 5
 
   // Generate buffer of days around todayKey
   const days = useMemo(() => {
@@ -88,8 +84,6 @@ export function DayCarousel({
           const isSelected = day === activeDay
           const isToday = day === todayKey
           const dayTasks = tasksForDay(state, day)
-          const planned = plannedHoursForDay(state, day)
-          const free = freeHoursForDay(cap, planned)
           const dateObj = parseLocal(day)
           const weekday = new Intl.DateTimeFormat(localeTag, { weekday: 'short' }).format(dateObj)
           const dayNum = dateObj.getDate()
@@ -118,21 +112,11 @@ export function DayCarousel({
                       </span>
                     )}
                   </div>
-                  <span className="text-[12px] font-medium text-ink-3">
-                    {formatHours(planned, locale)}h / {cap}h
-                  </span>
                 </div>
-
-                {/* Subtitle / capacity */}
-                <p className="mt-0.5 text-[12px] text-ink-3 font-medium">
-                  {free > 0
-                    ? `${formatHours(free, locale)} h libres para la obra`
-                    : 'Capacidad completa'}
-                </p>
               </div>
 
-              {/* Reloj de Avance Diario: Se come las tareas a medida que se cumplen */}
-              <div className="my-2 flex-1 flex flex-col justify-center">
+              {/* Reloj y Gestor de Tareas */}
+              <div className="mt-1 flex-1 flex flex-col justify-center">
                 <DayTaskClock
                   tasks={dayTasks}
                   activeDay={day}
@@ -141,32 +125,6 @@ export function DayCarousel({
                   onOpenCanvas={() => onOpenCanvas(day)}
                   onQuickAdd={() => onQuickAdd(day)}
                 />
-              </div>
-
-              {/* Card Actions: Planificar día & Rápido */}
-              <div className="mt-3.5 pt-3 border-t border-line flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onOpenCanvas(day)
-                  }}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-full bg-[#111113] py-2.5 px-3 text-[13px] font-semibold text-white hover:bg-black active:scale-98 transition-all shadow-xs"
-                >
-                  <Maximize2 className="size-3.5" />
-                  <span>Planificar día</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onQuickAdd(day)
-                  }}
-                  className="flex size-9 items-center justify-center rounded-full border border-line bg-subtle text-ink hover:border-[#7a3fe0] hover:text-[#7a3fe0] active:scale-95 transition-all shrink-0"
-                  title="Añadir tarea"
-                >
-                  <Plus className="size-4" />
-                </button>
               </div>
             </div>
           )
