@@ -1,12 +1,10 @@
 import { useRef, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Maximize2, Plus } from 'lucide-react'
-import { DayCellPreview } from './DayCellPreview'
+import { DayTaskClock } from './DayTaskClock'
 import { freeHoursForDay, plannedHoursForDay } from '@/data/dayLoad'
 import { tasksForDay } from '@/data/selectors'
 import { useAleph } from '@/data/store'
 import { addDays, parseLocal, toDayKey } from '@/domain/dates'
-import { isTaskDone } from '@/domain/economy'
-import { TERRENO_MAP } from '@/domain/terrenos'
 import { formatHours } from '@/i18n/format'
 
 interface DayCarouselProps {
@@ -133,53 +131,16 @@ export function DayCarousel({
                 </p>
               </div>
 
-              {/* Center Organ: Visual Day Cell Preview */}
-              <div className="my-3 flex flex-col items-center justify-center py-2">
-                <DayCellPreview tasks={dayTasks} compact={false} />
-                <p className="mt-1 text-[11px] font-semibold text-ink-3 tracking-wider uppercase">
-                  {dayTasks.length === 0
-                    ? 'Sin tareas asignadas'
-                    : `${dayTasks.length} ${dayTasks.length === 1 ? 'tarea' : 'tareas'}`}
-                </p>
-              </div>
-
-              {/* Tasks preview list (up to 3) */}
-              <div className="min-h-[72px] flex flex-col justify-center">
-                {dayTasks.length === 0 ? (
-                  <div className="rounded-[12px] border border-dashed border-line p-2.5 text-center text-[12px] text-ink-3">
-                    Sin tareas. Tocá para planificar el día.
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-1">
-                    {dayTasks.slice(0, 3).map((t) => {
-                      const tInfo = TERRENO_MAP[t.terreno ?? 'literatura']
-                      const done = isTaskDone(t.status)
-                      return (
-                        <div
-                          key={t.id}
-                          className="flex items-center gap-1.5 truncate text-[12px]"
-                        >
-                          <span
-                            className="size-1.5 rounded-full shrink-0"
-                            style={{ backgroundColor: tInfo.color }}
-                          />
-                          <span
-                            className={`truncate font-medium ${
-                              done ? 'line-through text-ink-3' : 'text-ink-2'
-                            }`}
-                          >
-                            {t.title}
-                          </span>
-                        </div>
-                      )
-                    })}
-                    {dayTasks.length > 3 && (
-                      <p className="text-[11px] font-medium text-ink-3 pl-3">
-                        +{dayTasks.length - 3} más...
-                      </p>
-                    )}
-                  </div>
-                )}
+              {/* Reloj de Avance Diario: Se come las tareas a medida que se cumplen */}
+              <div className="my-2 flex-1 flex flex-col justify-center">
+                <DayTaskClock
+                  tasks={dayTasks}
+                  activeDay={day}
+                  todayKey={todayKey}
+                  localeTag={localeTag}
+                  onOpenCanvas={() => onOpenCanvas(day)}
+                  onQuickAdd={() => onQuickAdd(day)}
+                />
               </div>
 
               {/* Card Actions: Planificar día & Rápido */}

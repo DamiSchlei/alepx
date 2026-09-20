@@ -125,14 +125,24 @@ export function TaskBlock({
 export function TaskBlockChip({ task }: { task: Task }) {
   const state = useAleph()
   const ctx = blockContext(state, task)
+  const done = isTaskDone(task.status)
+  const projectColor = ctx.projectColor || ctx.color || '#7a3fe0'
+
   return (
     <span className="flex min-w-0 items-center gap-1.5 py-0.5">
       <span
         aria-hidden
-        className="size-1.5 shrink-0 rounded-full"
-        style={{ backgroundColor: ctx.color }}
+        className="size-1.5 shrink-0 rounded-full transition-transform"
+        style={{
+          backgroundColor: projectColor,
+          boxShadow: done ? `0 0 0 1.5px ${projectColor}40` : undefined,
+        }}
       />
-      <span className="min-w-0 truncate text-[11px] font-medium leading-tight text-ink">
+      <span
+        className={`min-w-0 truncate text-[11px] font-medium leading-tight transition-colors ${
+          done ? 'line-through text-ink-3' : 'text-ink'
+        }`}
+      >
         {task.title}
       </span>
     </span>
