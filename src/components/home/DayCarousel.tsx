@@ -34,6 +34,7 @@ export function DayCarousel({
   const state = useAleph()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const programmatic = useRef(false)
+  const snapReady = useRef(false)
 
   const days = useMemo(() => {
     const list: string[] = []
@@ -49,11 +50,13 @@ export function DayCarousel({
     const el = container.querySelector<HTMLElement>(`[data-day="${activeDay}"]`)
     if (!el) return
     programmatic.current = true
+    snapReady.current = false
     const left = el.offsetLeft - (container.clientWidth - el.offsetWidth) / 2
     container.scrollTo({ left: Math.max(0, left), behavior: 'auto' })
     const release = window.setTimeout(() => {
       programmatic.current = false
-    }, 80)
+      snapReady.current = true
+    }, 320)
     return () => window.clearTimeout(release)
   }, [activeDay])
 
@@ -62,7 +65,7 @@ export function DayCarousel({
     if (!container) return
 
     const syncFromScroll = () => {
-      if (programmatic.current) return
+      if (programmatic.current || !snapReady.current) return
       const center = container.scrollLeft + container.clientWidth / 2
       let closest = activeDay
       let closestDist = Number.POSITIVE_INFINITY
