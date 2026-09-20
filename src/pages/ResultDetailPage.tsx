@@ -163,8 +163,15 @@ export function ResultDetailPage() {
       <header className="relative overflow-hidden rounded-[16px] border border-line bg-white py-3 pr-3 pl-4">
         <span aria-hidden className="absolute inset-y-0 left-0 w-1.5 bg-[#9aa0ae]" />
         <div className="pl-1">
+          {result.projectName && (
+            <p className="text-[12px] font-bold uppercase tracking-wider text-[#7a3fe0] mb-0.5">
+              Proyecto: {result.projectName}
+            </p>
+          )}
           <h1 className="line-clamp-2 text-[18px] font-bold leading-snug text-ink">{result.name}</h1>
-          <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">{meta}</p>
+          <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">
+            Resultado concreto · {meta}
+          </p>
           {result.why ? (
             <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">{result.why}</p>
           ) : null}

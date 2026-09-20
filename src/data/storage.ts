@@ -2,7 +2,7 @@ import { DEFAULT_SKILLS, initialState, newCharacter, STATE_VERSION } from './see
 import { MIN_ESTIMATED_HOURS } from '@/domain/limits'
 import { skillIdToPillar } from '@/domain/pillars'
 import { xpToNextForLevel } from '@/domain/economy'
-import type { AlephState, Locale, Objective, Result, Task } from '@/domain/types'
+import type { AlephState, Locale, Objective, Project, Result, Task } from '@/domain/types'
 
 export const STORAGE_KEY = 'aleph.state.v2'
 
@@ -133,10 +133,36 @@ export function normalize(input: unknown): AlephState {
     pillar: result.pillar ?? skillIdToPillar(result.skillId),
   }))
 
+  const rawProjects = (raw.projects ?? []) as Project[]
+  const existingProjectNames = new Set(rawProjects.map((p) => p.name.trim().toLowerCase()))
+  const projects: Project[] = [...rawProjects]
+  for (const r of results) {
+    const pName = r.projectName?.trim()
+    if (pName && !existingProjectNames.has(pName.toLowerCase())) {
+      existingProjectNames.add(pName.toLowerCase())
+      projects.push({
+        id: `proj_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+        name: pName,
+        createdAt: new Date().toISOString(),
+      })
+    }
+  }
+  if (projects.length === 0) {
+    projects.push({
+      id: 'proj_obra_principal',
+      name: 'La Obra Principal',
+      description: 'Proyecto central de creación, arte y desarrollo económico.',
+      color: '#7a3fe0',
+      icon: 'sparkles',
+      createdAt: new Date().toISOString(),
+    })
+  }
+
   return {
     version: STATE_VERSION,
     character,
     skills,
+    projects,
     results,
     objectives: raw.objectives ?? adopted.objectives ?? [],
     tasks,

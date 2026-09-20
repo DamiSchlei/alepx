@@ -22,6 +22,7 @@ import type {
   Objective,
   ParentType,
   Pillar,
+  Project,
   Result,
   ResultProgress,
   ResultStatus,
@@ -31,6 +32,44 @@ import type {
   Terreno,
 } from '@/domain/types'
 import { terrenoColor } from '@/domain/terrenos'
+
+export function allProjects(state: AlephState): Project[] {
+  const defined = state.projects ?? []
+  const definedNames = new Set(defined.map((p) => p.name.trim().toLowerCase()))
+  const synthesized: Project[] = [...defined]
+
+  for (const r of state.results) {
+    const pName = r.projectName?.trim()
+    if (pName && !definedNames.has(pName.toLowerCase())) {
+      definedNames.add(pName.toLowerCase())
+      synthesized.push({
+        id: `proj_${pName.toLowerCase().replace(/\s+/g, '_')}`,
+        name: pName,
+        createdAt: new Date().toISOString(),
+      })
+    }
+  }
+
+  if (synthesized.length === 0) {
+    synthesized.push({
+      id: 'proj_obra_principal',
+      name: 'La Obra Principal',
+      description: 'Proyecto central de creación, arte y desarrollo económico.',
+      color: '#7a3fe0',
+      icon: 'sparkles',
+      createdAt: new Date().toISOString(),
+    })
+  }
+
+  return synthesized
+}
+
+export function resultsOfProject(state: AlephState, projectName: string): Result[] {
+  const target = projectName.trim().toLowerCase()
+  return activeResults(state).filter(
+    (r) => (r.projectName?.trim() || 'La Obra Principal').toLowerCase() === target,
+  )
+}
 
 export function activeResults(state: AlephState): Result[] {
   return state.results

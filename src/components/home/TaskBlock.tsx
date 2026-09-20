@@ -4,7 +4,6 @@ import { blockContext } from '@/data/selectors'
 import { useAleph } from '@/data/store'
 import { isTaskDone } from '@/domain/economy'
 import { STAGE_LABELS } from '@/domain/stage'
-import { terrenoLabel } from '@/domain/terrenos'
 import { formatHours } from '@/i18n/format'
 import type { Task } from '@/domain/types'
 
@@ -33,11 +32,13 @@ export function TaskBlock({
   const ctx = blockContext(state, task)
   const done = isTaskDone(task.status)
 
-  // Meta: Terreno · horas · etapa
-  const tLabel = terrenoLabel(task.terreno)
+  // Meta: Objetivo/Proyecto decidido · horas · etapa (el riel porta el tono)
+  const targetName = ctx.objective?.name || ctx.result?.name
   const hoursFormatted = `${formatHours(ctx.hours, locale)} h`
   const stageFormatted = STAGE_LABELS[ctx.stage] ?? 'Ejecución'
-  const metaLine = `${tLabel} · ${hoursFormatted} · ${stageFormatted}`
+  const metaLine = targetName
+    ? `${targetName} · ${hoursFormatted} · ${stageFormatted}`
+    : `${hoursFormatted} · ${stageFormatted}`
 
   return (
     <div className="relative flex min-h-[56px] overflow-hidden rounded-[16px] border border-line bg-white transition-all hover:border-line-strong">

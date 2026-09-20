@@ -11,21 +11,27 @@ export function OnboardingResultPage() {
   const state = useAleph()
 
   const existingResult = state.results[0]
+  const [projectName, setProjectName] = useState(
+    existingResult?.projectName ?? 'La Obra Principal',
+  )
   const [work, setWork] = useState(existingResult?.name ?? DEFAULT_WORK)
 
-  const canContinue = work.trim().length > 0
+  const canContinue = work.trim().length > 0 && projectName.trim().length > 0
 
   const confirm = () => {
     if (!canContinue) return
+    const chosenProject = projectName.trim()
     const chosenName = work.trim()
 
     if (existingResult) {
       updateResult(existingResult.id, {
+        projectName: chosenProject,
         name: chosenName,
         pillar: 'body',
       })
     } else {
       createResult({
+        projectName: chosenProject,
         name: chosenName,
         pillar: 'body',
       })
@@ -51,79 +57,100 @@ export function OnboardingResultPage() {
         {/* Title & subtitle */}
         <div className="mt-4 space-y-2">
           <h1 className="font-display text-[28px] font-semibold leading-tight tracking-tight text-ink">
-            Qué obra vas a sostener
+            Proyecto y Resultado a sostener
           </h1>
           <p className="text-[15px] leading-relaxed text-ink-3">
-            Un Resultado. Home lo va a marcar día a día.
+            El proyecto es tu marco de creación; el resultado es lo que se produce concretamente dentro.
           </p>
         </div>
 
-        {/* Primary input with quick seed pill */}
-        <div className="mt-7 space-y-3">
+        {/* Primary inputs */}
+        <div className="mt-6 space-y-4">
           <div>
+            <label className="block text-[12px] font-bold uppercase tracking-wider text-ink-3 mb-1.5">
+              1. Nombre del Proyecto
+            </label>
+            <input
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              placeholder="Ej. La Obra Principal / Estudio Creativo"
+              className="h-12 w-full rounded-[16px] border border-line bg-white px-4 text-[15px] text-ink placeholder:text-ink-4 outline-none transition-all focus:border-[#7a3fe0] focus:ring-2 focus:ring-[#7a3fe0]/15"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[12px] font-bold uppercase tracking-wider text-ink-3 mb-1.5">
+              2. Resultado que se produce dentro
+            </label>
             <input
               type="text"
               value={work}
               onChange={(e) => setWork(e.target.value)}
-              placeholder="Nombre de tu obra…"
-              autoFocus
+              placeholder="Ej. Primer producto listo para vender"
               className="h-12 w-full rounded-[16px] border border-line bg-white px-4 text-[15px] text-ink placeholder:text-ink-4 outline-none transition-all focus:border-[#7a3fe0] focus:ring-2 focus:ring-[#7a3fe0]/15"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[13px] text-ink-3">Semilla:</span>
+            <span className="text-[13px] text-ink-3">Sugerencia:</span>
             <button
               type="button"
-              onClick={() => setWork(DEFAULT_WORK)}
+              onClick={() => {
+                setProjectName('La Obra Principal')
+                setWork(DEFAULT_WORK)
+              }}
               className="rounded-full border border-line bg-subtle px-3 py-1 text-[13px] text-ink-2 transition-colors hover:border-[#7a3fe0] hover:text-[#7a3fe0]"
             >
               Primer producto listo para vender
             </button>
           </div>
 
-          {/* Bloque ESTÁTICO explicativo (no selector excluyente) */}
+          {/* Presentación conceptual del recorrido */}
           <div className="mt-6 rounded-[16px] border border-line bg-[#fbfbfd] p-4">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-ink-3">
-              Tres terrenos para caminarla
+              Cómo se recorre una obra
             </div>
-            <div className="mt-3 space-y-3">
+            <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">
+              Toda obra se sostiene en tres dimensiones vivas. En tu día a día no gestionás categorías abstractas: caminás directamente hacia tus <strong>proyectos y objetivos decididos</strong>.
+            </p>
+            <div className="mt-3.5 space-y-2.5">
               <div className="flex items-start gap-3">
                 <div
-                  className="mt-1 size-2.5 shrink-0 rounded-full"
+                  className="mt-1.5 size-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: TERRENO_MAP.literatura.color }}
                   aria-hidden="true"
                 />
                 <div>
                   <span className="text-[14px] font-semibold text-ink">Literatura</span>
                   <span className="text-ink-4"> — </span>
-                  <span className="text-[14px] text-ink-2">nombra y decide</span>
+                  <span className="text-[13px] text-ink-2">lo que nombra, decide y acuerda (reglas, tiempos, estructura)</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <div
-                  className="mt-1 size-2.5 shrink-0 rounded-full"
+                  className="mt-1.5 size-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: TERRENO_MAP.arte.color }}
                   aria-hidden="true"
                 />
                 <div>
                   <span className="text-[14px] font-semibold text-ink">Arte</span>
                   <span className="text-ink-4"> — </span>
-                  <span className="text-[14px] text-ink-2">el paso que te atraviesa</span>
+                  <span className="text-[13px] text-ink-2">el paso que te atraviesa internamente (miedo, postura, límite propio)</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
                 <div
-                  className="mt-1 size-2.5 shrink-0 rounded-full"
+                  className="mt-1.5 size-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: TERRENO_MAP.empresa.color }}
                   aria-hidden="true"
                 />
                 <div>
                   <span className="text-[14px] font-semibold text-ink">Empresa</span>
                   <span className="text-ink-4"> — </span>
-                  <span className="text-[14px] text-ink-2">lo concreto</span>
+                  <span className="text-[13px] text-ink-2">lo que imprime en la materia tangible (producto, números, realidad)</span>
                 </div>
               </div>
             </div>

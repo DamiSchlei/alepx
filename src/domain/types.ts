@@ -63,8 +63,20 @@ export interface Skill {
   isCustom: boolean
 }
 
+export interface Project {
+  id: string
+  name: string
+  description?: string
+  color?: string
+  icon?: string
+  createdAt: string
+}
+
 export interface Result {
   id: string
+  /** The parent Project name, e.g. "Estudio Creativo", "Aleph", "Lanzamiento 2026" */
+  projectName?: string
+  /** The concrete Result produced inside the project, e.g. "Primer producto listo para vender" */
   name: string
   why?: string
   skillId?: string
@@ -192,6 +204,7 @@ export interface AlephState {
   version: number
   character: Character
   skills: Skill[]
+  projects?: Project[]
   results: Result[]
   objectives: Objective[]
   tasks: Task[]

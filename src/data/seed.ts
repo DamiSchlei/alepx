@@ -48,9 +48,20 @@ export function initialState(locale: Character['locale'] = 'es'): AlephState {
       onboarded: true,
     },
     skills: DEFAULT_SKILLS.map((s) => ({ ...s })),
+    projects: [
+      {
+        id: 'proj_obra_principal',
+        name: 'La Obra Principal',
+        description: 'Proyecto central de creación, arte y desarrollo económico.',
+        color: '#7a3fe0',
+        icon: 'sparkles',
+        createdAt: '2026-09-19T00:00:00.000Z',
+      },
+    ],
     results: [
       {
         id: 'result_obra_1',
+        projectName: 'La Obra Principal',
         name: 'Primer producto listo para vender',
         pillar: 'body',
         importance: 1,

@@ -45,29 +45,41 @@ export function Composer({ dayKey }: { dayKey: string }) {
       />
 
       <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-        {/* Selector de terreno: [Literatura | Arte | Empresa] */}
+        {/* Selector del tono del paso: Decidir | Atravesar | Concretar */}
         <div className="flex items-center gap-1.5">
           {TERRENOS.map((tId) => {
             const info = TERRENO_MAP[tId]
             const isSelected = terreno === tId
+            const verb =
+              tId === 'literatura'
+                ? 'Decidir'
+                : tId === 'arte'
+                  ? 'Atravesar'
+                  : 'Concretar'
             return (
               <button
                 key={tId}
                 type="button"
                 onClick={() => setTerreno(tId)}
+                title={info.filterQuestion}
                 className={cx(
                   'flex h-9 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-all active:scale-95',
                   isSelected
-                    ? 'border-[#7a3fe0] bg-[#f5f0ff] text-[#7a3fe0] font-semibold'
+                    ? 'border-current font-semibold shadow-xs'
                     : 'border-line bg-white text-ink-2 hover:border-line-strong',
                 )}
+                style={{
+                  borderColor: isSelected ? info.color : undefined,
+                  color: isSelected ? info.color : undefined,
+                  backgroundColor: isSelected ? `${info.color}12` : undefined,
+                }}
               >
                 <span
                   className="size-2 rounded-full"
                   style={{ backgroundColor: info.color }}
                   aria-hidden="true"
                 />
-                <span>{info.label}</span>
+                <span>{verb}</span>
               </button>
             )
           })}

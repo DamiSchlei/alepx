@@ -128,14 +128,12 @@ export function TaskRow({
           >
             {task.title}
           </p>
-          {/* Etiqueta de terreno */}
+          {/* Tinte discreto del paso */}
           <span
-            className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium"
-            style={{ backgroundColor: `${tInfo.color}15`, color: tInfo.color }}
-          >
-            <span className="size-1.5 rounded-full" style={{ backgroundColor: tInfo.color }} />
-            {tInfo.label}
-          </span>
+            className="size-2 rounded-full shrink-0"
+            style={{ backgroundColor: tInfo.color }}
+            aria-hidden="true"
+          />
         </div>
         <p className="mt-0.5 truncate text-[12px] font-medium leading-tight text-ink-3">
           {metaParts.join(' · ')}

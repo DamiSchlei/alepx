@@ -4,7 +4,6 @@ import { cx } from '@/components/ui/primitives'
 import { createTask, markOnboarded } from '@/data/actions'
 import { useAleph } from '@/data/store'
 import { toDayKey } from '@/domain/dates'
-import { TERRENOS, TERRENO_MAP } from '@/domain/terrenos'
 import type { Terreno } from '@/domain/types'
 
 export function OnboardingBlockPage() {
@@ -75,34 +74,60 @@ export function OnboardingBlockPage() {
             />
           </label>
 
-          {/* Selector de terreno (default Literatura) */}
+          {/* Selector del tono del paso */}
           <div className="space-y-1.5">
-            <span className="text-[13px] font-medium text-ink-3">Terreno</span>
+            <span className="text-[13px] font-medium text-ink-3">Naturaleza de este paso</span>
             <div className="grid grid-cols-3 gap-2">
-              {TERRENOS.map((tId) => {
-                const info = TERRENO_MAP[tId]
-                const isSelected = terreno === tId
-                return (
-                  <button
-                    key={tId}
-                    type="button"
-                    onClick={() => setTerreno(tId)}
-                    className={cx(
-                      'flex min-h-[44px] items-center justify-center gap-1.5 rounded-[16px] border px-2 py-2 text-[14px] font-medium transition-all active:scale-[0.98]',
-                      isSelected
-                        ? 'border-[#7a3fe0] bg-[#f5f0ff] font-semibold text-[#7a3fe0]'
-                        : 'border-line bg-white text-ink-2 hover:border-line-strong',
-                    )}
-                  >
-                    <span
-                      className="size-2 rounded-full"
-                      style={{ backgroundColor: info.color }}
-                      aria-hidden="true"
-                    />
-                    <span>{info.label}</span>
-                  </button>
-                )
-              })}
+              <button
+                type="button"
+                onClick={() => setTerreno('literatura')}
+                className={cx(
+                  'flex min-h-[44px] flex-col items-center justify-center rounded-[16px] border p-2 text-center transition-all active:scale-[0.98]',
+                  terreno === 'literatura'
+                    ? 'border-[#7a3fe0] bg-[#f5f0ff] font-semibold text-[#7a3fe0]'
+                    : 'border-line bg-white text-ink-2 hover:border-line-strong',
+                )}
+              >
+                <span className="flex items-center gap-1.5 text-[13px]">
+                  <span className="size-2 rounded-full bg-[#7a3fe0]" />
+                  <span>Decidir</span>
+                </span>
+                <span className="text-[10px] text-ink-3">acuerdo / regla</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTerreno('arte')}
+                className={cx(
+                  'flex min-h-[44px] flex-col items-center justify-center rounded-[16px] border p-2 text-center transition-all active:scale-[0.98]',
+                  terreno === 'arte'
+                    ? 'border-[#4f46e5] bg-[#eef2ff] font-semibold text-[#4f46e5]'
+                    : 'border-line bg-white text-ink-2 hover:border-line-strong',
+                )}
+              >
+                <span className="flex items-center gap-1.5 text-[13px]">
+                  <span className="size-2 rounded-full bg-[#4f46e5]" />
+                  <span>Atravesar</span>
+                </span>
+                <span className="text-[10px] text-ink-3">límite / postura</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setTerreno('empresa')}
+                className={cx(
+                  'flex min-h-[44px] flex-col items-center justify-center rounded-[16px] border p-2 text-center transition-all active:scale-[0.98]',
+                  terreno === 'empresa'
+                    ? 'border-[#0f9f6e] bg-[#ecfdf5] font-semibold text-[#0f9f6e]'
+                    : 'border-line bg-white text-ink-2 hover:border-line-strong',
+                )}
+              >
+                <span className="flex items-center gap-1.5 text-[13px]">
+                  <span className="size-2 rounded-full bg-[#0f9f6e]" />
+                  <span>Imprimir</span>
+                </span>
+                <span className="text-[10px] text-ink-3">materia concreta</span>
+              </button>
             </div>
           </div>
 

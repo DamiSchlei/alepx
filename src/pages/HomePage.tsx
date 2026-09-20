@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { DayIndexList } from '@/components/home/DayIndexList'
-import { DayTaskViewer } from '@/components/home/DayTaskViewer'
+import { DayCanvas } from '@/components/home/DayCanvas'
+import { DayCarousel } from '@/components/home/DayCarousel'
 import { HomeStickyChrome, type HomeGranularity } from '@/components/home/HomeStickyChrome'
 import { PeriodGrid } from '@/components/home/PeriodGrid'
 import { weekStartKeyOf } from '@/data/dayLoad'
@@ -21,6 +21,7 @@ export function HomePage() {
 
   const [granularity, setGranularity] = useState<HomeGranularity>('day')
   const [activeDay, setActiveDay] = useState(todayKey)
+  const [canvasOpenDay, setCanvasOpenDay] = useState<string | null>(null)
 
   const showHoy =
     granularity === 'day'
@@ -46,7 +47,7 @@ export function HomePage() {
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-24">
       <HomeStickyChrome
         activeDay={activeDay}
         todayKey={todayKey}
@@ -69,18 +70,14 @@ export function HomePage() {
 
       {granularity === 'day' ? (
         <div className="flex flex-col">
-          <DayTaskViewer
+          {/* Carrusel Infinito de Días */}
+          <DayCarousel
             activeDay={activeDay}
             todayKey={todayKey}
             localeTag={localeTag}
-          />
-          <DayIndexList
-            activeDay={activeDay}
-            todayKey={todayKey}
-            localeTag={localeTag}
-            onSelectDay={(dayKey) => {
-              jumpTo(dayKey)
-            }}
+            onSelectDay={jumpTo}
+            onOpenCanvas={(dayKey) => setCanvasOpenDay(dayKey)}
+            onQuickAdd={(dayKey) => setCanvasOpenDay(dayKey)}
           />
         </div>
       ) : (
@@ -93,6 +90,16 @@ export function HomePage() {
             setGranularity('day')
             jumpTo(dayKey)
           }}
+        />
+      )}
+
+      {/* Lienzo Amplio del Día (Pantalla completa con Células / Semillas) */}
+      {canvasOpenDay && (
+        <DayCanvas
+          dayKey={canvasOpenDay}
+          todayKey={todayKey}
+          localeTag={localeTag}
+          onClose={() => setCanvasOpenDay(null)}
         />
       )}
     </div>

@@ -10,7 +10,8 @@ export type HomeGranularity = 'day' | 'week' | 'month'
 function weekdayDate(dayKey: string, localeTag: string): string {
   const date = parseLocal(dayKey)
   const weekday = new Intl.DateTimeFormat(localeTag, { weekday: 'long' }).format(date)
-  return `${weekday} ${date.getDate()}`
+  const month = new Intl.DateTimeFormat(localeTag, { month: 'short' }).format(date)
+  return `${weekday} ${date.getDate()} ${month.replace('.', '')}`
 }
 
 function longDateLine(

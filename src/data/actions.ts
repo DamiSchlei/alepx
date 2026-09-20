@@ -20,6 +20,7 @@ import type {
   ObjectiveStatus,
   ParentType,
   Pillar,
+  Project,
   Result,
   ResultStatus,
   Skill,
@@ -89,10 +90,129 @@ export function createSkill(input: { name: string; icon: string; color?: string 
   return skill
 }
 
+// ----------------------------------------------------------------- projects
+
+export interface ProjectInput {
+  name: string
+  description?: string
+  color?: string
+  icon?: string
+}
+
+export function createProject(input: ProjectInput): Project {
+  const project: Project = {
+    id: newId('project'),
+    name: input.name.trim(),
+    description: input.description?.trim() || undefined,
+    color: input.color || '#7a3fe0',
+    icon: input.icon || 'folder',
+    createdAt: now(),
+  }
+  setState((s) => ({
+    ...s,
+    projects: [...(s.projects ?? []), project],
+  }))
+  return project
+}
+
+export function updateProject(
+  id: string,
+  patch: Partial<Omit<Project, 'id' | 'createdAt'>>,
+): void {
+  setState((s) => {
+    let projects = [...(s.projects ?? [])]
+    const existingIndex = projects.findIndex((p) => p.id === id)
+    const newName = patch.name?.trim()
+
+    let oldName = existingIndex >= 0 ? projects[existingIndex].name : undefined
+
+    // If not found by ID in s.projects, find from synthesized results or default
+    if (!oldName) {
+      const match = s.results.find(
+        (r) =>
+          r.projectName &&
+          (`proj_${r.projectName.toLowerCase().replace(/\s+/g, '_')}` === id ||
+            r.projectName.toLowerCase() === id.toLowerCase()),
+      )
+      if (match?.projectName) {
+        oldName = match.projectName
+      } else if (id === 'proj_obra_principal' || id === 'proj_default') {
+        oldName = 'La Obra Principal'
+      }
+    }
+
+    if (existingIndex >= 0) {
+      projects[existingIndex] = {
+        ...projects[existingIndex],
+        ...patch,
+        name: newName || projects[existingIndex].name,
+      }
+    } else {
+      // It was synthesized, so now we formally materialize it in s.projects
+      projects.push({
+        id,
+        name: newName || oldName || 'Proyecto',
+        description: patch.description,
+        color: patch.color || '#7a3fe0',
+        icon: patch.icon || 'folder',
+        createdAt: now(),
+      })
+    }
+
+    // If project was renamed, cascade update to results
+    let nextResults = s.results
+    const effectiveOld = oldName || (existingIndex >= 0 ? projects[existingIndex].name : undefined)
+    if (effectiveOld && newName && effectiveOld.trim().toLowerCase() !== newName.toLowerCase()) {
+      nextResults = s.results.map((r) => {
+        const rProj = r.projectName?.trim() || 'La Obra Principal'
+        if (rProj.toLowerCase() === effectiveOld.trim().toLowerCase()) {
+          return { ...r, projectName: newName }
+        }
+        return r
+      })
+    }
+
+    return {
+      ...s,
+      projects,
+      results: nextResults,
+    }
+  })
+}
+
+export function deleteProject(id: string): void {
+  setState((s) => {
+    const existing = (s.projects ?? []).find((p) => p.id === id)
+    let targetName = existing?.name
+    if (!targetName) {
+      const match = s.results.find(
+        (r) =>
+          r.projectName &&
+          (`proj_${r.projectName.toLowerCase().replace(/\s+/g, '_')}` === id ||
+            r.projectName.toLowerCase() === id.toLowerCase()),
+      )
+      targetName = match?.projectName
+    }
+
+    return {
+      ...s,
+      projects: (s.projects ?? []).filter((p) => p.id !== id),
+      results: targetName
+        ? s.results.map((r) =>
+            (r.projectName?.trim() || '').toLowerCase() === targetName.trim().toLowerCase()
+              ? { ...r, projectName: undefined }
+              : r,
+          )
+        : s.results,
+    }
+  })
+}
+
 // ------------------------------------------------------------------ results
 
 export interface ResultInput {
   name: string
+  projectName?: string
   why?: string
   skillId?: string
   pillar?: Pillar
@@ -104,6 +224,7 @@ export function createResult(input: ResultInput): Result {
   const skillId = input.skillId || undefined
   const result: Result = {
     id: newId('result'),
+    projectName: input.projectName?.trim() || undefined,
     name: input.name.trim(),
     why: input.why?.trim() || undefined,
     skillId,
