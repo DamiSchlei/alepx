@@ -89,14 +89,18 @@ export function ProjectHierarchyView({
   const accentColor = project.color || '#7a3fe0'
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* PROJECT BANNER / HEADER */}
-      <div className="relative overflow-hidden rounded-2xl border border-line bg-white p-4.5 shadow-paper">
-        <div
-          className="absolute inset-y-0 left-0 w-1.5"
-          style={{ backgroundColor: accentColor }}
-        />
-        <div className="flex flex-col gap-3 pl-1">
+    <div
+      className="relative overflow-hidden rounded-2xl border border-line bg-white shadow-paper"
+      style={{ borderLeftWidth: '5px', borderLeftColor: accentColor }}
+    >
+      {/* PROJECT */}
+      <div
+        className="p-4 pl-4"
+        style={{
+          background: `linear-gradient(to right, ${accentColor}14 0%, #ffffff 42%)`,
+        }}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
             <span
               className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
@@ -127,88 +131,65 @@ export function ProjectHierarchyView({
               className="flex items-center gap-1.5 shadow-sm text-[13px] px-3 py-1.5"
             >
               <Plus className="size-4" />
-              <span>Nuevo Resultado</span>
+              <span>Resultado</span>
             </Button>
           </div>
         </div>
 
-        {/* METRICS ROW */}
-        <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-line/60 pt-3 pl-1 text-[12px] text-ink-3">
-          <div className="flex items-center gap-1.5">
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-ink-3">
+          <span className="flex items-center gap-1.5">
             <Layers className="size-4 text-ink-2" />
-            <span>
-              <strong className="text-ink font-semibold">{results.length}</strong>{' '}
-              {results.length === 1 ? 'resultado' : 'resultados'}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
+            <strong className="text-ink font-semibold">{results.length}</strong>{' '}
+            {results.length === 1 ? 'resultado' : 'resultados'}
+          </span>
+          <span className="flex items-center gap-1.5">
             <Target className="size-4 text-ink-2" />
-            <span>
-              <strong className="text-ink font-semibold">{allObjectives.length}</strong>{' '}
-              {allObjectives.length === 1 ? 'objetivo' : 'objetivos'}
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
+            <strong className="text-ink font-semibold">{allObjectives.length}</strong>{' '}
+            {allObjectives.length === 1 ? 'objetivo' : 'objetivos'}
+          </span>
+          <span className="flex items-center gap-1.5">
             <CheckCircle2 className="size-4 text-emerald-600" />
-            <span>
-              <strong className="text-ink font-semibold">{completedTasks.length}</strong> de{' '}
-              {allTasks.length} {allTasks.length === 1 ? 'tarea' : 'tareas'} ({overallRatio}%)
-            </span>
-          </div>
+            <strong className="text-ink font-semibold">{completedTasks.length}</strong> de{' '}
+            {allTasks.length} {allTasks.length === 1 ? 'tarea' : 'tareas'} ({overallRatio}%)
+          </span>
         </div>
       </div>
 
-      {/* RESULTS LIST IN THIS PROJECT */}
       {results.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line bg-surface/40 p-8 text-center">
-          <div
-            className="flex size-12 items-center justify-center rounded-2xl text-white shadow-sm"
-            style={{ backgroundColor: accentColor }}
-          >
-            <Layers className="size-6" />
-          </div>
-          <h3 className="mt-3 text-[16px] font-bold text-ink">
-            No hay resultados definidos en este proyecto
-          </h3>
-          <p className="mt-1 max-w-sm text-[13px] text-ink-3">
-            Define el primer fruto u obra concreta que nacerá dentro de {project.name}.
-          </p>
+        <div className="border-t border-line/60 px-4 py-6 text-center">
+          <p className="text-[14px] font-medium text-ink-2">Sin resultados en este proyecto.</p>
           <Button
             onClick={() => onNewResult(project.name)}
-            className="mt-4 flex items-center gap-1.5"
+            className="mt-3 inline-flex items-center gap-1.5"
           >
             <Plus className="size-4" />
-            <span>Definir Primer Resultado</span>
+            <span>Definir resultado</span>
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col gap-3.5">
-          {results.map((result) => {
+        <div className="border-t border-line/60">
+          {results.map((result, resultIndex) => {
             const isCollapsed = collapsedResultIds.has(result.id)
             const objectives = activeObjectivesOfResult(state, result.id)
             const projectColor = project.color || '#7a3fe0'
+            const lastResult = resultIndex === results.length - 1
 
             return (
               <div
                 key={result.id}
-                className="overflow-hidden rounded-2xl border border-line bg-white shadow-xs transition-all hover:shadow-paper"
+                className={lastResult ? '' : 'border-b border-line/50'}
               >
-                {/* RESULT HEADER IMPREGNATED WITH PROJECT COLOR */}
                 <div
-                  className="relative border-b border-line/40 p-3.5 pl-4"
+                  className="px-4 py-3"
                   style={{
-                    background: `linear-gradient(to right, ${projectColor}12, ${projectColor}03 45%, transparent 75%)`,
+                    background: `linear-gradient(to right, ${projectColor}0c 0%, transparent 55%)`,
                   }}
                 >
-                  <div
-                    className="absolute inset-y-0 left-0 w-1.5"
-                    style={{ backgroundColor: projectColor }}
-                  />
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span
-                          className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
+                          className="inline-flex items-center text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md"
                           style={{
                             backgroundColor: `${projectColor}18`,
                             color: projectColor,
@@ -223,22 +204,19 @@ export function ProjectHierarchyView({
                           </span>
                         )}
                       </div>
-
                       <Link
                         to={`/planning/results/${result.id}`}
-                        className="mt-1 block text-[16px] font-bold text-ink hover:underline transition-colors"
+                        className="mt-1 block text-[16px] font-bold text-ink hover:underline"
                       >
                         {result.name}
                       </Link>
-
                       {result.why && (
                         <p className="mt-0.5 text-[12px] text-ink-3 line-clamp-1 italic">
                           "{result.why}"
                         </p>
                       )}
                     </div>
-
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 shrink-0">
                       <Button
                         variant="secondary"
                         className="text-[12px] px-2.5 py-1 flex items-center gap-1"
@@ -251,7 +229,7 @@ export function ProjectHierarchyView({
                         type="button"
                         aria-label={isCollapsed ? 'Desplegar' : 'Plegar'}
                         onClick={() => toggleResult(result.id)}
-                        className="rounded-full p-1.5 text-ink-3 hover:bg-black/5 hover:text-ink transition-colors"
+                        className="rounded-full p-1.5 text-ink-3 hover:bg-black/5 hover:text-ink"
                       >
                         {isCollapsed ? (
                           <ChevronRight className="size-4" />
@@ -261,9 +239,7 @@ export function ProjectHierarchyView({
                       </button>
                     </div>
                   </div>
-
-                  {/* MULTI-SABER PROGRESS BAR IMPREGNATED WITH PROJECT & SABER ACCUMULATION */}
-                  <div className="mt-3">
+                  <div className="mt-2.5">
                     <SaberProgressBar
                       tasks={tasksOfResult(state, result.id)}
                       projectColor={projectColor}
@@ -271,128 +247,127 @@ export function ProjectHierarchyView({
                       size="md"
                     />
                   </div>
-                </div>
 
-                {/* OBJECTIVES ACCORDION */}
-                {!isCollapsed && (
-                  <div className="flex flex-col gap-2.5 p-3">
-                    {objectives.length === 0 ? (
-                      <div className="flex items-center justify-between rounded-xl border border-dashed border-line/80 bg-surface/50 px-3.5 py-2.5 text-[12px] text-ink-3">
-                        <span>Sin objetivos definidos aún para este resultado.</span>
-                        <Button
-                          variant="ghost"
-                          className="text-[12px] p-0 h-auto font-semibold hover:underline"
-                          style={{ color: projectColor }}
-                          onClick={() => onNewObjective(result)}
-                        >
-                          + Añadir primer objetivo
-                        </Button>
-                      </div>
-                    ) : (
-                      objectives.map((obj) => {
-                        const objCollapsed = collapsedObjectiveIds.has(obj.id)
-                        const objTasks = tasksOfObjective(state, obj.id)
-                        const objDone = obj.status === 'done'
-
-                        return (
-                          <div
-                            key={obj.id}
-                            className="rounded-xl border border-line/80 p-3 transition-all"
-                            style={{
-                              borderLeftWidth: '3.5px',
-                              borderLeftColor: projectColor,
-                              background: `linear-gradient(to right, ${projectColor}08 0%, #ffffff 40%)`,
-                            }}
+                  {!isCollapsed && (
+                    <div
+                      className="mt-3 ml-1 flex flex-col gap-2.5 border-l-2 pl-3"
+                      style={{ borderLeftColor: `${projectColor}40` }}
+                    >
+                      {objectives.length === 0 ? (
+                        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-dashed border-line/80 bg-surface/50 px-3 py-2 text-[12px] text-ink-3">
+                          <span>Sin objetivos en este resultado.</span>
+                          <button
+                            type="button"
+                            className="font-semibold hover:underline"
+                            style={{ color: projectColor }}
+                            onClick={() => onNewObjective(result)}
                           >
-                            {/* OBJECTIVE TITLE ROW */}
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex min-w-0 flex-1 items-center gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => toggleObjective(obj.id)}
-                                  className="text-ink-3 hover:text-ink shrink-0"
-                                >
-                                  {objCollapsed ? (
-                                    <ChevronRight className="size-3.5" />
-                                  ) : (
-                                    <ChevronDown className="size-3.5" />
-                                  )}
-                                </button>
-                                <span
-                                  className="size-2 rounded-full shrink-0"
-                                  style={{ backgroundColor: projectColor }}
-                                  aria-hidden="true"
-                                />
-                                <div className="min-w-0">
-                                  <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-                                    Objetivo
-                                  </span>
-                                  <Link
-                                    to={`/planning/objectives/${obj.id}`}
-                                    className={`truncate text-[14px] font-semibold hover:underline transition-colors ${
-                                      objDone ? 'line-through text-ink-3' : 'text-ink'
-                                    }`}
+                            + Definir objetivo
+                          </button>
+                        </div>
+                      ) : (
+                        objectives.map((obj) => {
+                          const objCollapsed = collapsedObjectiveIds.has(obj.id)
+                          const objTasks = tasksOfObjective(state, obj.id)
+                          const objDone = obj.status === 'done'
+
+                          return (
+                            <div
+                              key={obj.id}
+                              className="rounded-xl bg-white/80 p-2.5"
+                              style={{
+                                borderLeftWidth: '3px',
+                                borderLeftStyle: 'solid',
+                                borderLeftColor: projectColor,
+                                background: `linear-gradient(to right, ${projectColor}0a 0%, #ffffff 50%)`,
+                              }}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex min-w-0 flex-1 items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleObjective(obj.id)}
+                                    className="text-ink-3 hover:text-ink shrink-0"
                                   >
-                                    {obj.name}
-                                  </Link>
-                                </div>
-                                <span className="text-[11px] text-ink-3 shrink-0">
-                                  ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
-                                </span>
-                              </div>
-
-                              <Button
-                                variant="ghost"
-                                className="text-[11px] h-auto px-2 py-0.5 shrink-0 font-semibold hover:bg-black/5"
-                                style={{ color: projectColor }}
-                                onClick={() => onNewTask(result.id, obj.id)}
-                              >
-                                + Tarea
-                              </Button>
-                            </div>
-
-                            {obj.doneWhen && (
-                              <p className="mt-1 pl-6 text-[11px] text-ink-3">
-                                <strong>Hecho cuando:</strong> {obj.doneWhen}
-                              </p>
-                            )}
-
-                            {/* OBJECTIVE SABER PROGRESS BAR */}
-                            {objTasks.length > 0 && (
-                              <div className="mt-2.5 pl-6 pr-1">
-                                <SaberProgressBar
-                                  tasks={objTasks}
-                                  projectColor={projectColor}
-                                  showBadges={true}
-                                  size="sm"
-                                />
-                              </div>
-                            )}
-
-                            {/* TASKS / PASOS OF THIS OBJECTIVE */}
-                            {!objCollapsed && objTasks.length > 0 && (
-                              <div
-                                className="mt-2.5 flex flex-col gap-1.5 pl-4 border-l-2"
-                                style={{ borderLeftColor: `${projectColor}35` }}
-                              >
-                                {objTasks.map((task) => (
-                                  <TaskRow
-                                    key={task.id}
-                                    task={task}
-                                    onToggle={() => handleToggleTask(task)}
-                                    onOpenTactical={() => onOpenTactical?.(task.id)}
-                                    onOpen={() => onOpenTactical?.(task.id)}
-                                    showContext={false}
+                                    {objCollapsed ? (
+                                      <ChevronRight className="size-3.5" />
+                                    ) : (
+                                      <ChevronDown className="size-3.5" />
+                                    )}
+                                  </button>
+                                  <span
+                                    className="size-2 rounded-full shrink-0"
+                                    style={{ backgroundColor: projectColor }}
+                                    aria-hidden="true"
                                   />
-                                ))}
+                                  <div className="min-w-0">
+                                    <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                                      Objetivo
+                                    </span>
+                                    <Link
+                                      to={`/planning/objectives/${obj.id}`}
+                                      className={`truncate text-[14px] font-semibold hover:underline ${
+                                        objDone ? 'line-through text-ink-3' : 'text-ink'
+                                      }`}
+                                    >
+                                      {obj.name}
+                                    </Link>
+                                  </div>
+                                  <span className="text-[11px] text-ink-3 shrink-0">
+                                    ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
+                                  </span>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  className="text-[11px] h-auto px-2 py-0.5 shrink-0 font-semibold hover:bg-black/5"
+                                  style={{ color: projectColor }}
+                                  onClick={() => onNewTask(result.id, obj.id)}
+                                >
+                                  + Tarea
+                                </Button>
                               </div>
-                            )}
-                          </div>
-                        )
-                      })
-                    )}
-                  </div>
-                )}
+
+                              {obj.doneWhen && (
+                                <p className="mt-1 pl-6 text-[11px] text-ink-3">
+                                  <strong>Hecho cuando:</strong> {obj.doneWhen}
+                                </p>
+                              )}
+
+                              {objTasks.length > 0 && (
+                                <div className="mt-2 pl-6 pr-1">
+                                  <SaberProgressBar
+                                    tasks={objTasks}
+                                    projectColor={projectColor}
+                                    showBadges={true}
+                                    size="sm"
+                                  />
+                                </div>
+                              )}
+
+                              {!objCollapsed && objTasks.length > 0 && (
+                                <div
+                                  className="mt-2 flex flex-col gap-1.5 border-l-2 pl-3 ml-2"
+                                  style={{ borderLeftColor: `${projectColor}30` }}
+                                >
+                                  {objTasks.map((task) => (
+                                    <TaskRow
+                                      key={task.id}
+                                      task={task}
+                                      onToggle={() => handleToggleTask(task)}
+                                      onOpenTactical={() => onOpenTactical?.(task.id)}
+                                      onOpen={() => onOpenTactical?.(task.id)}
+                                      showContext={false}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             )
           })}

@@ -757,7 +757,7 @@ export function DayCanvas({
             >
               <div className="flex items-center justify-between pb-3 border-b border-line">
                 <div>
-                  <h3 className="text-[17px] font-bold text-ink">Decidir nuevo objetivo</h3>
+                  <h3 className="text-[17px] font-bold text-ink">Definir objetivo</h3>
                   <p className="text-[12px] text-ink-3">Para: {targetResultForObjective.name}</p>
                 </div>
                 <button
@@ -803,7 +803,7 @@ export function DayCanvas({
                   disabled={!newObjectiveName.trim()}
                   className="mt-2 w-full rounded-full bg-[#7a3fe0] py-3 text-[14px] font-semibold text-white shadow-sm hover:bg-[#6832c7] active:scale-98 disabled:opacity-40 transition-all"
                 >
-                  Guardar objetivo decidido
+                  Guardar objetivo
                 </button>
               </form>
             </motion.div>
@@ -897,7 +897,8 @@ function ResultCellCard({
             </p>
           )}
           <p className="text-[11px] font-medium text-ink-3 mt-1">
-            {objectives.length} objetivos decididos · {tasks.length} {tasks.length === 1 ? 'tarea' : 'tareas'} hoy ({hours}h)
+            {objectives.length} {objectives.length === 1 ? 'objetivo' : 'objetivos'} · {tasks.length}{' '}
+            {tasks.length === 1 ? 'tarea' : 'tareas'} hoy ({hours}h)
           </p>
         </div>
 
@@ -926,12 +927,12 @@ function ResultCellCard({
         </div>
       </div>
 
-      {/* Objetivos Decididos dentro de este resultado (si existen) */}
+      {/* Objectives nested inside this result */}
       {objectives.length > 0 && (
         <div className="mt-3">
           <div className="flex items-center justify-between mb-1.5 px-0.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">
-              Objetivos Decididos
+              Objetivos
             </span>
             <button
               type="button"
@@ -939,7 +940,7 @@ function ResultCellCard({
               className="text-[11px] font-semibold hover:underline"
               style={{ color: projectColor }}
             >
-              + Decidir otro
+              + Definir objetivo
             </button>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -1017,7 +1018,7 @@ function ResultCellCard({
           onClick={onAddObjective}
           className="text-ink-3 hover:text-ink font-medium transition-colors"
         >
-          + Decidir objetivo
+          + Definir objetivo
         </button>
         <button
           type="button"
@@ -1110,7 +1111,9 @@ function ResultZoomModal({
 
         {/* Resumen */}
         <div className="my-3 flex items-center justify-between text-[12px] font-medium text-ink-3 bg-subtle p-2.5 rounded-[12px]">
-          <span>{objectives.length} objetivos decididos</span>
+          <span>
+            {objectives.length} {objectives.length === 1 ? 'objetivo' : 'objetivos'}
+          </span>
           <span>·</span>
           <span>{tasks.length} tareas hoy ({totalHours}h)</span>
         </div>
@@ -1121,7 +1124,7 @@ function ResultZoomModal({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[12px] font-bold uppercase tracking-wider text-ink-3">
-                Objetivos decididos dentro
+                Objetivos
               </span>
               <button
                 type="button"
@@ -1130,7 +1133,7 @@ function ResultZoomModal({
                 style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
-                <span>Decidir objetivo</span>
+                <span>Definir objetivo</span>
               </button>
             </div>
 

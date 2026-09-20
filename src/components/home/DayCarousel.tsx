@@ -140,7 +140,7 @@ export function DayCarousel({
               data-day={day}
               onClick={() => onSelectDay(day)}
               className={cx(
-                'w-[92%] max-w-[400px] shrink-0 snap-center rounded-[28px] border bg-surface p-5 transition-all',
+                'w-[92%] max-w-[400px] min-w-0 shrink-0 snap-center overflow-hidden rounded-[28px] border bg-surface p-4 transition-all sm:p-5',
                 selected
                   ? 'relative z-10 border-violet shadow-[var(--shadow-day)] ring-4 ring-violet/10'
                   : 'z-0 border-line opacity-70 shadow-paper',
