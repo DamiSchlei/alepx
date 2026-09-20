@@ -60,7 +60,7 @@ export function OnboardingResultPage() {
             Proyecto y Resultado a sostener
           </h1>
           <p className="text-[15px] leading-relaxed text-ink-3">
-            El proyecto es tu marco de creación; el resultado es lo que se produce concretamente dentro.
+            El proyecto es tu marco de creación; el resultado es lo concreto que se sostiene dentro.
           </p>
         </div>
 
@@ -81,7 +81,7 @@ export function OnboardingResultPage() {
 
           <div>
             <label className="block text-[12px] font-bold uppercase tracking-wider text-ink-3 mb-1.5">
-              2. Resultado que se produce dentro
+              2. Nombre del resultado
             </label>
             <input
               type="text"

@@ -27,6 +27,7 @@ import { freeHoursForDay, plannedHoursForDay } from '@/data/dayLoad'
 import {
   activeResults,
   allProjects,
+  objectiveById,
   objectivesOfResult,
   projectColorOfResult,
   tasksForDay,
@@ -58,7 +59,7 @@ export function DayCanvas({
   const results = activeResults(state)
   const projects = allProjects(state)
 
-  // Map of Projects -> Results produced inside
+  // Map of Projects -> Results inside
   const projectMap = useMemo(() => {
     const map = new Map<string, Result[]>()
     for (const p of projects) {
@@ -194,46 +195,50 @@ export function DayCanvas({
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-[#fbfbfa] text-ink overflow-hidden select-none">
       {/* Top Floating Navigation Bar */}
-      <header className="shrink-0 flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur-md border-b border-line z-20">
-        <div className="flex items-center gap-2.5">
+      <header className="shrink-0 flex flex-col gap-2 px-3 py-2.5 bg-white/90 backdrop-blur-md border-b border-line z-20">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={onClose}
             aria-label="Volver al carrusel"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line bg-subtle text-ink-2 hover:text-ink hover:border-line-strong active:scale-95 transition-all text-[13px] font-medium"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line bg-subtle text-ink-2 hover:text-ink hover:border-line-strong active:scale-95 transition-all text-[13px] font-medium shrink-0"
           >
             <ArrowLeft className="size-4" />
             <span>Carrusel</span>
           </button>
-          <div>
-            <h1 className="text-[15px] font-bold capitalize leading-tight flex items-center gap-1.5">
-              <span>{`${dayName} ${dayNum} de ${monthName}`}</span>
-              {isToday && (
-                <span className="rounded-full bg-[#f5f0ff] px-2 py-0.5 text-[10px] font-semibold text-[#7a3fe0]">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-[15px] font-bold capitalize leading-tight truncate">
+              {`${dayName} ${dayNum} de ${monthName}`}
+              {isToday ? (
+                <span className="ml-1.5 rounded-full bg-[#f5f0ff] px-2 py-0.5 text-[10px] font-semibold text-[#7a3fe0]">
                   Hoy
                 </span>
-              )}
+              ) : null}
             </h1>
-            <p className="text-[11px] font-medium text-ink-3">
+            <p className="text-[11px] font-medium text-ink-3 truncate">
               {formatHours(planned, locale)} h cargadas · {formatHours(free, locale)} h libres
             </p>
           </div>
-        </div>
-
-        {/* Action icons & view switcher */}
-        <div className="flex items-center gap-2">
-          {/* Botón de la Filosofía del Recorrido (explicación de los 3 movimientos) */}
           <button
             type="button"
             onClick={() => setShowPhilosophyModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-line bg-white text-ink-2 hover:text-[#7a3fe0] hover:border-[#7a3fe0]/40 text-[12px] font-medium transition-all shadow-2xs"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink-2 hover:text-[#7a3fe0] hover:border-[#7a3fe0]/40 transition-all"
             title="Ver filosofía del recorrido"
+            aria-label="El Recorrido"
           >
             <Sparkles className="size-3.5 text-[#7a3fe0]" />
-            <span className="hidden sm:inline">El Recorrido</span>
           </button>
+          <button
+            type="button"
+            onClick={() => handleOpenSeed()}
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#7a3fe0] text-white hover:bg-[#6832c7] active:scale-95 transition-all shadow-sm"
+            title="Añadir tarea"
+          >
+            <Plus className="size-4" />
+          </button>
+        </div>
 
-          {/* View switcher */}
+        <div className="flex justify-center">
           <div className="flex rounded-full bg-subtle p-0.5 border border-line">
             <button
               type="button"
@@ -272,16 +277,6 @@ export function DayCanvas({
               <span>Táctica</span>
             </button>
           </div>
-
-          {/* Añadir tarea */}
-          <button
-            type="button"
-            onClick={() => handleOpenSeed()}
-            className="flex size-9 items-center justify-center rounded-full bg-[#7a3fe0] text-white hover:bg-[#6832c7] active:scale-95 transition-all shadow-sm"
-            title="Añadir tarea"
-          >
-            <Plus className="size-4" />
-          </button>
         </div>
       </header>
 
@@ -365,9 +360,7 @@ export function DayCanvas({
                 <div className="mt-3 flex items-center gap-2 text-[11px] font-medium text-ink-3 border-t border-line/60 pt-2 w-full justify-center">
                   <span>
                     {resultsInCurrentProject.length}{' '}
-                    {resultsInCurrentProject.length === 1
-                      ? 'resultado producido'
-                      : 'resultados producidos'}
+                    {resultsInCurrentProject.length === 1 ? 'resultado' : 'resultados'}
                   </span>
                   <span>·</span>
                   <span>
@@ -384,13 +377,13 @@ export function DayCanvas({
               </motion.div>
             </div>
 
-            {/* SECCIÓN: RESULTADOS PRODUCIDOS DENTRO DEL PROYECTO */}
+            {/* SECCIÓN: RESULTADOS DENTRO DEL PROYECTO */}
             <div className="w-full z-10 flex flex-col gap-4">
               <div className="flex items-center justify-between px-1">
                 <div>
                   <span className="text-[12px] font-bold tracking-wider uppercase text-ink-3 flex items-center gap-1.5">
                     <Target className="size-3.5 text-ink-2" />
-                    <span>Resultados Producidos dentro</span>
+                    <span>Resultados</span>
                   </span>
                   <p className="text-[11px] text-ink-3">
                     Lo que se concreta dentro de {currentProjectName}
@@ -417,7 +410,7 @@ export function DayCanvas({
                     Aún no definiste resultados específicos para este proyecto.
                   </p>
                   <p className="mt-1 text-[12px] text-ink-3">
-                    El proyecto es el marco; los resultados son las obras tangibles que se producen dentro.
+                    El proyecto es el marco; los resultados son las obras tangibles que se sostienen dentro.
                   </p>
                   <div className="mt-4 flex justify-center">
                     <button
@@ -433,7 +426,7 @@ export function DayCanvas({
                 </div>
               )}
 
-              {/* Lista de células de Resultados Producidos */}
+              {/* Lista de células de Resultados */}
               {resultsInCurrentProject.map((res) => {
                 const resObjectives = objectivesOfResult(state, res.id)
                 const resTasks = tasks.filter((t) => t.resultId === res.id)
@@ -479,7 +472,7 @@ export function DayCanvas({
                       className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] px-2.5 py-1 rounded-full bg-[#f5f0ff]"
                     >
                       <Plus className="size-3" />
-                      <span>+ Tarea</span>
+                      <span>Tarea</span>
                     </button>
                   </div>
 
@@ -508,7 +501,7 @@ export function DayCanvas({
         )}
       </div>
 
-      {/* MODAL: ZOOM SEMÁNTICO EN EL RESULTADO PRODUCIDO */}
+      {/* MODAL: ZOOM SEMÁNTICO EN EL RESULTADO */}
       <AnimatePresence>
         {zoomedResult && (
           <ResultZoomModal
@@ -597,10 +590,10 @@ export function DayCanvas({
               </div>
 
               <form onSubmit={handleSeedSubmit} className="mt-4 flex flex-col gap-4">
-                {/* Selección del Resultado Producido */}
+                {/* Selección del Resultado */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Resultado Producido
+                    Resultado
                   </label>
                   <select
                     value={seedResultId || ''}
@@ -621,7 +614,7 @@ export function DayCanvas({
                 {/* Destino: Objetivo o directo al Resultado */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Hito / Objetivo específico (opcional)
+                    Nombre del objetivo
                   </label>
                   <select
                     value={seedObjectiveId || ''}
@@ -643,7 +636,7 @@ export function DayCanvas({
                 {/* Título de la acción */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    ¿Qué vas a hacer?
+                    Nombre de la tarea
                   </label>
                   <input
                     type="text"
@@ -651,7 +644,7 @@ export function DayCanvas({
                     autoFocus
                     value={seedTitle}
                     onChange={(e) => setSeedTitle(e.target.value)}
-                    placeholder="Ej. Escribir propuesta / Definir precio..."
+                    placeholder="Nombre de la tarea…"
                     className="w-full rounded-[12px] border border-line px-3.5 py-2.5 text-[15px] outline-none focus:border-[#7a3fe0] focus:ring-1 focus:ring-[#7a3fe0]"
                   />
                 </div>
@@ -764,7 +757,7 @@ export function DayCanvas({
             >
               <div className="flex items-center justify-between pb-3 border-b border-line">
                 <div>
-                  <h3 className="text-[17px] font-bold text-ink">Decidir nuevo objetivo</h3>
+                  <h3 className="text-[17px] font-bold text-ink">Definir objetivo</h3>
                   <p className="text-[12px] text-ink-3">Para: {targetResultForObjective.name}</p>
                 </div>
                 <button
@@ -810,7 +803,7 @@ export function DayCanvas({
                   disabled={!newObjectiveName.trim()}
                   className="mt-2 w-full rounded-full bg-[#7a3fe0] py-3 text-[14px] font-semibold text-white shadow-sm hover:bg-[#6832c7] active:scale-98 disabled:opacity-40 transition-all"
                 >
-                  Guardar objetivo decidido
+                  Guardar objetivo
                 </button>
               </form>
             </motion.div>
@@ -840,7 +833,7 @@ export function DayCanvas({
 }
 
 /**
- * Célula de Resultado Producido en el Lienzo
+ * Célula de Resultado en el Lienzo
  */
 function ResultCellCard({
   result,
@@ -889,7 +882,7 @@ function ResultCellCard({
               color: projectColor,
             }}
           >
-            Resultado Producido
+            Resultado
           </span>
           <h3
             onClick={onZoomResult}
@@ -904,7 +897,8 @@ function ResultCellCard({
             </p>
           )}
           <p className="text-[11px] font-medium text-ink-3 mt-1">
-            {objectives.length} objetivos decididos · {tasks.length} {tasks.length === 1 ? 'tarea' : 'tareas'} hoy ({hours}h)
+            {objectives.length} {objectives.length === 1 ? 'objetivo' : 'objetivos'} · {tasks.length}{' '}
+            {tasks.length === 1 ? 'tarea' : 'tareas'} hoy ({hours}h)
           </p>
         </div>
 
@@ -928,17 +922,17 @@ function ResultCellCard({
             }}
           >
             <Plus className="size-3" />
-            <span>+ Tarea</span>
+            <span>Tarea</span>
           </button>
         </div>
       </div>
 
-      {/* Objetivos Decididos dentro de este resultado (si existen) */}
+      {/* Objectives nested inside this result */}
       {objectives.length > 0 && (
         <div className="mt-3">
           <div className="flex items-center justify-between mb-1.5 px-0.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">
-              Objetivos Decididos
+              Objetivos
             </span>
             <button
               type="button"
@@ -946,7 +940,7 @@ function ResultCellCard({
               className="text-[11px] font-semibold hover:underline"
               style={{ color: projectColor }}
             >
-              + Decidir otro
+              + Definir objetivo
             </button>
           </div>
           <div className="flex flex-col gap-1.5">
@@ -966,8 +960,13 @@ function ResultCellCard({
                       className="size-2 rounded-full shrink-0"
                       style={{ backgroundColor: projectColor }}
                     />
-                    <span className="text-[13px] font-medium text-ink truncate group-hover:underline">
-                      {obj.name}
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                        Objetivo
+                      </span>
+                      <span className="text-[13px] font-medium text-ink truncate group-hover:underline block">
+                        {obj.name}
+                      </span>
                     </span>
                     <span className="text-[11px] text-ink-3 shrink-0">
                       ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
@@ -1019,7 +1018,7 @@ function ResultCellCard({
           onClick={onAddObjective}
           className="text-ink-3 hover:text-ink font-medium transition-colors"
         >
-          + Decidir objetivo
+          + Definir objetivo
         </button>
         <button
           type="button"
@@ -1034,7 +1033,7 @@ function ResultCellCard({
 }
 
 /**
- * Modal Zoom Semántico para un Resultado Producido
+ * Modal Zoom Semántico para un Resultado
  */
 function ResultZoomModal({
   result,
@@ -1089,7 +1088,10 @@ function ResultZoomModal({
               <FolderGit2 className="size-3.5" />
               <span>Proyecto: {result.projectName || 'La Obra Principal'}</span>
             </div>
-            <h2 className="text-[20px] font-bold text-ink mt-1 truncate">
+            <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+              Resultado
+            </span>
+            <h2 className="text-[20px] font-bold text-ink mt-0.5 truncate">
               {result.name}
             </h2>
             {result.why && (
@@ -1109,7 +1111,9 @@ function ResultZoomModal({
 
         {/* Resumen */}
         <div className="my-3 flex items-center justify-between text-[12px] font-medium text-ink-3 bg-subtle p-2.5 rounded-[12px]">
-          <span>{objectives.length} objetivos decididos</span>
+          <span>
+            {objectives.length} {objectives.length === 1 ? 'objetivo' : 'objetivos'}
+          </span>
           <span>·</span>
           <span>{tasks.length} tareas hoy ({totalHours}h)</span>
         </div>
@@ -1120,7 +1124,7 @@ function ResultZoomModal({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[12px] font-bold uppercase tracking-wider text-ink-3">
-                Objetivos decididos dentro
+                Objetivos
               </span>
               <button
                 type="button"
@@ -1129,7 +1133,7 @@ function ResultZoomModal({
                 style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
-                <span>Decidir objetivo</span>
+                <span>Definir objetivo</span>
               </button>
             </div>
 
@@ -1151,6 +1155,9 @@ function ResultZoomModal({
                         style={{ backgroundColor: projectColor }}
                       />
                       <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                          Objetivo
+                        </p>
                         <p className="text-[13px] font-bold text-ink truncate hover:underline">
                           {obj.name}
                         </p>
@@ -1181,7 +1188,7 @@ function ResultZoomModal({
                 style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
-                <span>+ Tarea</span>
+                <span>Tarea</span>
               </button>
             </div>
 
@@ -1239,6 +1246,8 @@ function TaskStepRow({
   onToggle: () => void
   onOpenTactical?: () => void
 }) {
+  const state = useAleph()
+  const objective = objectiveById(state, task.objectiveId)
   const done = isTaskDone(task.status)
   const tInfo = TERRENO_MAP[task.terreno ?? 'literatura']
 
@@ -1264,15 +1273,29 @@ function TaskStepRow({
           title={tInfo.label}
         />
 
-        <span
+        <div
           onClick={onOpenTactical}
-          className={`text-[13px] font-medium truncate cursor-pointer hover:text-purple-700 transition-colors ${
-            done ? 'line-through text-ink-3' : 'text-ink'
-          }`}
+          className="min-w-0 flex-1 cursor-pointer"
           title="Abrir estudio táctico"
         >
-          {task.title}
-        </span>
+          {objective ? (
+            <p className="text-[10px] font-bold uppercase tracking-wider text-ink-3 truncate">
+              Objetivo · {objective.name}
+            </p>
+          ) : null}
+          <p className="flex min-w-0 items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-ink-3 shrink-0">
+              Tarea
+            </span>
+            <span
+              className={`text-[13px] font-medium truncate ${
+                done ? 'line-through text-ink-3' : 'text-ink'
+              } hover:text-purple-700 transition-colors`}
+            >
+              {task.title}
+            </span>
+          </p>
+        </div>
       </div>
 
       <div className="flex items-center gap-1.5 shrink-0">
@@ -1329,7 +1352,10 @@ function ObjectiveZoomModal({
         <div className="flex items-start justify-between pb-3 border-b border-line">
           <div>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-3">
-              {resultName}
+              Resultado · {resultName}
+            </span>
+            <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+              Objetivo
             </span>
             <h3 className="text-[19px] font-bold text-ink mt-0.5">
               {objective.name}
@@ -1395,12 +1421,17 @@ function ObjectiveZoomModal({
                       style={{ backgroundColor: tInfo.color }}
                       title={tInfo.label}
                     />
-                    <span
-                      className={`text-[14px] font-semibold truncate ${
-                        done ? 'line-through text-ink-3' : 'text-ink'
-                      }`}
-                    >
-                      {t.title}
+                    <span className="min-w-0">
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                        Tarea
+                      </span>
+                      <span
+                        className={`text-[14px] font-semibold truncate block ${
+                          done ? 'line-through text-ink-3' : 'text-ink'
+                        }`}
+                      >
+                        {t.title}
+                      </span>
                     </span>
                   </div>
                   <span className="text-[12px] font-bold text-ink-3 ml-2">

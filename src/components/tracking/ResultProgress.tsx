@@ -68,13 +68,18 @@ export function ResultProgress({
                 aria-expanded={expanded}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <Link
-                    to={`/planning/results/${result.id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="min-w-0 flex-1 line-clamp-2 text-[17px] leading-snug font-medium text-ink"
-                  >
-                    {result.name}
-                  </Link>
+                  <div className="min-w-0 flex-1">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                      {t('common.result')}
+                    </span>
+                    <Link
+                      to={`/planning/results/${result.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="min-w-0 flex-1 line-clamp-2 text-[17px] leading-snug font-medium text-ink"
+                    >
+                      {result.name}
+                    </Link>
+                  </div>
                   {countLabel ? (
                     <span className="shrink-0 pt-0.5 text-[13px] font-medium tabular-nums text-accent">
                       {countLabel}
@@ -101,6 +106,9 @@ export function ResultProgress({
                             <span
                               className={`min-w-0 truncate text-[14px] ${done ? 'text-ink-3 line-through' : 'text-ink'}`}
                             >
+                              <span className="mr-1.5 text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                                {t('common.objective')}
+                              </span>
                               {objective.name}
                             </span>
                             <span className="shrink-0 text-[12px] text-text-3">

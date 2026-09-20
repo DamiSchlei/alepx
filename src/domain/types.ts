@@ -76,7 +76,7 @@ export interface Result {
   id: string
   /** The parent Project name, e.g. "Estudio Creativo", "Aleph", "Lanzamiento 2026" */
   projectName?: string
-  /** The concrete Result produced inside the project, e.g. "Primer producto listo para vender" */
+  /** The concrete Result inside the project, e.g. "Primer producto listo para vender" */
   name: string
   why?: string
   skillId?: string

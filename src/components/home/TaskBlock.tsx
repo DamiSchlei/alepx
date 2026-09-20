@@ -38,8 +38,12 @@ export function TaskBlock({
   const done = isTaskDone(task.status)
   const isExecuting = focusSession.activeTaskId === task.id
 
-  // Meta: Objetivo/Proyecto decidido · horas · etapa (el riel porta el tono)
-  const targetName = ctx.objective?.name || ctx.result?.name
+  // Meta: Objetivo/Resultado · horas · etapa (el riel porta el tono)
+  const targetName = ctx.objective
+    ? `Objetivo · ${ctx.objective.name}`
+    : ctx.result
+      ? `Resultado · ${ctx.result.name}`
+      : null
   const hoursFormatted = task.actualHours
     ? `${Math.round(task.actualHours * 60)}m dedicados`
     : `${formatHours(ctx.hours, locale)} h`
@@ -79,6 +83,9 @@ export function TaskBlock({
               done && 'line-through text-ink-3',
             )}
           >
+            <span className="mr-1.5 text-[10px] font-bold uppercase tracking-wider text-ink-3">
+              Tarea
+            </span>
             {task.title}
           </p>
           <div className="flex items-center gap-1.5 mt-0.5">

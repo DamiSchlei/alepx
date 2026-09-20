@@ -108,7 +108,7 @@ export function ResultForm({
           </datalist>
         </Field>
 
-        <Field label="Resultado que se produce dentro" hint="El resultado concreto y tangible que se genera dentro del proyecto">
+        <Field label={t('planning.results.nameLabel')} hint="El resultado concreto y tangible que se genera dentro del proyecto">
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}

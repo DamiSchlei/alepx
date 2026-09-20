@@ -34,6 +34,7 @@ export function DayCarousel({
   const state = useAleph()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const programmatic = useRef(false)
+  const snapReady = useRef(false)
 
   const days = useMemo(() => {
     const list: string[] = []
@@ -43,18 +44,51 @@ export function DayCarousel({
     return list
   }, [todayKey])
 
+  const centerActiveDay = (container: HTMLElement): boolean => {
+    const el = container.querySelector<HTMLElement>(`[data-day="${activeDay}"]`)
+    if (!el) return false
+    const width = container.clientWidth
+    if (width < 40 || el.offsetWidth < 40) return false
+    programmatic.current = true
+    snapReady.current = false
+    const left = el.offsetLeft - (width - el.offsetWidth) / 2
+    container.scrollTo({ left: Math.max(0, left), behavior: 'auto' })
+    const center = container.scrollLeft + width / 2
+    const mid = el.offsetLeft + el.offsetWidth / 2
+    return Math.abs(center - mid) < Math.max(28, el.offsetWidth / 3)
+  }
+
   useLayoutEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
-    const el = container.querySelector<HTMLElement>(`[data-day="${activeDay}"]`)
-    if (!el) return
-    programmatic.current = true
-    const left = el.offsetLeft - (container.clientWidth - el.offsetWidth) / 2
-    container.scrollTo({ left: Math.max(0, left), behavior: 'auto' })
-    const release = window.setTimeout(() => {
+
+    let cancelled = false
+    let frames = 0
+    const finish = () => {
+      if (cancelled) return
       programmatic.current = false
-    }, 80)
-    return () => window.clearTimeout(release)
+      snapReady.current = true
+    }
+
+    const trySnap = () => {
+      if (cancelled) return
+      if (centerActiveDay(container)) {
+        window.setTimeout(finish, 160)
+        return
+      }
+      if (frames++ < 30) requestAnimationFrame(trySnap)
+      else finish()
+    }
+
+    trySnap()
+    const ro = new ResizeObserver(() => {
+      if (!snapReady.current) trySnap()
+    })
+    ro.observe(container)
+    return () => {
+      cancelled = true
+      ro.disconnect()
+    }
   }, [activeDay])
 
   useEffect(() => {
@@ -62,7 +96,7 @@ export function DayCarousel({
     if (!container) return
 
     const syncFromScroll = () => {
-      if (programmatic.current) return
+      if (programmatic.current || !snapReady.current) return
       const center = container.scrollLeft + container.clientWidth / 2
       let closest = activeDay
       let closestDist = Number.POSITIVE_INFINITY
@@ -106,7 +140,7 @@ export function DayCarousel({
               data-day={day}
               onClick={() => onSelectDay(day)}
               className={cx(
-                'w-[92%] max-w-[400px] shrink-0 snap-center rounded-[28px] border bg-surface p-5 transition-all',
+                'w-[92%] max-w-[400px] min-w-0 shrink-0 snap-center overflow-hidden rounded-[28px] border bg-surface p-4 transition-all sm:p-5',
                 selected
                   ? 'relative z-10 border-violet shadow-[var(--shadow-day)] ring-4 ring-violet/10'
                   : 'z-0 border-line opacity-70 shadow-paper',

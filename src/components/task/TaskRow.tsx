@@ -211,27 +211,45 @@ export function TaskRow({
           title="Abrir estudio táctico y detalles"
         >
           {/* Title Row */}
-          <div className="flex items-center gap-2">
-            <span
-              className={cx(
-                'text-[13px] sm:text-[14px] font-semibold leading-tight truncate transition-colors group-hover:text-[#7a3fe0]',
-                done ? 'line-through text-ink-3' : 'text-ink',
-              )}
-            >
-              {task.title}
-            </span>
+          <div className="flex min-w-0 flex-col">
+            {showContext && objective ? (
+              <span className="text-[10px] font-bold uppercase tracking-wider text-ink-3 truncate">
+                Objetivo · {objective.name}
+              </span>
+            ) : null}
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-ink-3 shrink-0">
+                Tarea
+              </span>
+              <span
+                className={cx(
+                  'text-[13px] sm:text-[14px] font-semibold leading-tight truncate transition-colors group-hover:text-[#7a3fe0]',
+                  done ? 'line-through text-ink-3' : 'text-ink',
+                )}
+              >
+                {task.title}
+              </span>
+            </div>
           </div>
 
           {/* Context, Terreno & Schedule Badges */}
           <div className="flex flex-wrap items-center gap-1.5 mt-1">
             {/* Project / Result indicator */}
             {showContext && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-ink-3 truncate max-w-[130px] sm:max-w-[180px]">
+              <span className="inline-flex items-center gap-1 text-[10px] font-medium text-ink-3 truncate max-w-[160px] sm:max-w-[220px]">
                 <span
                   className="size-1.5 rounded-full shrink-0"
                   style={{ backgroundColor: projectColor }}
                 />
-                <span className="truncate">{projectName ?? (loose ? 'Suelto' : 'La Obra')}</span>
+                <span className="truncate">
+                  {projectName
+                    ? `${projectName}${contextResult ? ` · Resultado · ${contextResult.name}` : ''}`
+                    : contextResult
+                      ? `Resultado · ${contextResult.name}`
+                      : loose
+                        ? 'Suelto'
+                        : 'La Obra'}
+                </span>
               </span>
             )}
 

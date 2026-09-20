@@ -206,7 +206,7 @@ export function DayTaskClock({
   }
 
   return (
-    <div className="flex w-full flex-col items-center select-none">
+    <div className="flex w-full min-w-0 flex-col items-center select-none">
       <div className="mb-3 flex w-full flex-wrap items-center justify-between gap-2">
         <div className="flex items-center rounded-full border border-line bg-subtle p-0.5">
           {(['AM', 'PM'] as const).map((value) => {
@@ -265,22 +265,23 @@ export function DayTaskClock({
           {t('home.clock.taskCount', { count: tasks.length })}
         </p>
       ) : (
-        <div className="mt-4 flex w-full flex-col gap-2.5" onClick={(event) => event.stopPropagation()}>
-          <form onSubmit={handleQuickAdd} className="flex items-center gap-1.5">
+        <div className="mt-4 flex w-full min-w-0 flex-col gap-2.5" onClick={(event) => event.stopPropagation()}>
+          <form onSubmit={handleQuickAdd} className="flex w-full min-w-0 items-center gap-1">
             <input
               type="text"
               value={newTaskTitle}
               onChange={(event) => setNewTaskTitle(event.target.value)}
               placeholder={t('home.clock.newTaskPlaceholder')}
-              className="min-h-11 flex-1 rounded-2xl border border-line bg-subtle px-3.5 text-[14px] text-ink placeholder:text-ink-4 outline-none transition-colors focus:border-violet focus:bg-white focus:ring-2 focus:ring-violet/20"
+              className="min-h-11 min-w-0 flex-1 rounded-2xl border border-line bg-subtle px-3 text-[13px] text-ink placeholder:text-ink-4 outline-none transition-colors focus:border-violet focus:bg-white focus:ring-2 focus:ring-violet/20"
             />
             <button
               type="submit"
               disabled={!newTaskTitle.trim()}
-              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-2xl bg-ink px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-ink-2 disabled:pointer-events-none disabled:opacity-40"
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-2xl bg-ink text-white transition-colors hover:bg-ink-2 disabled:pointer-events-none disabled:opacity-40"
+              title={t('home.clock.addTask')}
+              aria-label={t('home.clock.addTask')}
             >
               <Plus className="size-4 stroke-[2.5]" />
-              {t('home.clock.addTask')}
             </button>
             <button
               type="button"
@@ -341,6 +342,9 @@ export function DayTaskClock({
                       className="min-w-0 flex-1 text-left"
                       title={t('home.clock.openTactical')}
                     >
+                      <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                        {t('common.task')}
+                      </span>
                       <span
                         className={cx(
                           'block truncate text-[13px] font-semibold leading-tight',
@@ -351,7 +355,13 @@ export function DayTaskClock({
                       </span>
                       <span className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[11px] text-ink-3">
                         <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: color }} />
-                        <span className="truncate">{ctx.project?.name ?? ctx.result?.name ?? t('home.clock.loose')}</span>
+                        <span className="truncate">
+                          {ctx.objective
+                            ? `${t('common.objective')} · ${ctx.objective.name}`
+                            : ctx.result
+                              ? `${t('common.result')} · ${ctx.result.name}`
+                              : ctx.project?.name ?? t('home.clock.loose')}
+                        </span>
                         {ctx.terreno ? (
                           <span
                             className="shrink-0 rounded-full px-1.5 py-px text-[10px] font-medium"
@@ -475,7 +485,11 @@ export function DayTaskClock({
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[14px] font-semibold text-ink">{task.title}</p>
                     <p className="truncate text-[12px] text-ink-3">
-                      {ctx.project?.name ?? ctx.result?.name ?? t('home.clock.loose')}
+                      {ctx.objective
+                        ? `${t('common.objective')} · ${ctx.objective.name}`
+                        : ctx.result
+                          ? `${t('common.result')} · ${ctx.result.name}`
+                          : ctx.project?.name ?? t('home.clock.loose')}
                       {' · '}
                       {task.scheduledFor
                         ? t('home.clock.scheduled', { date: task.scheduledFor })
