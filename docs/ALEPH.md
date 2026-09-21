@@ -18,15 +18,21 @@ Aleph is a personal organizer. Individual first. Teams / orgs later — do not b
 
 A customizable character represents the user. Real-life work is modeled as:
 
-**Result → (max 4) Objectives → 3 fixed Stages → Tasks**
+**Project → Result → (max 4) Objectives → Tasks**
 
-Work comments live on tasks and objectives. The character journal is a separate thread (Shell bubble). Completing a task grants XP + money + skill XP, from hours × difficulty.
+A Project is the container (the obra). A Result is a concrete outcome inside it. Objectives are the decisions that make the result real. Tasks are the day’s work.
+
+Terreno (`literatura` | `arte` | `empresa`) is the *tone of the action* on a task. It does not replace `skillId` or Result `pillar` (`mind` | `body` | `soul`).
+
+Work comments live on tasks and objectives. The character journal is a separate thread (Shell bubble, pip by default). Completing a task grants XP + money + skill XP, from hours × difficulty. Paid once.
 
 Three screens, one tab bar:
 
 - Left: Planning
-- Center: Home (primary)
-- Right: Tracking
+- Center: Home (primary) — ISO week chrome, one day card, civil 12h clock
+- Right: Tracking — same ISO week language
+
+UI is **paper**: quiet gray page, white cards, violet accent. Not a night/neon theme.
 
 iOS-first: safe-area, tab bar fixed, hit targets ≥ 44px, content never hidden behind the tab bar.
 
@@ -34,11 +40,13 @@ iOS-first: safe-area, tab bar fixed, hit targets ≥ 44px, content never hidden 
 
 | Code | EN UI | ES UI |
 |---|---|---|
+| Project | Project | Proyecto |
 | Result | Result | Resultado |
 | Objective | Objective | Objetivo |
 | Stage | Stage | Etapa |
 | Task | Task | Tarea |
 | Block | Block | Bloque |
+| Terreno | Ground | Terreno |
 | Skill | Skill | Habilidad |
 | Character | Character | Personaje |
 | Journal / Comment | Journal | Bitácora |
@@ -55,7 +63,7 @@ Do not keep a parallel `size: small | normal | large` economy.
 
 ## Data model
 
-See `src/domain/types.ts`. Required names: Character, Skill, Result, Objective, Task, Comment, Relation, Cosmetic.
+See `src/domain/types.ts`. Required names: Character, Skill, Project, Result, Objective, Task, Comment, Relation, Cosmetic.
 
 Constraint: at most 4 **active** objectives per result (`status !== 'done'` and not archived). Marking an objective done frees a quota slot without XP or auto-archive (`src/domain/limits.ts`).
 
@@ -100,11 +108,11 @@ Character level-up: `xpToNext = 100 * level`, overflow carries. Skill level-up a
 
 ## Screens
 
-- `/` Home — composer, today’s agenda, skills, customize
-- `/planning` Planning — Results | Tasks
+- `/` Home — ISO week header (`Semana N` + range), LUN–DOM strip, **one** day card (civil 12h clock, obra hours vs `dailyHourCap` default 5, composer, Plan the day). No Day/Week/Month tabs. No month grid.
+- `/planning` Planning — nested Project → Result → Objective → Task. Same labels as Home.
 - `/planning/results/:resultId` Result detail
 - `/planning/objectives/:objectiveId` Objective detail
-- `/tracking` Tracking — honest empty math, week chart, result progress
+- `/tracking` Tracking — ISO week chrome, honest empty math, week chart
 
 ## Seed
 
@@ -112,9 +120,9 @@ Skills if missing: creativity, study, finance, relationships, health, work.
 
 Cosmetics: level 1 free (2 skins, 2 hairs, 2 outfits, 1 accessory, 2 backgrounds). More at levels 2, 3, 5, 7, 10. Priced extras optional.
 
-Character: keep current name/level/xp/money if they exist. New character: level 1, xp 0, money 0.
+Character: keep current name/level/xp/money if they exist. New character: level 1, xp 0, money 0. Journal bubble starts as a pip so it does not cover the day card.
 
-No sample results, objectives, or completed tasks.
+The first-run sample may include one Project / Result / Objective so the hierarchy is visible. Do not seed XP, money, or completed work as a reward showcase. Empty samples still render empty UI (never 0%).
 
 ## Do not
 

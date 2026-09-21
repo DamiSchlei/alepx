@@ -34,6 +34,7 @@ export function newCharacter(locale: Character['locale'] = 'es'): Character {
     locale,
     dailyHourCap: 5,
     onboarded: false,
+    journalBubbleHidden: true,
   }
 }
 
@@ -46,6 +47,7 @@ export function initialState(locale: Character['locale'] = 'es'): AlephState {
       name: 'Aleph',
       dailyHourCap: 5,
       onboarded: true,
+      journalBubbleHidden: true,
     },
     skills: DEFAULT_SKILLS.map((s) => ({ ...s })),
     projects: [

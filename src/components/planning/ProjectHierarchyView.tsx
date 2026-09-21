@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   ChevronDown,
   ChevronRight,
@@ -43,6 +44,7 @@ export function ProjectHierarchyView({
   onEditProject,
   onOpenTactical,
 }: ProjectHierarchyViewProps) {
+  const { t } = useTranslation()
   const state = useAleph()
   const locale = state.character.locale
 
@@ -106,7 +108,7 @@ export function ProjectHierarchyView({
               className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full text-white"
               style={{ backgroundColor: accentColor }}
             >
-              Proyecto
+              {t('common.project')}
             </span>
             <h2 className="mt-1.5 text-[20px] font-bold text-ink leading-tight">
               {project.name}
@@ -124,14 +126,14 @@ export function ProjectHierarchyView({
               className="flex items-center gap-1 rounded-lg border border-line/70 bg-surface/70 px-2.5 py-1.5 text-[12px] font-medium text-ink-2 hover:bg-white hover:border-accent/60 hover:text-accent transition-all"
             >
               <Edit2 className="size-3.5" />
-              <span>Editar</span>
+              <span>{t('common.edit')}</span>
             </button>
             <Button
               onClick={() => onNewResult(project.name)}
               className="flex items-center gap-1.5 shadow-sm text-[13px] px-3 py-1.5"
             >
               <Plus className="size-4" />
-              <span>Resultado</span>
+              <span>{t('planning.newResult')}</span>
             </Button>
           </div>
         </div>
@@ -140,30 +142,33 @@ export function ProjectHierarchyView({
           <span className="flex items-center gap-1.5">
             <Layers className="size-4 text-ink-2" />
             <strong className="text-ink font-semibold">{results.length}</strong>{' '}
-            {results.length === 1 ? 'resultado' : 'resultados'}
+            {t('common.result')}
           </span>
           <span className="flex items-center gap-1.5">
             <Target className="size-4 text-ink-2" />
             <strong className="text-ink font-semibold">{allObjectives.length}</strong>{' '}
-            {allObjectives.length === 1 ? 'objetivo' : 'objetivos'}
+            {t('common.objective')}
           </span>
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="size-4 text-emerald-600" />
-            <strong className="text-ink font-semibold">{completedTasks.length}</strong> de{' '}
-            {allTasks.length} {allTasks.length === 1 ? 'tarea' : 'tareas'} ({overallRatio}%)
+            {t('planning.results.progress', {
+              done: completedTasks.length,
+              total: allTasks.length,
+            })}{' '}
+            ({overallRatio}%)
           </span>
         </div>
       </div>
 
       {results.length === 0 ? (
         <div className="border-t border-line/60 px-4 py-6 text-center">
-          <p className="text-[14px] font-medium text-ink-2">Sin resultados en este proyecto.</p>
+          <p className="text-[14px] font-medium text-ink-2">{t('planning.emptyProjectResults')}</p>
           <Button
             onClick={() => onNewResult(project.name)}
             className="mt-3 inline-flex items-center gap-1.5"
           >
             <Plus className="size-4" />
-            <span>Definir resultado</span>
+            <span>{t('planning.defineResult')}</span>
           </Button>
         </div>
       ) : (
@@ -195,7 +200,7 @@ export function ProjectHierarchyView({
                             color: projectColor,
                           }}
                         >
-                          Resultado
+                          {t('common.result')}
                         </span>
                         {result.targetDate && (
                           <span className="flex items-center gap-1 text-[11px] text-ink-3">
@@ -223,11 +228,11 @@ export function ProjectHierarchyView({
                         onClick={() => onNewObjective(result)}
                       >
                         <Plus className="size-3.5" />
-                        <span>Objetivo</span>
+                        <span>{t('common.objective')}</span>
                       </Button>
                       <button
                         type="button"
-                        aria-label={isCollapsed ? 'Desplegar' : 'Plegar'}
+                        aria-label={isCollapsed ? t('common.show') : t('common.hide')}
                         onClick={() => toggleResult(result.id)}
                         className="rounded-full p-1.5 text-ink-3 hover:bg-black/5 hover:text-ink"
                       >
@@ -255,14 +260,14 @@ export function ProjectHierarchyView({
                     >
                       {objectives.length === 0 ? (
                         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-dashed border-line/80 bg-surface/50 px-3 py-2 text-[12px] text-ink-3">
-                          <span>Sin objetivos en este resultado.</span>
+                          <span>{t('planning.emptyResultObjectives')}</span>
                           <button
                             type="button"
                             className="font-semibold hover:underline"
                             style={{ color: projectColor }}
                             onClick={() => onNewObjective(result)}
                           >
-                            + Definir objetivo
+                            + {t('planning.defineObjective')}
                           </button>
                         </div>
                       ) : (
@@ -302,7 +307,7 @@ export function ProjectHierarchyView({
                                   />
                                   <div className="min-w-0">
                                     <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-                                      Objetivo
+                                      {t('common.objective')}
                                     </span>
                                     <Link
                                       to={`/planning/objectives/${obj.id}`}
@@ -314,7 +319,7 @@ export function ProjectHierarchyView({
                                     </Link>
                                   </div>
                                   <span className="text-[11px] text-ink-3 shrink-0">
-                                    ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
+                                    ({objTasks.length} {t('common.task')})
                                   </span>
                                 </div>
                                 <Button
@@ -323,13 +328,13 @@ export function ProjectHierarchyView({
                                   style={{ color: projectColor }}
                                   onClick={() => onNewTask(result.id, obj.id)}
                                 >
-                                  + Tarea
+                                  + {t('common.task')}
                                 </Button>
                               </div>
 
                               {obj.doneWhen && (
                                 <p className="mt-1 pl-6 text-[11px] text-ink-3">
-                                  <strong>Hecho cuando:</strong> {obj.doneWhen}
+                                  <strong>{t('planning.objectives.doneWhen')}:</strong> {obj.doneWhen}
                                 </p>
                               )}
 

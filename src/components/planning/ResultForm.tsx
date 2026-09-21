@@ -94,11 +94,11 @@ export function ResultForm({
       }
     >
       <div className="flex flex-col gap-4">
-        <Field label="Nombre del Proyecto" hint="El marco general o proyecto donde se inscribe (ej. Estudio Creativo, Lanzamiento 2026)">
+        <Field label={t('planning.results.projectLabel')} hint={t('planning.results.projectHint')}>
           <Input
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            placeholder="Ej. Estudio Creativo / Mi Marca / La Obra"
+            placeholder={t('planning.results.projectPlaceholder')}
             list="project-suggestions"
           />
           <datalist id="project-suggestions">
@@ -108,11 +108,11 @@ export function ResultForm({
           </datalist>
         </Field>
 
-        <Field label={t('planning.results.nameLabel')} hint="El resultado concreto y tangible que se genera dentro del proyecto">
+        <Field label={t('planning.results.nameLabel')} hint={t('planning.results.nameHint')}>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ej. Primer producto listo para vender"
+            placeholder={t('planning.results.namePlaceholder')}
             autoFocus
           />
         </Field>

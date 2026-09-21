@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Folder, Plus, Edit2 } from 'lucide-react'
 import type { Project, Result, Task } from '@/domain/types'
 
@@ -21,6 +22,7 @@ export function ProjectCarousel({
   results,
   tasks,
 }: ProjectCarouselProps) {
+  const { t } = useTranslation()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -81,7 +83,7 @@ export function ProjectCarousel({
                     )}
                     <button
                       type="button"
-                      aria-label={`Editar ${project.name}`}
+                      aria-label={`${t('common.edit')} ${project.name}`}
                       onClick={(e) => {
                         e.stopPropagation()
                         e.preventDefault()
@@ -90,7 +92,7 @@ export function ProjectCarousel({
                       className="flex items-center gap-1 rounded-lg border border-line/70 bg-white/90 px-2 py-0.5 text-[11px] font-medium text-ink-2 shadow-2xs hover:border-accent hover:bg-white hover:text-accent transition-all cursor-pointer"
                     >
                       <Edit2 className="size-3" />
-                      <span>Editar</span>
+                      <span>{t('common.edit')}</span>
                     </button>
                   </div>
                 </div>
@@ -142,7 +144,7 @@ export function ProjectCarousel({
             <Plus className="size-4" />
           </span>
           <span className="text-[12px] font-semibold text-center leading-tight">
-            Definir Nuevo Proyecto
+            {t('planning.newProject')}
           </span>
         </button>
       </div>

@@ -380,7 +380,7 @@ describe('blockContext', () => {
     expect(ctx.kind).toBe('anchored')
     expect(ctx.result?.name).toBe('Literatura')
     expect(ctx.objective?.name).toBe('Capítulo')
-    expect(ctx.color).toBe('#60a5fa')
+    expect(ctx.color).toBe('#c47a00')
     expect(ctx.timeRange).toEqual({ start: '09:00', end: '10:30' })
     expect(ctx.doneWhen).toBe('Borrador listo')
     expect(ctx.hours).toBe(1.5)
@@ -395,7 +395,7 @@ describe('blockContext', () => {
     const ctx = blockContext(s, s.tasks[0])
     expect(ctx.kind).toBe('anchored')
     expect(ctx.result?.id).toBe('r')
-    expect(ctx.color).toBe('#facc15')
+    expect(ctx.color).toBe('#c47a00')
   })
 
   it('marks result-only and loose kinds', () => {
@@ -407,17 +407,25 @@ describe('blockContext', () => {
       ],
     })
     expect(blockContext(s, s.tasks[0]).kind).toBe('result-only')
-    expect(blockContext(s, s.tasks[0]).color).toBe('#a78bfa')
+    expect(blockContext(s, s.tasks[0]).color).toBe('#c47a00')
     expect(blockContext(s, s.tasks[1]).kind).toBe('loose')
-    expect(blockContext(s, s.tasks[1]).color).toContain('amber')
+    expect(blockContext(s, s.tasks[1]).color).toBe('#c47a00')
   })
 
-  it('falls back to pillar color when no skill is set', () => {
+  it('uses loose amber when the task has no terreno', () => {
     const s = state({
       results: [result({ id: 'r', name: 'Sin skill', pillar: 'mind' })],
       tasks: [task({ id: 't', title: 'Paso', resultId: 'r' })],
     })
-    expect(blockContext(s, s.tasks[0]).color).toBe('#2F6BFF')
+    expect(blockContext(s, s.tasks[0]).color).toBe('#c47a00')
+  })
+
+  it('uses terreno color when the task has a terreno', () => {
+    const s = state({
+      results: [result({ id: 'r', name: 'Literatura', skillId: 'study', pillar: 'mind' })],
+      tasks: [task({ id: 't', title: 'Escribir', resultId: 'r', terreno: 'literatura' })],
+    })
+    expect(blockContext(s, s.tasks[0]).color).toBe('#7a3fe0')
   })
 })
 

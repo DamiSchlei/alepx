@@ -5,7 +5,7 @@ import { WeekChart } from '@/components/tracking/WeekChart'
 import { Button } from '@/components/ui/primitives'
 import { tasksForDay, trackingStats } from '@/data/selectors'
 import { useAleph } from '@/data/store'
-import { addDays, formatWeekHeading, startOfWeek, toDayKey, weekDayKeys } from '@/domain/dates'
+import { addDays, isoWeekNumber, startOfWeek, toDayKey, weekDayKeys, weekRangeLabel } from '@/domain/dates'
 import { isTaskDone } from '@/domain/economy'
 import { formatHours } from '@/i18n/format'
 import type { Terreno } from '@/domain/types'
@@ -43,6 +43,12 @@ export function TrackingPage() {
     })
   }, [movedTerrenos, t])
 
+  const monday = startOfWeek(weekAnchor)
+  const mondayKey = toDayKey(monday)
+  const year = addDays(monday, 6).getFullYear()
+  const weekLine1 = t('home.weekNumber', { n: isoWeekNumber(weekAnchor) })
+  const weekLine2 = `${weekRangeLabel(mondayKey, locale)} ${year}`
+
   const kpis = [
     { label: t('tracking.kpiDone'), value: String(stats.weekCompleted) },
     {
@@ -67,9 +73,10 @@ export function TrackingPage() {
           >
             ‹
           </button>
-          <h1 className="min-w-0 flex-1 text-center text-[16px] font-semibold text-ink">
-            {formatWeekHeading(weekAnchor, locale)}
-          </h1>
+          <div className="min-w-0 flex-1 pt-1 text-center">
+            <h1 className="truncate text-[20px] font-semibold tracking-tight text-ink">{weekLine1}</h1>
+            <p className="mt-0.5 truncate text-[12px] text-ink-3">{weekLine2}</p>
+          </div>
           <button
             type="button"
             aria-label={t('tracking.nextWeek')}
@@ -84,7 +91,7 @@ export function TrackingPage() {
           <button
             type="button"
             onClick={() => setWeekAnchor(todayKey)}
-            className="self-center rounded-full bg-violet-soft px-3 py-1 text-[13px] font-semibold text-violet"
+            className="self-center min-h-11 rounded-full bg-violet-soft px-3 text-[13px] font-semibold text-violet"
           >
             {t('common.today')}
           </button>

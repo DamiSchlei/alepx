@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { Trans, useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'motion/react'
 import {
   ArrowLeft,
@@ -8,7 +9,6 @@ import {
   LayoutList,
   Compass,
   X,
-  Target,
   Maximize2,
   FolderGit2,
   SlidersHorizontal,
@@ -52,6 +52,7 @@ export function DayCanvas({
   localeTag,
   onClose,
 }: DayCanvasProps) {
+  const { t } = useTranslation()
   const state = useAleph()
   const locale = state.character.locale
   const cap = state.character.dailyHourCap ?? 5
@@ -126,9 +127,11 @@ export function DayCanvas({
 
   // Format header date
   const dateObj = parseLocal(dayKey)
-  const dayName = new Intl.DateTimeFormat(localeTag, { weekday: 'long' }).format(dateObj)
-  const dayNum = dateObj.getDate()
-  const monthName = new Intl.DateTimeFormat(localeTag, { month: 'long' }).format(dateObj)
+  const dateLabel = new Intl.DateTimeFormat(localeTag, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(dateObj)
   const isToday = dayKey === todayKey
 
   const handleToggleTask = (task: Task) => {
@@ -200,31 +203,34 @@ export function DayCanvas({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Volver al carrusel"
+            aria-label={t('planning.canvas.backToCarousel')}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-line bg-subtle text-ink-2 hover:text-ink hover:border-line-strong active:scale-95 transition-all text-[13px] font-medium shrink-0"
           >
             <ArrowLeft className="size-4" />
-            <span>Carrusel</span>
+            <span>{t('common.back')}</span>
           </button>
           <div className="min-w-0 flex-1">
             <h1 className="text-[15px] font-bold capitalize leading-tight truncate">
-              {`${dayName} ${dayNum} de ${monthName}`}
+              {dateLabel}
               {isToday ? (
                 <span className="ml-1.5 rounded-full bg-[#f5f0ff] px-2 py-0.5 text-[10px] font-semibold text-[#7a3fe0]">
-                  Hoy
+                  {t('common.today')}
                 </span>
               ) : null}
             </h1>
             <p className="text-[11px] font-medium text-ink-3 truncate">
-              {formatHours(planned, locale)} h cargadas · {formatHours(free, locale)} h libres
+              {t('planning.canvas.hoursLine', {
+                planned: formatHours(planned, locale),
+                free: formatHours(free, locale),
+              })}
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowPhilosophyModal(true)}
             className="flex size-9 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink-2 hover:text-[#7a3fe0] hover:border-[#7a3fe0]/40 transition-all"
-            title="Ver filosofía del recorrido"
-            aria-label="El Recorrido"
+            title={t('planning.canvas.philosophyTitle')}
+            aria-label={t('planning.canvas.philosophyAria')}
           >
             <Sparkles className="size-3.5 text-[#7a3fe0]" />
           </button>
@@ -232,7 +238,7 @@ export function DayCanvas({
             type="button"
             onClick={() => handleOpenSeed()}
             className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#7a3fe0] text-white hover:bg-[#6832c7] active:scale-95 transition-all shadow-sm"
-            title="Añadir tarea"
+            title={t('home.clock.addTask')}
           >
             <Plus className="size-4" />
           </button>
@@ -250,7 +256,7 @@ export function DayCanvas({
               }`}
             >
               <Compass className="size-3.5" />
-              <span>Lienzo</span>
+              <span>{t('planning.canvas.canvas')}</span>
             </button>
             <button
               type="button"
@@ -262,7 +268,7 @@ export function DayCanvas({
               }`}
             >
               <LayoutList className="size-3.5" />
-              <span>Lista</span>
+              <span>{t('planning.canvas.list')}</span>
             </button>
             <button
               type="button"
@@ -274,7 +280,7 @@ export function DayCanvas({
               }`}
             >
               <SlidersHorizontal className="size-3.5" />
-              <span>Táctica</span>
+              <span>{t('planning.canvas.tactical')}</span>
             </button>
           </div>
         </div>
@@ -298,204 +304,175 @@ export function DayCanvas({
             />
           </div>
         ) : (
-          /* CANVAS ESPACIAL: La Obra y sus Objetivos Decididos */
-          <div className="min-h-full flex flex-col items-center justify-start p-4 relative max-w-xl mx-auto pb-28">
-            {/* SVG Filamentos conectores sutiles */}
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none z-0"
-              style={{ minHeight: '680px' }}
+          /* Project → Result → Objective → Task, same nest as Planning */
+          <div className="min-h-full flex flex-col items-center justify-start p-4 max-w-xl mx-auto pb-28">
+            <div
+              className="w-full overflow-hidden rounded-[24px] border border-line bg-white shadow-paper"
+              style={{ borderLeftWidth: '5px', borderLeftColor: activeProjectColor }}
             >
-              <defs>
-                <linearGradient id="orbit-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#7a3fe0" stopOpacity="0.3" />
-                  <stop offset="50%" stopColor="#4f46e5" stopOpacity="0.2" />
-                  <stop offset="100%" stopColor="#0f9f6e" stopOpacity="0.3" />
-                </linearGradient>
-              </defs>
-            </svg>
-
-            {/* NÚCLEO CENTRAL: EL PROYECTO */}
-            <div className="w-full z-10 my-4 flex flex-col items-center text-center">
-              <motion.div
-                animate={{ scale: [1, 1.015, 1] }}
-                transition={{ duration: 4.5, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative flex flex-col items-center justify-center rounded-3xl border-2 border-line bg-white/95 px-6 py-4 shadow-sm backdrop-blur-sm max-w-md w-full"
+              <div
+                className="p-4"
+                style={{
+                  background: `linear-gradient(to right, ${activeProjectColor}14 0%, #ffffff 42%)`,
+                }}
               >
-                {/* Indicador y Selector de Proyecto */}
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <span
-                    className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+                        style={{ backgroundColor: activeProjectColor }}
+                      >
+                        <FolderGit2 className="size-3" />
+                        <span>{t('common.project')}</span>
+                      </span>
+                      {projectNames.length > 1 && (
+                        <select
+                          value={currentProjectName}
+                          onChange={(e) => setSelectedProject(e.target.value)}
+                          className="text-[12px] font-bold bg-transparent outline-none cursor-pointer border-b border-dashed"
+                          style={{
+                            color: activeProjectColor,
+                            borderColor: `${activeProjectColor}60`,
+                          }}
+                        >
+                          {projectNames.map((pName) => (
+                            <option key={pName} value={pName}>
+                              {pName}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                    <h2 className="mt-1.5 font-display text-[20px] font-bold text-ink leading-snug">
+                      {currentProjectName}
+                    </h2>
+                    <p className="mt-1 text-[11px] text-ink-3">
+                      {t('planning.resultsInside', { name: currentProjectName })}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowResultForm(true)}
+                    className="flex items-center gap-1 text-[12px] font-semibold transition-colors px-2.5 py-1.5 rounded-full"
                     style={{
                       backgroundColor: `${activeProjectColor}18`,
                       color: activeProjectColor,
                     }}
                   >
-                    <FolderGit2 className="size-3" />
-                    <span>Proyecto</span>
-                  </span>
-                  {projectNames.length > 1 && (
-                    <select
-                      value={currentProjectName}
-                      onChange={(e) => setSelectedProject(e.target.value)}
-                      className="text-[12px] font-bold bg-transparent outline-none cursor-pointer border-b border-dashed"
-                      style={{
-                        color: activeProjectColor,
-                        borderColor: `${activeProjectColor}60`,
-                      }}
-                    >
-                      {projectNames.map((pName) => (
-                        <option key={pName} value={pName}>
-                          {pName}
-                        </option>
-                      ))}
-                    </select>
-                  )}
+                    <Plus className="size-3.5" />
+                    <span>{t('planning.newResult')}</span>
+                  </button>
                 </div>
 
-                <h2 className="font-display text-[20px] font-bold text-ink leading-snug">
-                  {currentProjectName}
-                </h2>
-
-                {/* Resumen del Proyecto en el día */}
-                <div className="mt-3 flex items-center gap-2 text-[11px] font-medium text-ink-3 border-t border-line/60 pt-2 w-full justify-center">
+                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink-3">
                   <span>
-                    {resultsInCurrentProject.length}{' '}
-                    {resultsInCurrentProject.length === 1 ? 'resultado' : 'resultados'}
+                    <strong className="text-ink font-semibold">{resultsInCurrentProject.length}</strong>{' '}
+                    {t('common.result')}
                   </span>
                   <span>·</span>
                   <span>
-                    {
-                      tasks.filter(
-                        (t) =>
-                          t.resultId &&
-                          resultsInCurrentProject.some((r) => r.id === t.resultId),
-                      ).length
-                    }{' '}
-                    tareas para hoy
+                    {t('planning.canvas.tasksToday', {
+                      count: tasks.filter(
+                        (task) =>
+                          task.resultId &&
+                          resultsInCurrentProject.some((r) => r.id === task.resultId),
+                      ).length,
+                    })}
                   </span>
                 </div>
-              </motion.div>
-            </div>
-
-            {/* SECCIÓN: RESULTADOS DENTRO DEL PROYECTO */}
-            <div className="w-full z-10 flex flex-col gap-4">
-              <div className="flex items-center justify-between px-1">
-                <div>
-                  <span className="text-[12px] font-bold tracking-wider uppercase text-ink-3 flex items-center gap-1.5">
-                    <Target className="size-3.5 text-ink-2" />
-                    <span>Resultados</span>
-                  </span>
-                  <p className="text-[11px] text-ink-3">
-                    Lo que se concreta dentro de {currentProjectName}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowResultForm(true)}
-                  className="flex items-center gap-1 text-[12px] font-semibold transition-colors px-2.5 py-1 rounded-full"
-                  style={{
-                    backgroundColor: `${activeProjectColor}18`,
-                    color: activeProjectColor,
-                  }}
-                >
-                  <Plus className="size-3.5" />
-                  <span>Nuevo resultado</span>
-                </button>
               </div>
 
-              {/* Si no hay resultados en este proyecto aún */}
-              {resultsInCurrentProject.length === 0 && (
-                <div className="rounded-[20px] border border-dashed border-line bg-white/80 p-6 text-center">
-                  <p className="text-[14px] font-medium text-ink-2">
-                    Aún no definiste resultados específicos para este proyecto.
-                  </p>
-                  <p className="mt-1 text-[12px] text-ink-3">
-                    El proyecto es el marco; los resultados son las obras tangibles que se sostienen dentro.
-                  </p>
-                  <div className="mt-4 flex justify-center">
-                    <button
-                      type="button"
-                      onClick={() => setShowResultForm(true)}
-                      className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white shadow-xs"
-                      style={{ backgroundColor: activeProjectColor }}
-                    >
-                      <Plus className="size-4" />
-                      <span>Crear primer resultado en este proyecto</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Lista de células de Resultados */}
-              {resultsInCurrentProject.map((res) => {
-                const resObjectives = objectivesOfResult(state, res.id)
-                const resTasks = tasks.filter((t) => t.resultId === res.id)
-
-                return (
-                  <ResultCellCard
-                    key={res.id}
-                    result={res}
-                    objectives={resObjectives}
-                    tasks={resTasks}
-                    onToggleTask={handleToggleTask}
-                    onZoomResult={() => setZoomedResult(res)}
-                    onZoomObjective={(obj) => {
-                      setZoomedObjective(obj)
-                      setZoomedObjectiveResultName(res.name)
-                    }}
-                    onAddStep={(objId) => handleOpenSeed(res.id, objId)}
-                    onAddObjective={() => handleOpenNewObjective(res)}
-                    onOpenTacticalTask={(taskId) => setSelectedTacticalTaskId(taskId)}
-                  />
-                )
-              })}
-
-              {/* Tareas sueltas sin resultado asociado */}
-              {tasks.filter(
-                (t) =>
-                  !t.resultId ||
-                  !resultsInCurrentProject.some((r) => r.id === t.resultId),
-              ).length > 0 && (
-                <div className="relative flex flex-col rounded-[20px] border border-line bg-white/95 p-4 shadow-xs transition-all hover:shadow-md">
-                  <div className="flex items-center justify-between pb-2 border-b border-line/60">
-                    <div>
-                      <h3 className="text-[14px] font-bold text-ink">
-                        Tareas sueltas del día
-                      </h3>
-                      <p className="text-[11px] text-ink-3">
-                        Acciones que caminan de forma libre
-                      </p>
+              <div className="border-t border-line/60 p-3 flex flex-col gap-3">
+                {resultsInCurrentProject.length === 0 && (
+                  <div className="rounded-[16px] border border-dashed border-line bg-surface/50 p-5 text-center">
+                    <p className="text-[14px] font-medium text-ink-2">
+                      {t('planning.emptyProjectResults')}
+                    </p>
+                    <p className="mt-1 text-[12px] text-ink-3">
+                      {t('planning.canvas.emptyProjectHint')}
+                    </p>
+                    <div className="mt-4 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setShowResultForm(true)}
+                        className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white shadow-xs"
+                        style={{ backgroundColor: activeProjectColor }}
+                      >
+                        <Plus className="size-4" />
+                        <span>{t('planning.canvas.addFirstResult')}</span>
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenSeed()}
-                      className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] px-2.5 py-1 rounded-full bg-[#f5f0ff]"
-                    >
-                      <Plus className="size-3" />
-                      <span>Tarea</span>
-                    </button>
                   </div>
+                )}
 
-                  <div className="mt-2.5 flex flex-col gap-1.5">
-                    {tasks
-                      .filter(
-                        (t) =>
-                          !t.resultId ||
-                          !resultsInCurrentProject.some(
-                            (r) => r.id === t.resultId,
-                          ),
-                      )
-                      .map((t) => (
-                        <TaskStepRow
-                          key={t.id}
-                          task={t}
-                          onToggle={() => handleToggleTask(t)}
-                          onOpenTactical={() => setSelectedTacticalTaskId(t.id)}
-                        />
-                      ))}
+                {resultsInCurrentProject.map((res) => {
+                  const resObjectives = objectivesOfResult(state, res.id)
+                  const resTasks = tasks.filter((task) => task.resultId === res.id)
+
+                  return (
+                    <ResultCellCard
+                      key={res.id}
+                      result={res}
+                      objectives={resObjectives}
+                      tasks={resTasks}
+                      onToggleTask={handleToggleTask}
+                      onZoomResult={() => setZoomedResult(res)}
+                      onZoomObjective={(obj) => {
+                        setZoomedObjective(obj)
+                        setZoomedObjectiveResultName(res.name)
+                      }}
+                      onAddStep={(objId) => handleOpenSeed(res.id, objId)}
+                      onAddObjective={() => handleOpenNewObjective(res)}
+                      onOpenTacticalTask={(taskId) => setSelectedTacticalTaskId(taskId)}
+                    />
+                  )
+                })}
+
+                {tasks.filter(
+                  (task) =>
+                    !task.resultId ||
+                    !resultsInCurrentProject.some((r) => r.id === task.resultId),
+                ).length > 0 && (
+                  <div className="relative flex flex-col rounded-[16px] border border-line bg-white p-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-line/60">
+                      <div>
+                        <h3 className="text-[14px] font-bold text-ink">
+                          {t('planning.canvas.looseToday')}
+                        </h3>
+                        <p className="text-[11px] text-ink-3">
+                          {t('planning.canvas.looseHint')}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenSeed()}
+                        className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] px-2.5 py-1 rounded-full bg-[#f5f0ff]"
+                      >
+                        <Plus className="size-3" />
+                        <span>{t('common.task')}</span>
+                      </button>
+                    </div>
+
+                    <div className="mt-2.5 flex flex-col gap-1.5">
+                      {tasks
+                        .filter(
+                          (task) =>
+                            !task.resultId ||
+                            !resultsInCurrentProject.some((r) => r.id === task.resultId),
+                        )
+                        .map((task) => (
+                          <TaskStepRow
+                            key={task.id}
+                            task={task}
+                            onToggle={() => handleToggleTask(task)}
+                            onOpenTactical={() => setSelectedTacticalTaskId(task.id)}
+                          />
+                        ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -535,7 +512,7 @@ export function DayCanvas({
         {zoomedObjective && (
           <ObjectiveZoomModal
             objective={zoomedObjective}
-            resultName={zoomedObjectiveResultName || 'Resultado'}
+            resultName={zoomedObjectiveResultName || t('common.result')}
             tasks={tasks.filter((t) => t.objectiveId === zoomedObjective.id)}
             onClose={() => setZoomedObjective(null)}
             onToggleTask={handleToggleTask}
@@ -575,9 +552,9 @@ export function DayCanvas({
             >
               <div className="flex items-center justify-between pb-3 border-b border-line">
                 <div>
-                  <h3 className="text-[17px] font-bold text-ink">Añadir tarea al día</h3>
+                  <h3 className="text-[17px] font-bold text-ink">{t('planning.canvas.addTaskTitle')}</h3>
                   <p className="text-[12px] text-ink-3">
-                    {`${dayName} ${dayNum} de ${monthName}`} · {currentProjectName}
+                    {dateLabel} · {currentProjectName}
                   </p>
                 </div>
                 <button
@@ -593,7 +570,7 @@ export function DayCanvas({
                 {/* Selección del Resultado */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Resultado
+                    {t('common.result')}
                   </label>
                   <select
                     value={seedResultId || ''}
@@ -614,14 +591,14 @@ export function DayCanvas({
                 {/* Destino: Objetivo o directo al Resultado */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Nombre del objetivo
+                    {t('planning.canvas.objectiveName')}
                   </label>
                   <select
                     value={seedObjectiveId || ''}
                     onChange={(e) => setSeedObjectiveId(e.target.value || undefined)}
                     className="w-full rounded-[12px] border border-line px-3.5 py-2.5 text-[14px] font-medium bg-white text-ink outline-none focus:border-[#7a3fe0] focus:ring-1 focus:ring-[#7a3fe0]"
                   >
-                    <option value="">Directo al resultado (sin objetivo intermedio)</option>
+                    <option value="">{t('planning.canvas.seedObjectiveDirect')}</option>
                     {(seedResultId
                       ? objectivesOfResult(state, seedResultId)
                       : []
@@ -636,7 +613,7 @@ export function DayCanvas({
                 {/* Título de la acción */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Nombre de la tarea
+                    {t('planning.tasks.nameLabel')}
                   </label>
                   <input
                     type="text"
@@ -644,7 +621,7 @@ export function DayCanvas({
                     autoFocus
                     value={seedTitle}
                     onChange={(e) => setSeedTitle(e.target.value)}
-                    placeholder="Nombre de la tarea…"
+                    placeholder={t('planning.tasks.titlePlaceholder')}
                     className="w-full rounded-[12px] border border-line px-3.5 py-2.5 text-[15px] outline-none focus:border-[#7a3fe0] focus:ring-1 focus:ring-[#7a3fe0]"
                   />
                 </div>
@@ -652,7 +629,7 @@ export function DayCanvas({
                 {/* Horas estimadas */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Tiempo estimado
+                    {t('planning.canvas.estimatedTime')}
                   </label>
                   <div className="flex gap-2">
                     {[0.5, 1, 1.5, 2, 3].map((h) => (
@@ -675,24 +652,14 @@ export function DayCanvas({
                 {/* Naturaleza / Enfoque de la tarea */}
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Enfoque de la acción
+                    {t('planning.canvas.actionFocus')}
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {TERRENOS.map((terrId) => {
                       const tInfo = TERRENO_MAP[terrId]
                       const active = seedTerreno === terrId
-                      const verb =
-                        terrId === 'literatura'
-                          ? 'Decidir'
-                          : terrId === 'arte'
-                            ? 'Atravesar'
-                            : 'Concretar'
-                      const sub =
-                        terrId === 'literatura'
-                          ? 'regla / acuerdo'
-                          : terrId === 'arte'
-                            ? 'límite interno'
-                            : 'materia tangible'
+                      const verb = t(`planning.canvas.terreno.${terrId}Verb`)
+                      const sub = t(`planning.canvas.terreno.${terrId}Sub`)
 
                       return (
                         <button
@@ -732,7 +699,7 @@ export function DayCanvas({
                   disabled={!seedTitle.trim()}
                   className="mt-2 w-full rounded-full bg-[#7a3fe0] py-3 text-[14px] font-semibold text-white shadow-sm hover:bg-[#6832c7] active:scale-98 disabled:opacity-40 transition-all"
                 >
-                  Añadir tarea a este día
+                  {t('planning.canvas.addTaskToDay')}
                 </button>
               </form>
             </motion.div>
@@ -757,8 +724,8 @@ export function DayCanvas({
             >
               <div className="flex items-center justify-between pb-3 border-b border-line">
                 <div>
-                  <h3 className="text-[17px] font-bold text-ink">Definir objetivo</h3>
-                  <p className="text-[12px] text-ink-3">Para: {targetResultForObjective.name}</p>
+                  <h3 className="text-[17px] font-bold text-ink">{t('planning.canvas.defineObjectiveTitle')}</h3>
+                  <p className="text-[12px] text-ink-3">{t('planning.canvas.forResult', { name: targetResultForObjective.name })}</p>
                 </div>
                 <button
                   type="button"
@@ -772,7 +739,7 @@ export function DayCanvas({
               <form onSubmit={handleCreateObjective} className="mt-4 flex flex-col gap-4">
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    Nombre del objetivo
+                    {t('planning.canvas.objectiveName')}
                   </label>
                   <input
                     type="text"
@@ -780,20 +747,20 @@ export function DayCanvas({
                     autoFocus
                     value={newObjectiveName}
                     onChange={(e) => setNewObjectiveName(e.target.value)}
-                    placeholder="Ej. Oferta visible / Catálogo listo..."
+                    placeholder={t('planning.canvas.objectiveNamePlaceholder')}
                     className="w-full rounded-[12px] border border-line px-3.5 py-2.5 text-[15px] outline-none focus:border-[#7a3fe0] focus:ring-1 focus:ring-[#7a3fe0]"
                   />
                 </div>
 
                 <div>
                   <label className="block text-[12px] font-semibold text-ink-3 uppercase tracking-wider mb-1.5">
-                    ¿Cuándo está listo? (opcional)
+                    {t('planning.canvas.doneWhenOptional')}
                   </label>
                   <input
                     type="text"
                     value={newObjectiveDoneWhen}
                     onChange={(e) => setNewObjectiveDoneWhen(e.target.value)}
-                    placeholder="Criterio claro de completitud..."
+                    placeholder={t('planning.canvas.doneWhenPlaceholder')}
                     className="w-full rounded-[12px] border border-line px-3.5 py-2.5 text-[14px] outline-none focus:border-[#7a3fe0] focus:ring-1 focus:ring-[#7a3fe0]"
                   />
                 </div>
@@ -803,7 +770,7 @@ export function DayCanvas({
                   disabled={!newObjectiveName.trim()}
                   className="mt-2 w-full rounded-full bg-[#7a3fe0] py-3 text-[14px] font-semibold text-white shadow-sm hover:bg-[#6832c7] active:scale-98 disabled:opacity-40 transition-all"
                 >
-                  Guardar objetivo
+                  {t('planning.canvas.saveObjective')}
                 </button>
               </form>
             </motion.div>
@@ -856,12 +823,14 @@ function ResultCellCard({
   onAddObjective: () => void
   onOpenTacticalTask?: (taskId: string) => void
 }) {
+  const { t } = useTranslation()
   const state = useAleph()
   const projectColor = projectColorOfResult(state, result)
   const hours = tasks.reduce(
-    (sum, t) => sum + (t.actualHours ?? t.estimatedHours ?? 1),
+    (sum, task) => sum + (task.actualHours ?? task.estimatedHours ?? 1),
     0,
   )
+  const resultLevelTasks = tasks.filter((task) => !task.objectiveId)
 
   return (
     <div
@@ -882,7 +851,7 @@ function ResultCellCard({
               color: projectColor,
             }}
           >
-            Resultado
+            {t('common.result')}
           </span>
           <h3
             onClick={onZoomResult}
@@ -897,8 +866,8 @@ function ResultCellCard({
             </p>
           )}
           <p className="text-[11px] font-medium text-ink-3 mt-1">
-            {objectives.length} {objectives.length === 1 ? 'objetivo' : 'objetivos'} · {tasks.length}{' '}
-            {tasks.length === 1 ? 'tarea' : 'tareas'} hoy ({hours}h)
+            {objectives.length} {t('common.objective')} ·{' '}
+            {t('planning.canvas.tasksTodayCount', { count: tasks.length, hours })}
           </p>
         </div>
 
@@ -907,10 +876,10 @@ function ResultCellCard({
             type="button"
             onClick={onZoomResult}
             className="flex items-center gap-1 text-[11px] font-semibold text-ink-3 hover:text-ink px-2.5 py-1 rounded-full border border-line bg-subtle transition-all"
-            title="Ver estructura completa del resultado"
+            title={t('planning.canvas.zoomStructure')}
           >
             <Maximize2 className="size-3" />
-            <span>Zoom</span>
+            <span>{t('planning.canvas.zoom')}</span>
           </button>
           <button
             type="button"
@@ -922,110 +891,126 @@ function ResultCellCard({
             }}
           >
             <Plus className="size-3" />
-            <span>Tarea</span>
+            <span>{t('common.task')}</span>
           </button>
         </div>
       </div>
 
-      {/* Objectives nested inside this result */}
-      {objectives.length > 0 && (
-        <div className="mt-3">
-          <div className="flex items-center justify-between mb-1.5 px-0.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">
-              Objetivos
-            </span>
-            <button
-              type="button"
-              onClick={onAddObjective}
-              className="text-[11px] font-semibold hover:underline"
-              style={{ color: projectColor }}
-            >
-              + Definir objetivo
-            </button>
-          </div>
-          <div className="flex flex-col gap-1.5">
+      <div className="mt-3">
+        <div className="flex items-center justify-between mb-1.5 px-0.5">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">
+            {t('common.objective')}
+          </span>
+          <button
+            type="button"
+            onClick={onAddObjective}
+            className="text-[11px] font-semibold hover:underline"
+            style={{ color: projectColor }}
+          >
+            + {t('planning.defineObjective')}
+          </button>
+        </div>
+        {objectives.length === 0 ? (
+          <p className="text-[12px] text-ink-3 italic px-0.5">{t('planning.emptyResultObjectives')}</p>
+        ) : (
+          <div className="flex flex-col gap-2">
             {objectives.map((obj) => {
-              const objTasks = tasks.filter((t) => t.objectiveId === obj.id)
+              const objTasks = tasks.filter((task) => task.objectiveId === obj.id)
               return (
                 <div
                   key={obj.id}
-                  className="flex items-center justify-between rounded-[12px] border border-line/50 bg-subtle/30 px-2.5 py-1.5 group hover:bg-subtle/70 transition-colors"
+                  className="rounded-[12px] border border-line/50 bg-subtle/30 px-2.5 py-2"
+                  style={{ borderLeftWidth: '3px', borderLeftColor: projectColor }}
                 >
-                  <button
-                    type="button"
-                    onClick={() => onZoomObjective(obj)}
-                    className="flex items-center gap-2 min-w-0 text-left flex-1 pr-2"
-                  >
-                    <span
-                      className="size-2 rounded-full shrink-0"
-                      style={{ backgroundColor: projectColor }}
-                    />
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-                        Objetivo
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onZoomObjective(obj)}
+                      className="flex items-center gap-2 min-w-0 text-left flex-1 pr-2"
+                    >
+                      <span
+                        className="size-2 rounded-full shrink-0"
+                        style={{ backgroundColor: projectColor }}
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
+                          {t('common.objective')}
+                        </span>
+                        <span className="text-[13px] font-medium text-ink truncate hover:underline block">
+                          {obj.name}
+                        </span>
                       </span>
-                      <span className="text-[13px] font-medium text-ink truncate group-hover:underline block">
-                        {obj.name}
+                      <span className="text-[11px] text-ink-3 shrink-0">
+                        ({objTasks.length} {t('common.task')})
                       </span>
-                    </span>
-                    <span className="text-[11px] text-ink-3 shrink-0">
-                      ({objTasks.length} {objTasks.length === 1 ? 'tarea' : 'tareas'})
-                    </span>
-                  </button>
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={() => onAddStep(obj.id)}
-                    className="text-[11px] font-semibold hover:underline shrink-0"
-                    style={{ color: projectColor }}
-                  >
-                    + Tarea
-                  </button>
+                    <button
+                      type="button"
+                      onClick={() => onAddStep(obj.id)}
+                      className="text-[11px] font-semibold hover:underline shrink-0"
+                      style={{ color: projectColor }}
+                    >
+                      + {t('common.task')}
+                    </button>
+                  </div>
+                  {objTasks.length > 0 && (
+                    <div className="mt-2 flex flex-col gap-1.5 pl-3 border-l" style={{ borderLeftColor: `${projectColor}30` }}>
+                      {objTasks.map((task) => (
+                        <TaskStepRow
+                          key={task.id}
+                          task={task}
+                          onToggle={() => onToggleTask(task)}
+                          onOpenTactical={() => onOpenTacticalTask?.(task.id)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               )
             })}
           </div>
-        </div>
-      )}
-
-      {/* Tareas del día hacia este resultado */}
-      <div className="mt-3">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3 block mb-1.5 px-0.5">
-          Tareas para hoy
-        </span>
-        {tasks.length === 0 ? (
-          <div className="py-2 px-3 rounded-[10px] bg-subtle/20 border border-dashed border-line text-center text-[12px] text-ink-4">
-            Sin tareas programadas para hoy.
-          </div>
-        ) : (
-          <div className="flex flex-col gap-1.5">
-            {tasks.map((t) => (
-              <TaskStepRow
-                key={t.id}
-                task={t}
-                onToggle={() => onToggleTask(t)}
-                onOpenTactical={() => onOpenTacticalTask?.(t.id)}
-              />
-            ))}
-          </div>
         )}
       </div>
 
-      {/* Footer con acciones rápidas */}
+      {resultLevelTasks.length > 0 || tasks.length === 0 ? (
+          <div className="mt-3">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3 block mb-1.5 px-0.5">
+              {t('planning.canvas.tasksTodayLabel')}
+            </span>
+            {resultLevelTasks.length === 0 ? (
+              <div className="py-2 px-3 rounded-[10px] bg-subtle/20 border border-dashed border-line text-center text-[12px] text-ink-4">
+                {t('planning.canvas.noTasksToday')}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {resultLevelTasks.map((task) => (
+                  <TaskStepRow
+                    key={task.id}
+                    task={task}
+                    onToggle={() => onToggleTask(task)}
+                    onOpenTactical={() => onOpenTacticalTask?.(task.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ) : null}
+
       <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between text-[12px]">
         <button
           type="button"
           onClick={onAddObjective}
           className="text-ink-3 hover:text-ink font-medium transition-colors"
         >
-          + Definir objetivo
+          + {t('planning.defineObjective')}
         </button>
         <button
           type="button"
           onClick={() => onAddStep()}
           className="text-[#7a3fe0] hover:text-[#6832c7] font-semibold transition-colors"
         >
-          + Añadir tarea
+          + {t('home.clock.addTask')}
         </button>
       </div>
     </div>
@@ -1054,10 +1039,11 @@ function ResultZoomModal({
   onAddObjective: () => void
   onZoomObjective: (o: Objective) => void
 }) {
+  const { t } = useTranslation()
   const state = useAleph()
   const projectColor = projectColorOfResult(state, result)
   const totalHours = tasks.reduce(
-    (sum, t) => sum + (t.actualHours ?? t.estimatedHours ?? 1),
+    (sum, task) => sum + (task.actualHours ?? task.estimatedHours ?? 1),
     0,
   )
 
@@ -1086,10 +1072,10 @@ function ResultZoomModal({
               }}
             >
               <FolderGit2 className="size-3.5" />
-              <span>Proyecto: {result.projectName || 'La Obra Principal'}</span>
+              <span>{t('planning.canvas.projectOf', { name: result.projectName || 'La Obra Principal' })}</span>
             </div>
             <span className="mt-2 block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-              Resultado
+              {t('common.result')}
             </span>
             <h2 className="text-[20px] font-bold text-ink mt-0.5 truncate">
               {result.name}
@@ -1112,10 +1098,10 @@ function ResultZoomModal({
         {/* Resumen */}
         <div className="my-3 flex items-center justify-between text-[12px] font-medium text-ink-3 bg-subtle p-2.5 rounded-[12px]">
           <span>
-            {objectives.length} {objectives.length === 1 ? 'objetivo' : 'objetivos'}
+            {objectives.length} {t('common.objective')}
           </span>
           <span>·</span>
-          <span>{tasks.length} tareas hoy ({totalHours}h)</span>
+          <span>{t('planning.canvas.tasksTodayCount', { count: tasks.length, hours: totalHours })}</span>
         </div>
 
         {/* Cuerpo con scroll: Objetivos decididos + Tareas del día */}
@@ -1124,7 +1110,7 @@ function ResultZoomModal({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[12px] font-bold uppercase tracking-wider text-ink-3">
-                Objetivos
+                {t('common.objective')}
               </span>
               <button
                 type="button"
@@ -1133,13 +1119,13 @@ function ResultZoomModal({
                 style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
-                <span>Definir objetivo</span>
+                <span>{t('planning.defineObjective')}</span>
               </button>
             </div>
 
             {objectives.length === 0 ? (
               <div className="p-3 rounded-[12px] border border-dashed border-line text-center text-[12px] text-ink-3">
-                Sin objetivos específicos aún en este resultado.
+                {t('planning.emptyResultObjectives')}
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
@@ -1156,14 +1142,14 @@ function ResultZoomModal({
                       />
                       <div className="min-w-0">
                         <p className="text-[10px] font-bold uppercase tracking-wider text-ink-3">
-                          Objetivo
+                          {t('common.objective')}
                         </p>
                         <p className="text-[13px] font-bold text-ink truncate hover:underline">
                           {obj.name}
                         </p>
                         {obj.doneWhen && (
                           <p className="text-[11px] text-ink-3 truncate">
-                            Listo cuando: {obj.doneWhen}
+                            {t('home.doneWhen', { text: obj.doneWhen })}
                           </p>
                         )}
                       </div>
@@ -1179,7 +1165,7 @@ function ResultZoomModal({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[12px] font-bold uppercase tracking-wider text-ink-3">
-                Tareas del día para este resultado
+                {t('planning.canvas.tasksTodayForResult')}
               </span>
               <button
                 type="button"
@@ -1188,13 +1174,13 @@ function ResultZoomModal({
                 style={{ color: projectColor }}
               >
                 <Plus className="size-3" />
-                <span>Tarea</span>
+                <span>{t('common.task')}</span>
               </button>
             </div>
 
             {tasks.length === 0 ? (
               <div className="p-4 rounded-[12px] border border-dashed border-line text-center text-[12px] text-ink-3">
-                Sin tareas programadas para hoy en este resultado.
+                {t('planning.canvas.noTasksInResult')}
               </div>
             ) : (
               <div className="flex flex-col gap-1.5">
@@ -1219,14 +1205,14 @@ function ResultZoomModal({
             style={{ color: projectColor }}
           >
             <Plus className="size-4" />
-            <span>Añadir tarea para hoy</span>
+            <span>{t('planning.canvas.addTaskToDay')}</span>
           </button>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full bg-subtle px-4 py-2 text-[13px] font-semibold text-ink-2 hover:bg-line-strong/30"
           >
-            Cerrar zoom
+            {t('planning.canvas.closeZoom')}
           </button>
         </div>
       </div>
@@ -1246,6 +1232,7 @@ function TaskStepRow({
   onToggle: () => void
   onOpenTactical?: () => void
 }) {
+  const { t } = useTranslation()
   const state = useAleph()
   const objective = objectiveById(state, task.objectiveId)
   const done = isTaskDone(task.status)
@@ -1276,16 +1263,16 @@ function TaskStepRow({
         <div
           onClick={onOpenTactical}
           className="min-w-0 flex-1 cursor-pointer"
-          title="Abrir estudio táctico"
+          title={t('planning.canvas.openTactical')}
         >
           {objective ? (
             <p className="text-[10px] font-bold uppercase tracking-wider text-ink-3 truncate">
-              Objetivo · {objective.name}
+              {t('common.objective')} · {objective.name}
             </p>
           ) : null}
           <p className="flex min-w-0 items-center gap-1.5">
             <span className="text-[10px] font-bold uppercase tracking-wider text-ink-3 shrink-0">
-              Tarea
+              {t('common.task')}
             </span>
             <span
               className={`text-[13px] font-medium truncate ${
@@ -1304,7 +1291,7 @@ function TaskStepRow({
             type="button"
             onClick={onOpenTactical}
             className="opacity-0 group-hover:opacity-100 p-1 text-ink-3 hover:text-purple-700 rounded transition-all"
-            title="Abrir táctica y producción"
+            title={t('home.clock.openTactical')}
           >
             <SlidersHorizontal className="size-3" />
           </button>
@@ -1335,8 +1322,9 @@ function ObjectiveZoomModal({
   onToggleTask: (t: Task) => void
   onAddStep: () => void
 }) {
+  const { t } = useTranslation()
   const totalHours = tasks.reduce(
-    (sum, t) => sum + (t.actualHours ?? t.estimatedHours ?? 1),
+    (sum, task) => sum + (task.actualHours ?? task.estimatedHours ?? 1),
     0,
   )
 
@@ -1348,21 +1336,20 @@ function ObjectiveZoomModal({
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4"
     >
       <div className="w-full max-w-lg rounded-[24px] border border-line bg-white p-6 shadow-2xl max-h-[85vh] flex flex-col">
-        {/* Header */}
         <div className="flex items-start justify-between pb-3 border-b border-line">
           <div>
             <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-3">
-              Resultado · {resultName}
+              {t('common.result')} · {resultName}
             </span>
             <span className="mt-1 block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-              Objetivo
+              {t('common.objective')}
             </span>
             <h3 className="text-[19px] font-bold text-ink mt-0.5">
               {objective.name}
             </h3>
             {objective.doneWhen && (
               <p className="text-[12px] text-ink-2 mt-0.5 italic">
-                Criterio: {objective.doneWhen}
+                {t('planning.canvas.criteria', { text: objective.doneWhen })}
               </p>
             )}
           </div>
@@ -1375,39 +1362,37 @@ function ObjectiveZoomModal({
           </button>
         </div>
 
-        {/* Resumen */}
         <div className="my-3 flex items-center justify-between text-[12px] font-medium text-ink-3 bg-subtle p-2.5 rounded-[12px]">
-          <span>Tareas programadas hoy: {tasks.length}</span>
-          <span>Dedicación: {totalHours} h</span>
+          <span>{t('planning.canvas.tasksToday', { count: tasks.length })}</span>
+          <span>{t('planning.canvas.dedication', { hours: totalHours })}</span>
         </div>
 
-        {/* Lista de tareas */}
         <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-2">
           {tasks.length === 0 ? (
             <div className="py-8 text-center text-ink-3">
-              <p className="text-[14px]">No hay tareas para este objetivo hoy.</p>
+              <p className="text-[14px]">{t('planning.canvas.noTasksInObjective')}</p>
               <button
                 type="button"
                 onClick={onAddStep}
                 className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#7a3fe0] px-4 py-2 text-[13px] font-semibold text-white shadow-xs"
               >
                 <Plus className="size-4" />
-                <span>Añadir primera tarea</span>
+                <span>{t('planning.canvas.addFirstTask')}</span>
               </button>
             </div>
           ) : (
-            tasks.map((t) => {
-              const done = isTaskDone(t.status)
-              const tInfo = TERRENO_MAP[t.terreno ?? 'literatura']
+            tasks.map((task) => {
+              const done = isTaskDone(task.status)
+              const tInfo = TERRENO_MAP[task.terreno ?? 'literatura']
               return (
                 <div
-                  key={t.id}
+                  key={task.id}
                   className="flex items-center justify-between rounded-[14px] border border-line bg-subtle/50 p-3"
                 >
                   <div className="flex items-center gap-2.5 min-w-0 flex-1">
                     <button
                       type="button"
-                      onClick={() => onToggleTask(t)}
+                      onClick={() => onToggleTask(task)}
                       className={`flex size-5 shrink-0 items-center justify-center rounded-[5px] border-2 transition-all ${
                         done
                           ? 'border-[#0f9f6e] bg-[#0f9f6e] text-white'
@@ -1423,19 +1408,19 @@ function ObjectiveZoomModal({
                     />
                     <span className="min-w-0">
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-                        Tarea
+                        {t('common.task')}
                       </span>
                       <span
                         className={`text-[14px] font-semibold truncate block ${
                           done ? 'line-through text-ink-3' : 'text-ink'
                         }`}
                       >
-                        {t.title}
+                        {task.title}
                       </span>
                     </span>
                   </div>
                   <span className="text-[12px] font-bold text-ink-3 ml-2">
-                    {t.actualHours ?? t.estimatedHours}h
+                    {task.actualHours ?? task.estimatedHours}h
                   </span>
                 </div>
               )
@@ -1443,7 +1428,6 @@ function ObjectiveZoomModal({
           )}
         </div>
 
-        {/* Footer */}
         <div className="pt-3 mt-2 border-t border-line flex items-center justify-between">
           <button
             type="button"
@@ -1451,14 +1435,14 @@ function ObjectiveZoomModal({
             className="flex items-center gap-1.5 text-[13px] font-semibold text-[#7a3fe0]"
           >
             <Plus className="size-4" />
-            <span>Añadir tarea para este objetivo</span>
+            <span>{t('planning.canvas.addTaskToObjective')}</span>
           </button>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full bg-subtle px-4 py-2 text-[13px] font-semibold text-ink-2 hover:bg-line-strong/30"
           >
-            Cerrar zoom
+            {t('planning.canvas.closeZoom')}
           </button>
         </div>
       </div>
@@ -1471,6 +1455,7 @@ function ObjectiveZoomModal({
  * Explica las 3 dimensiones vivas para que quede comprendido sin necesidad de etiquetar todo.
  */
 function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
+  const { t } = useTranslation()
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
@@ -1482,7 +1467,7 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-center justify-between pb-3 border-b border-line">
           <div className="flex items-center gap-2">
             <Sparkles className="size-4 text-[#7a3fe0]" />
-            <h3 className="text-[17px] font-bold text-ink">El Recorrido de la Obra</h3>
+            <h3 className="text-[17px] font-bold text-ink">{t('planning.canvas.philosophyTitle')}</h3>
           </div>
           <button
             type="button"
@@ -1494,16 +1479,16 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <p className="mt-3 text-[13px] leading-relaxed text-ink-2">
-          Tus proyectos avanzan mediante acciones cotidianas. Cada tarea que realizás hacia tus <strong>proyectos y objetivos</strong> nutre tres dimensiones fundamentales:
+          <Trans i18nKey="planning.canvas.philosophy.intro" components={{ strong: <strong /> }} />
         </p>
 
         <div className="mt-4 space-y-3">
           <div className="flex items-start gap-3 rounded-[14px] bg-[#f5f0ff]/60 border border-[#7a3fe0]/20 p-3">
             <span className="mt-1 size-2.5 rounded-full bg-[#7a3fe0] shrink-0" />
             <div>
-              <h4 className="text-[13px] font-bold text-ink">Literatura (Decidir y nombrar)</h4>
+              <h4 className="text-[13px] font-bold text-ink">{t('planning.canvas.philosophy.literaturaTitle')}</h4>
               <p className="text-[12px] text-ink-2 mt-0.5">
-                Lo que nombra, acuerda y da estructura: reglas, tiempos, condiciones y compromisos.
+                {t('planning.canvas.philosophy.literaturaBody')}
               </p>
             </div>
           </div>
@@ -1511,9 +1496,9 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
           <div className="flex items-start gap-3 rounded-[14px] bg-[#eef2ff]/60 border border-[#4f46e5]/20 p-3">
             <span className="mt-1.5 size-2.5 rounded-full bg-[#4f46e5] shrink-0" />
             <div>
-              <h4 className="text-[13px] font-bold text-ink">Arte (El roce interno)</h4>
+              <h4 className="text-[13px] font-bold text-ink">{t('planning.canvas.philosophy.arteTitle')}</h4>
               <p className="text-[12px] text-ink-2 mt-0.5">
-                La acción que atraviesa la postura y el límite propio: sostener el precio, superar el rechazo, quién estás siendo.
+                {t('planning.canvas.philosophy.arteBody')}
               </p>
             </div>
           </div>
@@ -1521,16 +1506,16 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
           <div className="flex items-start gap-3 rounded-[14px] bg-[#ecfdf5]/60 border border-[#0f9f6e]/20 p-3">
             <span className="mt-1.5 size-2.5 rounded-full bg-[#0f9f6e] shrink-0" />
             <div>
-              <h4 className="text-[13px] font-bold text-ink">Empresa (La materia concreta)</h4>
+              <h4 className="text-[13px] font-bold text-ink">{t('planning.canvas.philosophy.empresaTitle')}</h4>
               <p className="text-[12px] text-ink-2 mt-0.5">
-                Lo que imprime en la realidad tangible: el producto listo, los números, la entrega y los hechos.
+                {t('planning.canvas.philosophy.empresaBody')}
               </p>
             </div>
           </div>
         </div>
 
         <p className="mt-4 text-[12px] leading-relaxed text-ink-3 italic">
-          En tu día a día, esto no son rótulos burocráticos: es la textura viva con la que avanzas hacia tus objetivos decididos.
+          {t('planning.canvas.philosophy.outro')}
         </p>
 
         <div className="mt-5">
@@ -1539,7 +1524,7 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             className="w-full rounded-full bg-[#7a3fe0] py-2.5 text-[14px] font-semibold text-white hover:bg-[#6832c7] transition-all"
           >
-            Entendido
+            {t('planning.canvas.understood')}
           </button>
         </div>
       </div>

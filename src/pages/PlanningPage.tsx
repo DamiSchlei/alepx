@@ -144,10 +144,10 @@ export function PlanningPage() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h1 className="text-[22px] font-bold text-ink tracking-tight">
-              Planificación
+              {t('planning.title')}
             </h1>
             <p className="text-[12px] text-ink-3">
-              Proyectos · Resultados · Objetivos · Tareas
+              {t('planning.subtitle')}
             </p>
           </div>
 
@@ -157,7 +157,7 @@ export function PlanningPage() {
               className="flex items-center gap-1.5 text-[12px] px-3 py-1.5 shadow-sm"
             >
               <FolderPlus className="size-4" />
-              <span>Definir Proyecto</span>
+              <span>{t('planning.defineProject')}</span>
             </Button>
           </div>
         </div>
@@ -170,7 +170,7 @@ export function PlanningPage() {
             className="flex items-center gap-1.5 px-3 py-1 text-[13px]"
           >
             <Layers className="size-3.5" />
-            <span>Por Proyecto</span>
+            <span>{t('planning.viewByProject')}</span>
           </Chip>
           <Chip
             active={viewMode === 'tree'}
@@ -178,7 +178,7 @@ export function PlanningPage() {
             className="flex items-center gap-1.5 px-3 py-1 text-[13px]"
           >
             <GitFork className="size-3.5" />
-            <span>Árbol Integral</span>
+            <span>{t('planning.viewTree')}</span>
           </Chip>
           <Chip
             active={viewMode === 'tasks'}
@@ -186,7 +186,7 @@ export function PlanningPage() {
             className="flex items-center gap-1.5 px-3 py-1 text-[13px]"
           >
             <ListTodo className="size-3.5" />
-            <span>Lista Integral</span>
+            <span>{t('planning.viewList')}</span>
           </Chip>
         </div>
       </div>
