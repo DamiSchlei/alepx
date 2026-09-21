@@ -13,161 +13,66 @@ All UI strings in src/locales/en.json and es.json.
   es = Rioplatense (vos, completá, proponé, querés, anotá, sostuviste).
 Exactly 3 tabs: Planning, Home, Tracking. Home is primary.
 Economy untouched in formula. Paid once. No second currency.
-No teams, no light theme, no infinite recurrence, no “edit entire series”.
+No teams, no night/neon theme, no infinite recurrence, no “edit entire series”.
 Empty sample = empty UI. Never draw 0%.
-Do not seed XP, money, or completed work.
+Do not seed XP, money, or completed work as a payout showcase.
 After every slice the app runs.
 
-Color lock — attractive dark
+UI lock — paper
 
-Ground is night. Type is white. Accents are neon-jewel, used sparingly.
+Quiet gray page. White day cards lift. One violet accent. Ink is dark.
 
-Put these in src/index.css @theme and use them. Do not invent extra hex in JSX.
+Ground lives in `src/index.css` `@theme` (paper tokens). Do not reintroduce night hex.
 
-@theme {
-  --color-ink-950: #050814;
-  --color-ink-900: #0A1022;
-  --color-ink-800: #121A32;
-  --color-ink-700: #1A2544;
+- Page: `--color-bg` `#f4f5f8`
+- Cards: `--color-surface` white, `--shadow-paper`
+- Ink: `--color-ink` `#111113`, meta `--color-ink-3`
+- Accent / today / ISO chip: `--color-violet` `#7a3fe0`
+- Mint: done. Amber: loose / overdue. Rose: blocked.
 
-  --color-text: #FFFFFF;
-  --color-text-2: #E8EEFB;
-  --color-text-3: #93A0C2;
-
-  --color-accent: #5CE1FF;
-  --color-accent-strong: #2EC8FF;
-  --color-violet: #C084FC;
-  --color-mint: #34F1B4;
-  --color-amber: #FFB020;
-  --color-rose: #FF6B8A;
-
-  --color-surface: #10182E;
-  --color-surface-2: #162240;
-  --color-line: rgb(255 255 255 / 0.14);
-
-  --font-sans: 'Inter var', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Fraunces', 'Newsreader', ui-serif, Georgia, serif;
-}
-
-Load Fraunces (opsz 144, wght 600) in index.html. Display font ONLY on:
-Home character name
-Planning result titles
-Tracking week sentence
-
-Body background:
-
-body {
-  background:
-    radial-gradient(90% 50% at 70% 0%, rgb(46 200 255 / 0.22) 0%, transparent 55%),
-    radial-gradient(70% 40% at 10% 10%, rgb(192 132 252 / 0.10) 0%, transparent 50%),
-    var(--color-ink-950);
-  color: var(--color-text-2);
-}
-
-Usage law:
-Titles, task names, character name = #FFFFFF
-Body / meta = text-2
-Labels / times / hints = text-3
-Accent: XP fill, primary button, active tab, today eyebrow, current stage
-Violet: literature / writing fold only
-Mint: done checks, kept blocks
-Amber: overdue, missed blocks
-Rose: blocked only
-ink-400 on a title is a bug. Fix it.
-
-Primitives must change:
-Card: bg-surface, border-white/14, text inherits
-Button primary: bg-accent-strong text-ink-950 font-semibold
-Button secondary: bg-ink-800 text-text-2 border-white/10
-ProgressBar track: white/10, fill accent-strong
-Chip active: border-accent/50 bg-accent/15 text-accent
-Input: bg-ink-800 text-white placeholder:text-3
-
-Type + space lock
-
-greeting        13px  text-3
-name            38px  font-display text-white leading-none
-pills           12px  text-white, h-7, rounded-full, bg-ink-800
-xp bar          h-2
-today eyebrow   12px  accent
-today title     18px  text-white medium
-today meta      13px  text-3
-agenda label    11px  uppercase tracking-[0.16em] text-3
-agenda title    14px  text-white
-duration        12px  text-3
-screen title    30px  text-white
-week sentence   22px  font-display text-white
+Display font (Fraunces) ONLY on:
+Home week-range is not display; keep it sans.
+Planning project titles may use display.
+Tracking week sentence uses display.
 
 page            max-w-lg (already in Shell)
-hero gap        16
-avatar          136
-hero → today    32
-today padding   20
-agenda row      min-h-11, gap 8
-section gaps    8 / 16 / 32 — never gap-6 on every sibling
+hit targets     min 44px
+tab bar         fixed, content padded above it
 
 Home structure — only legal tree
 
 Page
-  Hero
-    left: greeting, name, pills (level + money), XP bar,
-          optional one-line active enterprises (hide if 0),
-          ghost text button Skills (not a fat CTA)
-    right: button > Avatar size={136}
-           wrapper classes:
-           rounded-full ring-1 ring-accent/40
-           shadow-[0_0_44px_rgba(46,200,255,0.28)]
-  TodayStep          ← ONLY raised surface
-  DateChips          quiet
-  Composer           quiet single bar
-  DayBar             if dayKey
-  Agenda             rows, max 4, overflow “See the day”
-  SeriesPulseLine    one line, hide if no series this week
-  WritingFold        collapsed (Walker + Literature inside)
-  CustomizeSheet / SkillsSheet
+  HomeStickyChrome
+    ISO week number + range
+    ‹ › shift ISO week (lands on Monday)
+    Hoy if activeDay !== today
+    WeekStrip LUN–DOM (today pip + max 3 project color dots, no 2/2 rings)
+  One DayCard (full width, no peek)
+    day title + Hoy badge
+    12h AM/PM analog, civil hands + digital time on today
+    obra line: planned / cap · free hours for the work
+    composer + Task + Plan the day
 
 Illegal on Home:
-ALEPH / acronym stack
-two equal Customize + Skills buttons
-PlanTotal as a block
-Literature / Walker always open
-wrapping agenda rows in Card
-more than one raised card
-
-TodayStep raised:
-
-bg-surface-2 border border-accent/20 p-5 rounded-[20px]
-
-Empty today: one sentence home.stepTodayEmpty. No dashed soup. No link to Plan Total.
-
-Agenda row:
-
-rounded-2xl bg-ink-900/80 px-3 py-2.5 min-h-11
-flex items-center gap-3
-
-Not Card.
-
-Avatar tap → CustomizeSheet. Name is the product title. Brand lives in Customize.
+Day / Week / Month granularity tabs
+Month grid
+Neighbor day peek / carousel snap
+Idle-hour chips (“16h inactivo”)
+Bring-from-planning icon on the card edge
+0% on an empty sample
+Character journal covering the Plan-the-day button (pip only)
 
 Planning
 
-Title white 30px. Subtitle text-3.
-Tabs Results / Tasks only.
-Result card: display title white, 1-line why in text-3, StagePath, up to 4 objective pills, health max 2 lines, progress bar ONLY if total > 0.
-StagePath: past mint, current accent, future text-3. Display only on the card.
-Dashed “new result” at end of list. Keep existing chips in empty state.
-Task filters in a sheet. Loose tasks first with amber hairline.
-No extra nav.
-
+Same four-level tree as Home’s Plan-the-day overlay: Project → Result → Objective → Task.
+All user-visible strings through i18n (en + Rioplatense es).
 Tracking
 
-Title white.
-First content = week sentence (white, display or 22px).
+Same ISO week chrome as Home: week number + range, ‹ ›, Hoy.
+First content = week sentence (ink, display 22px).
 If no completed work this week and no history: tracking.weekSentenceNone. No 0%.
 WeekChart: empty days are ticks, not fake bars.
-Then series pulse list if any series this week.
-Then existing KPIs / chart / results.
-Skills: names white. Optional constellation row. Detailed list can stay.
+Then existing KPIs / chart.
 
 Weekly series (Block = Task)
 

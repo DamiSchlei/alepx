@@ -175,8 +175,9 @@ describe('closeTask', () => {
     const outcome = closeTask(created.id, { actualHours: 1, comment: 'Quedó el cierre' })
     expect(outcome?.paid).toBe(true)
     expect(outcome?.reward.hours).toBe(1)
-    expect(outcome?.reward.xp).toBe(10)
-    expect(getState().character.xp).toBe(10)
+    // Seed sample has an active result; closeTask applies the +20% active-result bonus (10 → 12).
+    expect(outcome?.reward.xp).toBe(12)
+    expect(getState().character.xp).toBe(12)
     const task = getState().tasks.find((t) => t.id === created.id)!
     expect(task.actualHours).toBe(1)
     expect(task.status).toMatch(/^done_/)

@@ -25,8 +25,6 @@ import { resolveTaskViewTemplate } from '@/domain/taskView'
 import { TERRENO_MAP } from '@/domain/terrenos'
 import type { Task } from '@/domain/types'
 
-export { MiniDayClock, MicroDayClock } from '@/components/home/AnalogClock'
-
 interface DayTaskClockProps {
   tasks: Task[]
   activeDay: string

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronRight, Edit2, Plus } from 'lucide-react'
 import { TaskRow } from '@/components/task/TaskRow'
 import { Button } from '@/components/ui/primitives'
@@ -36,6 +37,7 @@ export function GlobalHierarchyTree({
   onEditProject,
   onOpenTactical,
 }: GlobalHierarchyTreeProps) {
+  const { t } = useTranslation()
   const state = useAleph()
   const [collapsedProjects, setCollapsedProjects] = useState<Set<string>>(new Set())
   const [collapsedResults, setCollapsedResults] = useState<Set<string>>(new Set())
@@ -70,7 +72,7 @@ export function GlobalHierarchyTree({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-[12px] text-ink-3">
-          Mapa completo: Proyectos ➔ Resultados ➔ Objetivos ➔ Tareas
+          {t('planning.fullTreeHint')}
         </p>
         <Button
           variant="secondary"
@@ -78,7 +80,7 @@ export function GlobalHierarchyTree({
           className="text-[12px] px-2.5 py-1 flex items-center gap-1"
         >
           <Plus className="size-3.5" />
-          <span>Definir Proyecto</span>
+          <span>{t('planning.defineProject')}</span>
         </Button>
       </div>
 
@@ -129,8 +131,7 @@ export function GlobalHierarchyTree({
 
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-[11px] text-ink-3">
-                    {projectResults.length}{' '}
-                    {projectResults.length === 1 ? 'resultado' : 'resultados'}
+                    {projectResults.length} {t('common.result')}
                   </span>
                   {onEditProject && (
                     <button
@@ -139,7 +140,7 @@ export function GlobalHierarchyTree({
                       className="flex items-center gap-1 rounded-lg border border-line/60 bg-white px-2 py-0.5 text-[11px] font-medium text-ink-2 hover:border-accent hover:text-accent transition-colors"
                     >
                       <Edit2 className="size-3" />
-                      <span>Editar</span>
+                      <span>{t('common.edit')}</span>
                     </button>
                   )}
                   <Button
@@ -147,7 +148,7 @@ export function GlobalHierarchyTree({
                     className="text-[12px] text-accent px-2 py-0.5"
                     onClick={() => onNewResult(project.name)}
                   >
-                    + Resultado
+                    + {t('common.result')}
                   </Button>
                 </div>
               </div>
@@ -157,7 +158,7 @@ export function GlobalHierarchyTree({
                 <div className="flex flex-col gap-2 p-3 pl-6">
                   {projectResults.length === 0 ? (
                     <p className="text-[12px] text-ink-3 italic py-1">
-                      Sin resultados en este proyecto.
+                      {t('planning.emptyProjectResults')}
                     </p>
                   ) : (
                     projectResults.map((result) => {
@@ -197,7 +198,7 @@ export function GlobalHierarchyTree({
                                     color: projectColor,
                                   }}
                                 >
-                                  Resultado
+                                  {t('common.result')}
                                 </span>
                                 <Link
                                   to={`/planning/results/${result.id}`}
@@ -213,7 +214,10 @@ export function GlobalHierarchyTree({
                                   color: projectColor,
                                 }}
                               >
-                                {progress.tasksDone}/{progress.tasksTotal} hechos
+                                {t('planning.results.tasksDone', {
+                                  done: progress.tasksDone,
+                                  total: progress.tasksTotal,
+                                })}
                               </span>
                             </div>
 
@@ -223,7 +227,7 @@ export function GlobalHierarchyTree({
                               style={{ color: projectColor }}
                               onClick={() => onNewObjective(result)}
                             >
-                              + Objetivo
+                              + {t('common.objective')}
                             </Button>
                           </div>
 
@@ -245,7 +249,7 @@ export function GlobalHierarchyTree({
                             >
                               {objectives.length === 0 ? (
                                 <p className="text-[11px] text-ink-3 italic">
-                                  Sin objetivos aún.
+                                  {t('planning.emptyResultObjectives')}
                                 </p>
                               ) : (
                                 objectives.map((obj) => {
@@ -271,7 +275,7 @@ export function GlobalHierarchyTree({
                                           />
                                           <span className="min-w-0">
                                             <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-                                              Objetivo
+                                              {t('common.objective')}
                                             </span>
                                             <span>{obj.name}</span>
                                           </span>
@@ -282,7 +286,7 @@ export function GlobalHierarchyTree({
                                           style={{ color: projectColor }}
                                           onClick={() => onNewTask(result.id, obj.id)}
                                         >
-                                          + Tarea
+                                          + {t('common.task')}
                                         </Button>
                                       </div>
 

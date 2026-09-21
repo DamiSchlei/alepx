@@ -1,19 +1,20 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Sheet } from '@/components/ui/Sheet'
 import { Button, Field, Input } from '@/components/ui/primitives'
 import { createProject, updateProject, deleteProject } from '@/data/actions'
 import type { Project } from '@/domain/types'
 
 const PRESET_COLORS = [
-  { label: 'Violeta', value: '#7a3fe0' },
-  { label: 'Azul', value: '#2563eb' },
-  { label: 'Esmeralda', value: '#059669' },
-  { label: 'Ámbar', value: '#d97706' },
-  { label: 'Rosa', value: '#e11d48' },
-  { label: 'Cian', value: '#0891b2' },
-  { label: 'Índigo', value: '#4f46e5' },
-  { label: 'Pizarra', value: '#475569' },
-]
+  { key: 'violet', value: '#7a3fe0' },
+  { key: 'blue', value: '#2563eb' },
+  { key: 'emerald', value: '#059669' },
+  { key: 'amber', value: '#d97706' },
+  { key: 'rose', value: '#e11d48' },
+  { key: 'cyan', value: '#0891b2' },
+  { key: 'indigo', value: '#4f46e5' },
+  { key: 'slate', value: '#475569' },
+] as const
 
 function ProjectFormContent({
   project,
@@ -26,6 +27,7 @@ function ProjectFormContent({
   onSaved?: (project: Project) => void
   onDeleted?: (id: string) => void
 }) {
+  const { t } = useTranslation()
   const isEditing = Boolean(project)
 
   const [name, setName] = useState(project?.name ?? '')
@@ -73,27 +75,27 @@ function ProjectFormContent({
   return (
     <div className="flex flex-col gap-4">
       <form id="project-form" onSubmit={handleSubmit} className="flex flex-col gap-4 py-2">
-        <Field label="Nombre del Proyecto" hint="El contenedor superior o línea estratégica (ej: Estudio Creativo, Lanzamiento 2026)">
+        <Field label={t('planning.projectForm.nameLabel')} hint={t('planning.projectForm.nameHint')}>
           <Input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ej: Novela y Ensayos, Plataforma Web..."
+            placeholder={t('planning.projectForm.namePlaceholder')}
             autoFocus
             required
           />
         </Field>
 
-        <Field label="Propósito u Horizonte" hint="¿Por qué existe este proyecto y qué cambio genera?">
+        <Field label={t('planning.projectForm.purposeLabel')} hint={t('planning.projectForm.purposeHint')}>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Describe brevemente la visión o meta superior de este proyecto..."
+            placeholder={t('planning.projectForm.purposePlaceholder')}
             rows={3}
             className="w-full resize-none rounded-xl border border-line bg-surface p-3 text-[14px] text-ink placeholder:text-ink-3 focus:border-accent focus:outline-none"
           />
         </Field>
 
-        <Field label="Color Distintivo" hint="Color con el que se identificará en el Lienzo y en la Planificación">
+        <Field label={t('planning.projectForm.colorLabel')} hint={t('planning.projectForm.colorHint')}>
           <div className="flex flex-wrap gap-2 pt-1">
             {PRESET_COLORS.map((c) => (
               <button
@@ -113,7 +115,7 @@ function ProjectFormContent({
                   className="size-3 rounded-full shrink-0"
                   style={{ backgroundColor: c.value }}
                 />
-                {c.label}
+                {t(`planning.projectForm.colors.${c.key}`)}
               </button>
             ))}
           </div>
@@ -122,18 +124,18 @@ function ProjectFormContent({
         {showDeleteConfirm && (
           <div className="mt-2 rounded-xl border border-red-200 bg-red-50 p-3 text-red-900 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-200">
             <p className="text-[13px] font-medium">
-              ¿Seguro que deseas eliminar este proyecto? Los resultados existentes conservarán sus datos.
+              {t('planning.projectForm.deleteConfirm')}
             </p>
             <div className="mt-3 flex gap-2">
               <Button type="button" variant="secondary" onClick={() => setShowDeleteConfirm(false)}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="button"
                 className="bg-red-600 text-white hover:bg-red-700"
                 onClick={handleDelete}
               >
-                Confirmar Eliminación
+                {t('planning.projectForm.confirmDelete')}
               </Button>
             </div>
           </div>
@@ -148,19 +150,19 @@ function ProjectFormContent({
             className="text-red-500 hover:text-red-600"
             onClick={() => setShowDeleteConfirm(true)}
           >
-            Eliminar
+            {t('common.delete')}
           </Button>
         ) : <div />}
         <div className="flex gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
-            Cancelar
+            {t('common.cancel')}
           </Button>
           <Button
             type="button"
             disabled={!name.trim()}
             onClick={() => handleSubmit()}
           >
-            {isEditing ? 'Guardar Cambios' : 'Crear Proyecto'}
+            {isEditing ? t('planning.projectForm.save') : t('planning.projectForm.create')}
           </Button>
         </div>
       </div>
@@ -182,12 +184,13 @@ export function ProjectFormSheet({
   onDeleted?: (id: string) => void
 }) {
   const isEditing = Boolean(project)
+  const { t } = useTranslation()
 
   return (
     <Sheet
       open={open}
       onClose={onClose}
-      title={isEditing ? 'Editar Proyecto' : 'Definir Nuevo Proyecto'}
+      title={isEditing ? t('planning.editProject') : t('planning.newProject')}
     >
       {open && (
         <ProjectFormContent
