@@ -271,7 +271,7 @@
     "emptyProjectResults": "Sin resultados en este proyecto.",
     "emptyResultObjectives": "Sin objetivos en este resultado.",
     "resultsInside": "Lo que se concreta dentro de {{name}}",
-    "newResult": "Resultado",
+    "newResult": "Nuevo resultado",
     "canvas": {
       "canvas": "Lienzo",
       "list": "Lista",
@@ -511,7 +511,6 @@
     "activeEnterprises": "Empresas Activas",
     "progress": "Progreso",
     "nextTask": "Próximo: {{title}}",
-    "newResult": "+ Nuevo resultado",
     "resultHint": "Un resultado es una empresa que estás armando.",
     "openWeek": "Vista semanal",
     "objectiveCount": "{{count}} objetivos",

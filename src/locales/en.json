@@ -271,7 +271,7 @@
     "emptyProjectResults": "No results in this project.",
     "emptyResultObjectives": "No objectives in this result.",
     "resultsInside": "What takes shape inside {{name}}",
-    "newResult": "Result",
+    "newResult": "New result",
     "canvas": {
       "canvas": "Canvas",
       "list": "List",
@@ -511,7 +511,6 @@
     "activeEnterprises": "Active Enterprises",
     "progress": "Progress",
     "nextTask": "Next: {{title}}",
-    "newResult": "+ New result",
     "resultHint": "A result is an enterprise you are building.",
     "openWeek": "Weekly view",
     "objectiveCount": "{{count}} objectives",
