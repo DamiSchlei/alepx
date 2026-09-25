@@ -171,7 +171,8 @@ describe('closeTask', () => {
   })
 
   it('uses actualHours for the payout and persists the comment', () => {
-    const created = createTask({ title: 'Cerrar', estimatedHours: 4, difficulty: 'low' })
+    const res = createResult({ name: 'Resultado Test' })
+    const created = createTask({ title: 'Cerrar', estimatedHours: 4, difficulty: 'low', resultId: res.id })
     const outcome = closeTask(created.id, { actualHours: 1, comment: 'Quedó el cierre' })
     expect(outcome?.paid).toBe(true)
     expect(outcome?.reward.hours).toBe(1)
