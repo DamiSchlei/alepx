@@ -18,7 +18,9 @@ import {
   Play,
   Flame,
   Calendar,
+  Target,
 } from 'lucide-react'
+import { computeEndTime } from '@/domain/clockHours'
 import { MindMapCanvas } from './MindMapCanvas'
 import { TaskTemplatePicker, TaskTemplateTrigger } from './TaskTemplatePicker'
 import { useFeedback } from '@/app/FeedbackProvider'
@@ -343,51 +345,159 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
           </div>
         </div>
 
-        {/* Agenda & Home Synchronization Bar */}
+        {/* Agenda, Schedule & Objective Synchronization Bar */}
         {(() => {
           const todayKey = toDayKey(new Date())
           const isToday = task.scheduledFor === todayKey || task.dueAt === todayKey
           return (
-            <div className="flex flex-wrap items-center justify-between gap-2 px-4 sm:px-5 py-2 bg-slate-50/90 border-b border-line text-[11px] shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-ink-2">Agenda (Home):</span>
-                {isToday ? (
-                  <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-100/90 px-2.5 py-0.5 rounded-full">
-                    <span>☀️ Visible en el Home de Hoy</span>
-                  </span>
-                ) : task.scheduledFor ? (
-                  <span className="inline-flex items-center gap-1 font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
-                    <Calendar className="size-3" />
-                    <span>Agendada para: {task.scheduledFor}</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-0.5 rounded-full">
-                    <span>⚪ En Backlog de Planificación</span>
-                  </span>
-                )}
+            <div className="flex flex-col gap-2.5 px-4 sm:px-5 py-3 bg-slate-50/90 border-b border-line text-[12px] shrink-0">
+              {/* Row 1: Objective Assignment & Agenda Status */}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex items-center gap-1.5 font-bold text-ink shrink-0">
+                    <Target className="size-4 text-violet" />
+                    <span>Objetivo:</span>
+                  </div>
+                  <select
+                    value={task.objectiveId ?? ''}
+                    onChange={(e) => {
+                      const newObjId = e.target.value
+                      if (newObjId) {
+                        const targetObj = state.objectives.find((o) => o.id === newObjId)
+                        if (targetObj) {
+                          updateTask(task.id, {
+                            objectiveId: targetObj.id,
+                            resultId: targetObj.resultId,
+                          })
+                        }
+                      } else {
+                        updateTask(task.id, { objectiveId: undefined })
+                      }
+                    }}
+                    className="max-w-[240px] truncate rounded-xl border border-line bg-white px-2.5 py-1 text-[11px] font-semibold text-ink shadow-2xs hover:border-violet focus:outline-hidden focus:ring-1 focus:ring-violet"
+                  >
+                    <option value="">Sin objetivo (paso suelto)</option>
+                    {state.results.map((res) => {
+                      const resObjs = state.objectives.filter((o) => o.resultId === res.id)
+                      if (resObjs.length === 0) return null
+                      return (
+                        <optgroup
+                          key={res.id}
+                          label={`${res.projectName ? `${res.projectName} · ` : ''}${res.name}`}
+                        >
+                          {resObjs.map((o) => (
+                            <option key={o.id} value={o.id}>
+                              {o.name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      )
+                    })}
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="font-semibold text-ink-3 text-[11px]">Agenda:</span>
+                  {isToday ? (
+                    <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full text-[10px]">
+                      <span>☀️ En Hoy (Home)</span>
+                    </span>
+                  ) : task.scheduledFor ? (
+                    <span className="inline-flex items-center gap-1 font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-full text-[10px]">
+                      <Calendar className="size-2.5" />
+                      <span>{task.scheduledFor}</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 font-medium text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full text-[10px]">
+                      <span>⚪ Backlog</span>
+                    </span>
+                  )}
+
+                  {!isToday ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateTask(task.id, { scheduledFor: todayKey, dueAt: todayKey, stage: 'execution' })
+                      }}
+                      className="px-2 py-0.5 rounded-lg bg-emerald-600 text-white font-bold text-[10px] hover:bg-emerald-700 transition-colors shadow-2xs"
+                    >
+                      + Poner en Hoy
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        updateTask(task.id, { scheduledFor: undefined, dueAt: undefined })
+                      }}
+                      className="px-2 py-0.5 rounded-lg bg-white border border-line text-ink-3 hover:text-rose-600 font-semibold text-[10px] hover:bg-rose-50 transition-colors"
+                    >
+                      Mover a Backlog
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                {!isToday ? (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateTask(task.id, { scheduledFor: todayKey, dueAt: todayKey, stage: 'execution' })
+              {/* Row 2: Clock Schedule Setting (Horario en el Reloj) */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-line/50">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 font-bold text-ink shrink-0">
+                    <Clock className="size-3.5 text-violet" />
+                    <span>Horario en el reloj:</span>
+                  </div>
+
+                  <input
+                    type="time"
+                    value={task.scheduledStart || ''}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      if (val) {
+                        const endVal = computeEndTime(val, task.estimatedHours ?? 1)
+                        updateTask(task.id, { scheduledStart: val, scheduledEnd: endVal })
+                      } else {
+                        updateTask(task.id, { scheduledStart: undefined, scheduledEnd: undefined })
+                      }
                     }}
-                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold text-[11px] hover:bg-emerald-700 transition-colors shadow-2xs"
-                  >
-                    <span>☀️ Poner en Hoy (Home)</span>
-                  </button>
+                    className="h-7 rounded-lg border border-line bg-white px-2 text-[11px] font-semibold text-ink shadow-2xs focus:border-violet focus:outline-hidden"
+                  />
+
+                  <div className="flex items-center gap-1">
+                    {['09:00', '12:00', '15:00', '18:30'].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => {
+                          const endVal = computeEndTime(preset, task.estimatedHours ?? 1)
+                          updateTask(task.id, { scheduledStart: preset, scheduledEnd: endVal })
+                        }}
+                        className={`rounded-md px-2 py-0.5 text-[10px] font-semibold transition ${
+                          task.scheduledStart === preset
+                            ? 'bg-violet text-white shadow-2xs'
+                            : 'bg-white border border-line text-ink-2 hover:bg-violet-soft hover:text-violet'
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                    {task.scheduledStart && (
+                      <button
+                        type="button"
+                        onClick={() => updateTask(task.id, { scheduledStart: undefined, scheduledEnd: undefined })}
+                        className="text-[10px] font-medium text-ink-3 hover:text-rose-600 hover:underline px-1.5"
+                      >
+                        Sin hora fija
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {task.scheduledStart ? (
+                  <span className="text-[11px] font-bold text-violet">
+                    🕒 {task.scheduledStart} - {task.scheduledEnd || computeEndTime(task.scheduledStart, task.estimatedHours ?? 1)}
+                  </span>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateTask(task.id, { scheduledFor: undefined, dueAt: undefined })
-                    }}
-                    className="px-2.5 py-1 rounded-lg bg-white border border-line text-ink-3 hover:text-rose-600 font-semibold text-[11px] hover:bg-rose-50 transition-colors"
-                  >
-                    Mover a Backlog
-                  </button>
+                  <span className="text-[10px] text-ink-3">
+                    Reloj automático según orden del día
+                  </span>
                 )}
               </div>
             </div>

@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/components/character/Avatar'
-import { JournalThread } from '@/components/journal/JournalThread'
-import { Sheet } from '@/components/ui/Sheet'
+import { CharacterAssistantSheet } from '@/components/character/CharacterAssistantSheet'
 import { setJournalBubbleHidden } from '@/data/actions'
 import { useAleph } from '@/data/store'
 
@@ -123,16 +122,11 @@ export function JournalBubble() {
         </div>
       ) : null}
 
-      <Sheet open={mode === 'open'} onClose={closeSheet} title={t('journal.characterTitle')}>
-        <JournalThread
-          parentType="character"
-          parentId={character.id}
-          placeholder={t('journal.characterPlaceholder')}
-          emptyLabel={t('journal.characterEmpty')}
-          showHeading={false}
-          chronological
-        />
-      </Sheet>
+      <CharacterAssistantSheet
+        open={mode === 'open'}
+        onClose={closeSheet}
+        initialTab="character"
+      />
     </>
   )
 }

@@ -80,6 +80,100 @@ export function allProjects(state: AlephState): Project[] {
   return synthesized
 }
 
+export interface ProjectStats {
+  project: Project
+  resultsCount: number
+  objectivesCount: number
+  totalTasks: number
+  completedTasks: number
+  progressPercent: number
+  hasAdvances: boolean
+}
+
+export function projectStats(
+  state: AlephState,
+  projectOrName: Project | string,
+): ProjectStats {
+  const projects = allProjects(state)
+  const proj =
+    typeof projectOrName === 'string'
+      ? projects.find(
+          (p) =>
+            p.name.trim().toLowerCase() === projectOrName.trim().toLowerCase() ||
+            p.id === projectOrName,
+        )
+      : projectOrName
+
+  const defaultProj: Project = {
+    id: 'proj_unknown',
+    name: typeof projectOrName === 'string' ? projectOrName : 'Proyecto',
+    createdAt: new Date().toISOString(),
+  }
+  const project = proj ?? defaultProj
+  const pName = project.name.trim().toLowerCase()
+
+  // Find results
+  const results = state.results.filter(
+    (r) => (r.projectName?.trim().toLowerCase() || 'la obra principal') === pName,
+  )
+  const resultIds = new Set(results.map((r) => r.id))
+
+  // Find objectives
+  const objectives = state.objectives.filter((o) => resultIds.has(o.resultId))
+  const objectiveIds = new Set(objectives.map((o) => o.id))
+
+  // Find tasks
+  const tasks = state.tasks.filter(
+    (t) =>
+      (t.resultId && resultIds.has(t.resultId)) ||
+      (t.objectiveId && objectiveIds.has(t.objectiveId)),
+  )
+
+  const completed = tasks.filter((t) => isTaskDone(t.status))
+  const totalTasks = tasks.length
+  const completedTasks = completed.length
+  const progressPercent = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0
+
+  // A project has advances if it has at least 1 completed task,
+  // or tasks with work logged (workDone / timeSpentMinutes)
+  const hasWorkDone = tasks.some(
+    (t) => (t.workDone && t.workDone.length > 0) || (t.timeSpentMinutes && t.timeSpentMinutes > 0),
+  )
+  const hasAdvances = completedTasks > 0 || hasWorkDone
+
+  return {
+    project,
+    resultsCount: results.length,
+    objectivesCount: objectives.length,
+    totalTasks,
+    completedTasks,
+    progressPercent,
+    hasAdvances,
+  }
+}
+
+export function allProjectsWithStats(state: AlephState): ProjectStats[] {
+  const projects = allProjects(state)
+  return projects.map((p) => projectStats(state, p))
+}
+
+export function projectsWithoutAdvances(state: AlephState): ProjectStats[] {
+  return allProjectsWithStats(state).filter((stat) => !stat.hasAdvances)
+}
+
+export function canCreateNewProject(state: AlephState): {
+  allowed: boolean
+  inactiveCount: number
+  inactiveProjects: ProjectStats[]
+} {
+  const inactiveProjects = projectsWithoutAdvances(state)
+  return {
+    allowed: inactiveProjects.length < 3,
+    inactiveCount: inactiveProjects.length,
+    inactiveProjects,
+  }
+}
+
 export function projectOfResult(
   state: AlephState,
   resultOrProjectName?: Result | { projectName?: string } | string,
@@ -675,6 +769,7 @@ export interface JournalEntry {
 
 function originTitle(state: AlephState, type: ParentType, id: string): string {
   if (type === 'character') return state.character.name
+  if (type === 'project') return state.projects?.find((p) => p.id === id)?.name ?? 'Proyecto'
   if (type === 'result') return state.results.find((r) => r.id === id)?.name ?? ''
   if (type === 'objective') return state.objectives.find((o) => o.id === id)?.name ?? ''
   return state.tasks.find((t) => t.id === id)?.title ?? ''
@@ -683,6 +778,7 @@ function originTitle(state: AlephState, type: ParentType, id: string): string {
 /**
  * Work journals: task = that task only; objective = objective + its tasks.
  * Result = comments on that result only (no child rollup).
+ * Project = direct project comments + rollup of its results, objectives, and tasks.
  * Character = character thread only — never mixed with work.
  */
 export function journalFor(state: AlephState, type: ParentType, id: string): JournalEntry[] {
@@ -692,6 +788,28 @@ export function journalFor(state: AlephState, type: ParentType, id: string): Jou
     state.tasks
       .filter((t) => t.objectiveId === id)
       .forEach((t) => matches.push({ parentType: 'task', parentId: t.id }))
+  }
+
+  if (type === 'project') {
+    const proj = state.projects?.find((p) => p.id === id)
+    const projName = proj?.name || id
+    const projectResults = state.results.filter(
+      (r) =>
+        r.projectName === projName ||
+        `proj_${r.projectName?.toLowerCase().replace(/\s+/g, '_')}` === id ||
+        (id === 'proj_obra_principal' && r.projectName === 'La Obra Principal'),
+    )
+    projectResults.forEach((r) => {
+      matches.push({ parentType: 'result', parentId: r.id })
+      state.objectives
+        .filter((o) => o.resultId === r.id)
+        .forEach((o) => {
+          matches.push({ parentType: 'objective', parentId: o.id })
+          state.tasks
+            .filter((t) => t.objectiveId === o.id)
+            .forEach((t) => matches.push({ parentType: 'task', parentId: t.id }))
+        })
+    })
   }
 
   // result and character: no rollup — exact parent only

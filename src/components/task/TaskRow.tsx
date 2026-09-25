@@ -5,6 +5,7 @@ import {
   Brain,
   Calendar,
   Check,
+  Clock,
   Coins,
   Play,
   Plus,
@@ -302,6 +303,14 @@ export function TaskRow({
                 <Plus className="size-2.5 stroke-[3]" />
                 <span>Poner en Home</span>
               </button>
+            )}
+
+            {/* Scheduled clock hours badge */}
+            {task.scheduledStart && (
+              <span className="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-violet-50 text-violet border border-violet/20 shrink-0">
+                <Clock className="size-2.5 text-violet" />
+                <span>{task.scheduledStart}{task.scheduledEnd ? ` - ${task.scheduledEnd}` : ''}</span>
+              </span>
             )}
 
             {/* Real Time Dedicated Badge */}

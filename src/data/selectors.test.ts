@@ -20,6 +20,9 @@ import {
   trackingStats,
   weekSeriesPulse,
   journalFor,
+  projectStats,
+  projectsWithoutAdvances,
+  canCreateNewProject,
 } from './selectors'
 import type { AlephState, Comment, Objective, Result, Task } from '@/domain/types'
 
@@ -357,6 +360,24 @@ describe('journalFor', () => {
     ])
     expect(journalFor(s, 'task', 't').map((e) => e.comment.body)).toEqual(['task note'])
   })
+
+  it('rolls project comments and its results/objectives/tasks into project journal', () => {
+    const s = state({
+      projects: [{ id: 'p1', name: 'Mi Proyecto', createdAt: '2026-09-01' }],
+      results: [result({ id: 'r1', name: 'R1', projectName: 'Mi Proyecto' })],
+      objectives: [objective({ id: 'o1', resultId: 'r1', name: 'O1' })],
+      tasks: [task({ id: 't1', title: 'T1', objectiveId: 'o1' })],
+      comments: [
+        comment({ id: 'cp', parentType: 'project', parentId: 'p1', body: 'project note' }),
+        comment({ id: 'cr', parentType: 'result', parentId: 'r1', body: 'result note' }),
+        comment({ id: 'co', parentType: 'objective', parentId: 'o1', body: 'objective note' }),
+        comment({ id: 'ct', parentType: 'task', parentId: 't1', body: 'task note' }),
+      ],
+    })
+    const entries = journalFor(s, 'project', 'p1')
+    const ids = entries.map((e) => e.comment.id).sort()
+    expect(ids).toEqual(['co', 'cp', 'cr', 'ct'])
+  })
 })
 
 describe('blockContext', () => {
@@ -510,6 +531,51 @@ describe('resultWeekStats', () => {
     expect(week.hours).toBe(2)
     expect(week.ratio).toBe(0.5)
     expect(resultRailColor(s, s.results[0])).toBe('#a78bfa')
+  })
+})
+
+describe('projectStats and inactive projects limit', () => {
+  it('detects projects without advances and triggers limit if >= 3', () => {
+    const s = state({
+      projects: [
+        { id: 'p1', name: 'Alpha', createdAt: '2026-09-01T00:00:00Z' },
+        { id: 'p2', name: 'Beta', createdAt: '2026-09-02T00:00:00Z' },
+        { id: 'p3', name: 'Gamma', createdAt: '2026-09-03T00:00:00Z' },
+      ],
+      results: [
+        { id: 'r1', name: 'R1', projectName: 'Alpha', pillar: 'mind', importance: 1, status: 'attending' },
+        { id: 'r2', name: 'R2', projectName: 'Beta', pillar: 'mind', importance: 1, status: 'attending' },
+        { id: 'r3', name: 'R3', projectName: 'Gamma', pillar: 'mind', importance: 1, status: 'attending' },
+      ],
+      tasks: [
+        task({ id: 't1', title: 'Task in Alpha', resultId: 'r1', status: 'pending' }),
+        task({ id: 't2', title: 'Task in Beta', resultId: 'r2', status: 'pending' }),
+      ],
+    })
+
+    const inactive = projectsWithoutAdvances(s)
+    expect(inactive).toHaveLength(3) // All 3 have 0 completed tasks
+
+    const limitCheck = canCreateNewProject(s)
+    expect(limitCheck.allowed).toBe(false)
+    expect(limitCheck.inactiveCount).toBe(3)
+
+    // Complete a task in Alpha
+    const sWithProgress = {
+      ...s,
+      tasks: [
+        { ...s.tasks[0], status: 'done_on_time' as const },
+        s.tasks[1],
+      ],
+    }
+
+    const statsAlpha = projectStats(sWithProgress, 'Alpha')
+    expect(statsAlpha.hasAdvances).toBe(true)
+    expect(statsAlpha.completedTasks).toBe(1)
+
+    const inactiveAfter = projectsWithoutAdvances(sWithProgress)
+    expect(inactiveAfter).toHaveLength(2)
+    expect(canCreateNewProject(sWithProgress).allowed).toBe(true)
   })
 })
 

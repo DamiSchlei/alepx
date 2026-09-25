@@ -34,12 +34,12 @@
   --color-line: #e6e8ee;
   --color-line-strong: #d0d4dc;
 
-  /* Brand — one accent */
-  --color-accent: #2f6bff;
-  --color-accent-hover: #1f56e0;
-  --color-accent-pressed: #1646c4;
-  --color-accent-soft: #e8eeff;
-  --color-accent-strong: #1f56e0;
+  /* Brand — unified violet accent */
+  --color-accent: #7a3fe0;
+  --color-accent-hover: #6c35cc;
+  --color-accent-pressed: #5f2cb8;
+  --color-accent-soft: #f1e9ff;
+  --color-accent-strong: #6c35cc;
 
   /* Semantics */
   --color-mint: #0f9f6e;

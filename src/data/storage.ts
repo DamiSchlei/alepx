@@ -105,12 +105,14 @@ export function normalize(input: unknown): AlephState {
     new Set([...base.character.ownedCosmeticIds, ...(character.ownedCosmeticIds ?? [])]),
   )
   character.seenNewCosmeticIds = character.seenNewCosmeticIds ?? []
-  {
+  if (typeof raw.character?.onboarded === 'boolean') {
+    character.onboarded = raw.character.onboarded
+  } else {
     const hasHistory =
       (raw.results?.length ?? 0) > 0 ||
       (raw.objectives?.length ?? 0) > 0 ||
       (raw.tasks?.length ?? 0) > 0
-    character.onboarded = character.onboarded ?? hasHistory
+    character.onboarded = hasHistory
   }
 
   const storedSkills = raw.skills ?? []
