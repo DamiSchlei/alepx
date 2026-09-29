@@ -152,8 +152,8 @@ export function ResultDetailPage() {
       <div className="pt-6">
         <EmptyState
           action={
-            <Button variant="secondary" onClick={() => navigate('/planning')}>
-              Volver
+            <Button variant="secondary" onClick={() => navigate('/')}>
+              {t('common.back')}
             </Button>
           }
         >
@@ -177,10 +177,10 @@ export function ResultDetailPage() {
       <div className="flex items-center justify-between gap-2">
         <button
           type="button"
-          onClick={() => navigate('/planning')}
+          onClick={() => navigate('/')}
           className="min-h-11 text-left text-[14px] font-medium text-ink-3 hover:text-ink transition-colors"
         >
-          ← Planificación
+          ← {t('nav.home')}
         </button>
         {isArchived ? (
           <Button variant="secondary" className="min-h-11 px-3" onClick={() => restoreResult(result.id)}>
@@ -339,7 +339,7 @@ export function ResultDetailPage() {
         onCancel={() => setArchiveOpen(false)}
         onConfirm={() => {
           archiveResult(result.id)
-          navigate('/planning')
+          navigate('/')
         }}
       />
     </Page>

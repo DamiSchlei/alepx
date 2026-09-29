@@ -80,12 +80,14 @@ export function JournalBubble() {
           type="button"
           aria-label={t('journal.bubbleOpen')}
           onClick={showCollapsed}
-          className="fixed z-40 size-3 rounded-full bg-ink-2/80"
+          className="fixed z-40 flex size-11 items-center justify-center"
           style={{
-            right: 'max(1rem, env(safe-area-inset-right))',
-            bottom: 'max(calc(var(--tab-bar-height) + 9.5rem), env(safe-area-inset-bottom))',
+            right: 'max(0.5rem, env(safe-area-inset-right))',
+            bottom: 'max(calc(var(--tab-bar-height) + 8.5rem), env(safe-area-inset-bottom))',
           }}
-        />
+        >
+          <span className="size-2.5 rounded-full bg-ink-2/80" />
+        </button>
       ) : null}
 
       {visibleMode === 'collapsed' ? (
