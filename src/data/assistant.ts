@@ -1,6 +1,7 @@
 import { plannedHoursForDay } from '@/data/dayLoad'
 import { tasksForDay } from '@/data/selectors'
 import { toDayKey } from '@/domain/dates'
+import { resolvePlanningFlow } from '@/domain/planningLaws'
 import type { AlephState } from '@/domain/types'
 
 export interface AssistantMessage {
@@ -81,7 +82,7 @@ export async function askAssistant(
 ): Promise<string> {
   const todayKey = toDayKey(new Date())
   const todayTasks = tasksForDay(state, todayKey)
-  const plannedHours = plannedHoursForDay(todayTasks)
+  const plannedHours = plannedHoursForDay(state, todayKey)
 
   const payload = {
     messages: messages.map((m) => ({
@@ -121,11 +122,22 @@ export async function askAssistant(
       })),
       plannedHours,
       dailyHourCap: state.character.dailyHourCap ?? 5,
-      recentJournalComments: (state.journalComments || []).slice(0, 5).map((c) => ({
+      recentJournalComments: state.comments.slice(0, 5).map((c) => ({
         body: c.body,
         createdAt: c.createdAt,
-        originType: c.originType,
+        originType: c.parentType,
       })),
+      planningFlow: (() => {
+        const flow = resolvePlanningFlow(state, todayKey)
+        return {
+          current: flow.current,
+          resultName: flow.result?.name,
+          resultMeaning: flow.result?.why,
+          objectiveName: flow.objective?.name,
+          objectiveMeaning: flow.objective?.why,
+          todayStep: flow.todayTask?.title,
+        }
+      })(),
     },
   }
 

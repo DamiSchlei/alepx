@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { FocusExecutionModal } from '@/components/home/FocusExecutionModal'
 import { JournalBubble } from '@/components/journal/JournalBubble'
@@ -8,6 +8,8 @@ import { rollPendingTasksToToday } from '@/data/actions'
 
 export function Shell() {
   const [accountOpen, setAccountOpen] = useState(false)
+  const { pathname } = useLocation()
+  const wide = pathname === '/' || pathname === '/planning'
 
   useEffect(() => {
     rollPendingTasksToToday()
@@ -16,7 +18,7 @@ export function Shell() {
   return (
     <div className="relative min-h-dvh bg-bg">
       <main
-        className="safe-top mx-auto w-full max-w-lg px-4"
+        className={wide ? 'safe-top mx-auto w-full max-w-6xl px-4 xl:px-6' : 'safe-top mx-auto w-full max-w-lg px-4'}
         style={{ paddingBottom: 'calc(var(--tab-bar-height) + env(safe-area-inset-bottom))' }}
       >
         <Outlet />

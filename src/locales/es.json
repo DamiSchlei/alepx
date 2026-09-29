@@ -703,6 +703,48 @@
     "sat": "Sáb",
     "sun": "Dom"
   },
+  "flow": {
+    "kicker": "Leyes de la planificación",
+    "title": "El flujo de la obra",
+    "hint": "Inicio y planificación son la misma pantalla. Cada paso espera al anterior.",
+    "today": "Hoy:",
+    "saveMeaning": "Guardar el sentido",
+    "ledger": "Lista completa",
+    "backToFlow": "Volver al flujo",
+    "laws": {
+      "vision": {
+        "name": "Visión",
+        "law": "Un resultado es un punto más allá de hoy. Si solo planificás desde lo que ya podés, repetís el presente.",
+        "ask": "Qué significa este resultado para vos",
+        "placeholder": "La tensión que te obliga a inventar lo que hoy no tenés…",
+        "cta": "Nombrar el resultado",
+        "missing": "falta qué significa"
+      },
+      "vector": {
+        "name": "A dónde",
+        "law": "El objetivo no es una lista de tareas. Es el hito intermedio que vuelve inevitable el resultado.",
+        "ask": "Hacia dónde apunta este objetivo",
+        "placeholder": "Esta semana, la proa va hacia…",
+        "cta": "Definir el objetivo",
+        "missing": "falta hacia dónde apunta"
+      },
+      "pulse": {
+        "name": "Pulso",
+        "law": "La tarea de hoy es la unidad donde la visión toca la materia. Un paso, ligado a ese objetivo, dentro de las horas de la obra.",
+        "cta": "Anotar el paso de hoy",
+        "missing": "hoy no hay un paso de esta obra"
+      },
+      "texture": {
+        "name": "Terreno",
+        "law": "Cada paso tiene una naturaleza: decidir y nombrar, atravesar un límite, o concretar materia.",
+        "cta": "Elegí la naturaleza de este paso"
+      },
+      "hold": {
+        "name": "Sostener",
+        "law": "El árbol no es una jaula. El paso de hoy y el resultado dicen lo mismo: sostené el pulso."
+      }
+    }
+  },
   "onboarding": {
     "back": "Atrás",
     "character": {
@@ -720,11 +762,17 @@
       "seedLit": "Literatura — Un texto sostenido",
       "seedBiz": "Empresa — Primer producto listo para vender",
       "customPlaceholder": "O escribí la tuya",
-      "cta": "Seguir"
+      "cta": "Seguir",
+      "law": "Ley de la visión: decidí un resultado más allá de lo que hoy ya podés, y decí qué significa.",
+      "meaningLabel": "Qué significa para vos",
+      "meaningPlaceholder": "Por qué este resultado te tensa…",
+      "vectorLabel": "Primer a dónde",
+      "vectorPlaceholder": "El hito que vuelve inevitable ese resultado…"
     },
     "block": {
       "title": "Qué vas a hacer hoy",
       "subtitle": "Un paso de esa obra, para hoy.",
+      "law": "Ley del pulso: un solo paso de esa obra, para hoy. Elegí su naturaleza.",
       "taskPlaceholder": "Un paso de esa obra, para hoy…",
       "cta": "Entrar a hoy"
     }
