@@ -20,7 +20,7 @@ import { completeTask, createTask, createObjective, reopenTask } from '@/data/ac
 import { useAleph } from '@/data/store'
 import { isTaskDone } from '@/domain/economy'
 import { activeObjectivesOfResult, tasksOfObjective, tasksOfResult } from '@/data/selectors'
-import type { Project, Result, Task } from '@/domain/types'
+import type { Objective, Project, Result, Task } from '@/domain/types'
 import { PlanningPhilosophyModal } from './PlanningPhilosophyModal'
 
 interface VisualPlanningFieldProps {
@@ -34,6 +34,7 @@ interface VisualPlanningFieldProps {
   onDeleteProject: (project: Project) => void
   onOpenTacticalTask?: (taskId: string) => void
   onZoomResult?: (result: Result) => void
+  onZoomObjective?: (objective: Objective, result: Result) => void
 }
 
 export function VisualPlanningField({
@@ -47,6 +48,7 @@ export function VisualPlanningField({
   onDeleteProject,
   onOpenTacticalTask,
   onZoomResult,
+  onZoomObjective,
 }: VisualPlanningFieldProps) {
   const { t } = useTranslation()
   const state = useAleph()
@@ -356,21 +358,22 @@ export function VisualPlanningField({
             </div>
           </div>
 
-          {/* Project progress track */}
-          <div className="mt-4 flex items-center gap-3">
-            <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{
-                  width: `${progressPercent}%`,
-                  backgroundColor: accentColor,
-                }}
-              />
+          {totalTasks > 0 ? (
+            <div className="mt-4 flex items-center gap-3">
+              <div className="flex-1 h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${progressPercent}%`,
+                    backgroundColor: accentColor,
+                  }}
+                />
+              </div>
+              <span className="text-[12px] font-bold text-ink-2 shrink-0">
+                {progressPercent}% de avance
+              </span>
             </div>
-            <span className="text-[12px] font-bold text-ink-2 shrink-0">
-              {progressPercent}% de avance
-            </span>
-          </div>
+          ) : null}
         </div>
 
         {/* TREE BRANCHES: RESULTS → OBJECTIVES → TASKS */}
@@ -589,6 +592,15 @@ export function VisualPlanningField({
                                 </div>
                               </div>
 
+                              {onZoomObjective ? (
+                                <button
+                                  type="button"
+                                  onClick={() => onZoomObjective(obj, result)}
+                                  className="flex min-h-11 items-center gap-1 rounded-lg border border-line bg-white px-2.5 text-[11px] font-semibold text-ink-2"
+                                >
+                                  Zoom
+                                </button>
+                              ) : null}
                               <button
                                 type="button"
                                 onClick={() => setActiveInlineAddTaskObjId(obj.id)}
