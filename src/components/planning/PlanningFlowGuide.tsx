@@ -128,6 +128,17 @@ export function PlanningFlowGuide({
   )
 }
 
+function MeaningLine({ name, why, missing }: { name: string; why?: string; missing: string }) {
+  const same = Boolean(why?.trim()) && why!.trim() === name.trim()
+  const suffix = !why?.trim() ? ` — ${missing}` : same ? '' : ` — ${why}`
+  return (
+    <li>
+      <span className="font-medium text-ink">{name}</span>
+      {suffix}
+    </li>
+  )
+}
+
 function CapturedContext({
   resultName,
   resultWhy,
@@ -146,16 +157,10 @@ function CapturedContext({
   return (
     <ul className="mt-2 space-y-1 text-[13px] leading-relaxed text-ink-2">
       {resultName ? (
-        <li>
-          <span className="font-medium text-ink">{resultName}</span>
-          {resultWhy ? ` — ${resultWhy}` : ` — ${t('flow.laws.vision.missing')}`}
-        </li>
+        <MeaningLine name={resultName} why={resultWhy} missing={t('flow.laws.vision.missing')} />
       ) : null}
       {objectiveName ? (
-        <li>
-          <span className="font-medium text-ink">{objectiveName}</span>
-          {objectiveWhy ? ` — ${objectiveWhy}` : ` — ${t('flow.laws.vector.missing')}`}
-        </li>
+        <MeaningLine name={objectiveName} why={objectiveWhy} missing={t('flow.laws.vector.missing')} />
       ) : null}
       {todayTitle ? (
         <li>
