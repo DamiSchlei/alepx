@@ -85,36 +85,28 @@ export function DailyJournalCard({ activeDay, localeTag }: DailyJournalCardProps
 
   // Contextual invitation prompt
   const contextualPrompt = useMemo(() => {
-    const objNames = linkedObjectives.slice(0, 2).map((n) => `«${n}»`).join(' y ')
-    const resNames = linkedResults.slice(0, 2).map((n) => `«${n}»`).join(' y ')
+    const join = t('journal.promptJoin')
+    const objNames = linkedObjectives.slice(0, 2).map((n) => `«${n}»`).join(join)
+    const resNames = linkedResults.slice(0, 2).map((n) => `«${n}»`).join(join)
+    const done = t('journal.doneCount', { count: doneTasks.length })
 
     if (doneTasks.length > 0) {
-      const taskCountStr = `${doneTasks.length} ${doneTasks.length === 1 ? 'tarea realizada' : 'tareas realizadas'}`
       if (resNames && objNames) {
-        return `Hoy registrás ${taskCountStr} impulsando el objetivo ${objNames} y tu resultado ${resNames}. ¿Cómo impactaron estas acciones en lo que te propusiste? ¿Qué descubriste sobre tu ritmo y dirección?`
+        return t('journal.doneWithBoth', { done, objectives: objNames, results: resNames })
       }
-      if (resNames) {
-        return `Hoy lograste ${taskCountStr} con foco en ${resNames}. ¿Qué avances concretos sentís que lograste hacia ese resultado y qué aprendizajes te deja la jornada?`
-      }
-      if (objNames) {
-        return `Con ${taskCountStr} orientadas a ${objNames}: ¿cómo sentís que respondió tu enfoque? Anotá tus reflexiones, dudas y próximas decisiones.`
-      }
-      return `Con ${taskCountStr} hoy: ¿cómo dialogan estos pasos con tus objetivos y el resultado deseado de tu obra?`
+      if (resNames) return t('journal.doneWithResult', { done, results: resNames })
+      if (objNames) return t('journal.doneWithObjective', { done, objectives: objNames })
+      return t('journal.donePlain', { done })
     }
 
     if (pendingTasks.length > 0) {
-      if (objNames) {
-        return `Tenés ${pendingTasks.length} ${pendingTasks.length === 1 ? 'tarea propuesta' : 'tareas propuestas'} hacia ${objNames}. ¿Qué claridad o intención querés fijar antes de ejecutarlas?`
-      }
-      return `Para las tareas de hoy: ¿cuál es la decisión central que querés sostener hacia tus objetivos propuestos?`
+      if (objNames) return t('journal.pendingWithObjective', { count: pendingTasks.length, objectives: objNames })
+      return t('journal.pendingPlain')
     }
 
-    if (resNames) {
-      return `Tus resultados propuestos activos son ${resNames}. Registrá en tu bitácora qué ideas, decisiones o reflexiones tenés hoy para avanzar hacia ellos.`
-    }
-
-    return 'Espacio de bitácora personal: conectá tus decisiones, acciones cotidianas y aprendizajes con los resultados y objetivos que te propusiste alcanzar.'
-  }, [doneTasks.length, linkedObjectives, linkedResults, pendingTasks.length])
+    if (resNames) return t('journal.resultsOnly', { results: resNames })
+    return t('journal.emptyPrompt')
+  }, [doneTasks.length, linkedObjectives, linkedResults, pendingTasks.length, t])
 
   // Journal entries
   const journalEntries = journalFor(state, 'character', character.id || '')

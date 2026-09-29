@@ -70,7 +70,7 @@ export function ObjectiveDetailPage() {
       <div className="pt-6">
         <EmptyState
           action={
-            <Button variant="secondary" onClick={() => navigate('/planning')}>
+            <Button variant="secondary" onClick={() => navigate('/')}>
               {t('common.back')}
             </Button>
           }
@@ -146,7 +146,7 @@ export function ObjectiveDetailPage() {
         >
           <div className="flex items-center justify-between text-[12px] font-semibold text-ink mb-1.5">
             <span>Progreso de Saberes Conquistados</span>
-            <span style={{ color: projectColor }}>{percent ?? '0%'}</span>
+            {percent ? <span style={{ color: projectColor }}>{percent}</span> : null}
           </div>
           <SaberProgressBar
             tasks={all}
