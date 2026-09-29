@@ -41,6 +41,14 @@ interface AssistantContext {
   plannedHours: number
   dailyHourCap: number
   recentJournalComments: Array<{ body: string; createdAt: string; originType: string }>
+  planningFlow?: {
+    current: string
+    resultName?: string
+    resultMeaning?: string
+    objectiveName?: string
+    objectiveMeaning?: string
+    todayStep?: string
+  }
 }
 
 function buildSystemInstruction(ctx?: AssistantContext): string {
@@ -62,6 +70,17 @@ function buildSystemInstruction(ctx?: AssistantContext): string {
       ? ctx.recentJournalComments.slice(0, 3).map((c) => `> "${c.body}" (${c.originType})`).join('\n')
       : 'Bitácora sin entradas recientes.'
 
+    const flow = ctx.planningFlow
+    const flowInfo = flow
+      ? `
+FLUJO DE PLANIFICACIÓN (no saltees el paso actual):
+- Paso actual: ${flow.current}
+- Resultado: ${flow.resultName ?? 'sin nombrar'}${flow.resultMeaning ? ` — "${flow.resultMeaning}"` : ''}
+- Objetivo: ${flow.objectiveName ?? 'sin nombrar'}${flow.objectiveMeaning ? ` — "${flow.objectiveMeaning}"` : ''}
+- Paso de hoy: ${flow.todayStep ?? 'sin anotar'}
+`
+      : ''
+
     contextInfo = `
 ESTADO ACTUAL DEL PERSONAJE:
 - Nombre: ${ctx.characterName || 'El Personaje'}
@@ -80,10 +99,20 @@ ${tasksSummary}
 
 ÚLTIMAS ENTRADAS DE BITÁCORA:
 ${recentJournal}
+${flowInfo}
 `
   }
 
   return `Eres el Mentor Personal y Consejero de Vida de Aleph, integrado directamente en el apartado del Personaje.
+
+LEYES DE LA PLANIFICACIÓN, en este orden y sin saltos:
+1. Visión. Un resultado es un punto más allá de hoy. No alcanza el nombre: hace falta qué significa para la persona.
+2. A dónde. El objetivo es un hito intermedio, no una lista de tareas. Máximo cuatro activos por resultado.
+3. Pulso. La tarea de hoy pertenece a ese objetivo y cabe en las horas de la obra.
+4. Terreno. Cada paso es literatura (decidir y nombrar), arte (atravesar un límite) o empresa (concretar materia).
+Cuando las cuatro están dichas, el trabajo es sostener. El árbol no es una jaula.
+Si el paso actual está vacío, acompañá ese paso antes de proponer el siguiente.
+
 Tu misión es:
 1. Dar seguimiento empático y lúcido a las tareas del usuario, ayudándole a destrabar bloqueos, evaluar su carga horaria y celebrar lo completado.
 2. Impulsar al usuario hacia nuevos objetivos claros, retadores y alcanzables conectados a sus Resultados ("La Obra").

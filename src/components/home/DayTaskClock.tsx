@@ -251,6 +251,7 @@ export function DayTaskClock({
         <div className="mt-4 flex w-full min-w-0 flex-col gap-2.5" onClick={(event) => event.stopPropagation()}>
           <form onSubmit={handleQuickAdd} className="flex w-full min-w-0 items-center gap-1">
             <input
+              id="studio-day-composer"
               type="text"
               value={newTaskTitle}
               onChange={(event) => setNewTaskTitle(event.target.value)}

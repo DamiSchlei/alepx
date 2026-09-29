@@ -703,6 +703,48 @@
     "sat": "Sat",
     "sun": "Sun"
   },
+  "flow": {
+    "kicker": "Laws of planning",
+    "title": "The flow of the work",
+    "hint": "Home and planning are one screen. Each step waits for the one before it.",
+    "today": "Today:",
+    "saveMeaning": "Save the meaning",
+    "ledger": "Full list",
+    "backToFlow": "Back to the flow",
+    "laws": {
+      "vision": {
+        "name": "Vision",
+        "law": "A result is a point beyond today. Planning only from what you can already do repeats the present.",
+        "ask": "What this result means to you",
+        "placeholder": "The tension that makes you invent what you do not have yet…",
+        "cta": "Name the result",
+        "missing": "its meaning is still open"
+      },
+      "vector": {
+        "name": "Bearing",
+        "law": "An objective is not a task list. It is the intermediate mark that makes the result inevitable.",
+        "ask": "Where this objective points",
+        "placeholder": "This week, the bow points toward…",
+        "cta": "Define the objective",
+        "missing": "its bearing is still open"
+      },
+      "pulse": {
+        "name": "Pulse",
+        "law": "Today's task is where the vision touches matter. One step, tied to that objective, inside the hours of the work.",
+        "cta": "Note today's step",
+        "missing": "today has no step of this work"
+      },
+      "texture": {
+        "name": "Ground",
+        "law": "Every step has a nature: to name and decide, to cross a limit, or to make matter concrete.",
+        "cta": "Choose the nature of this step"
+      },
+      "hold": {
+        "name": "Sustain",
+        "law": "The tree is not a cage. Today's step and the result say the same thing: keep the pulse."
+      }
+    }
+  },
   "onboarding": {
     "back": "Back",
     "character": {
@@ -720,11 +762,17 @@
       "seedLit": "Literature — A sustained text",
       "seedBiz": "Venture — First product ready to sell",
       "customPlaceholder": "Or write your own",
-      "cta": "Continue"
+      "cta": "Continue",
+      "law": "Law of vision: decide a result beyond what you can already do, and say what it means.",
+      "meaningLabel": "What it means to you",
+      "meaningPlaceholder": "Why this result pulls on you…",
+      "vectorLabel": "First bearing",
+      "vectorPlaceholder": "The mark that makes that result inevitable…"
     },
     "block": {
       "title": "What will you do today?",
       "subtitle": "One step of that work, for today.",
+      "law": "Law of the pulse: one step of that work, for today. Choose its nature.",
       "taskPlaceholder": "One step of that work, for today…",
       "cta": "Enter today"
     }

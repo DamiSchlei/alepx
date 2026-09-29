@@ -26,6 +26,9 @@ export function OnboardingBlockPage() {
     if (!canContinue) return
     const today = toDayKey(new Date())
     const activeResult = state.results.find((r) => r.status === 'active') || state.results[0]
+    const objective = state.objectives.find(
+      (item) => item.resultId === activeResult?.id && !item.archivedAt && item.status !== 'done',
+    )
     createTask({
       title: title.trim(),
       estimatedHours: hours,
@@ -33,6 +36,7 @@ export function OnboardingBlockPage() {
       scheduledFor: today,
       scheduledStart: '10:00',
       resultId: activeResult?.id,
+      objectiveId: objective?.id,
       terreno,
       stage: 'execution',
     })
@@ -63,6 +67,7 @@ export function OnboardingBlockPage() {
           <p className="text-[15px] leading-relaxed text-ink-3">
             {t('onboarding.block.subtitle', 'Un paso de esa obra, para hoy.')}
           </p>
+          <p className="text-[14px] leading-relaxed text-ink-2">{t('onboarding.block.law')}</p>
         </div>
 
         <div className="mt-7 space-y-4">
