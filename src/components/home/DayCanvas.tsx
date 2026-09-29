@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'motion/react'
 import {
@@ -15,6 +16,9 @@ import {
 } from 'lucide-react'
 import { DayTaskViewer } from '@/components/home/DayTaskViewer'
 import { DayTacticalDashboard } from '@/components/home/DayTacticalDashboard'
+import { PlanningFlowGuide } from '@/components/planning/PlanningFlowGuide'
+import { ProjectFormSheet } from '@/components/planning/ProjectFormSheet'
+import { VisualPlanningField } from '@/components/planning/VisualPlanningField'
 import { TacticalTaskModal } from '@/components/task/TacticalTaskModal'
 import { ResultFormSheet } from '@/components/planning/ResultForm'
 import {
@@ -37,7 +41,7 @@ import { parseLocal } from '@/domain/dates'
 import { isTaskDone } from '@/domain/economy'
 import { TERRENO_MAP, TERRENOS } from '@/domain/terrenos'
 import { formatHours } from '@/i18n/format'
-import type { Objective, Result, Task, Terreno } from '@/domain/types'
+import type { Objective, Project, Result, Task, Terreno } from '@/domain/types'
 
 interface DayCanvasProps {
   dayKey: string
@@ -53,6 +57,7 @@ export function DayCanvas({
   onClose,
 }: DayCanvasProps) {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const state = useAleph()
   const locale = state.character.locale
   const cap = state.character.dailyHourCap ?? 5
@@ -88,14 +93,6 @@ export function DayCanvas({
     ? selectedProject
     : (projectNames[0] ?? 'La Obra Principal')
 
-  const activeProjectColor = useMemo(() => {
-    const projects = allProjects(state)
-    const p = projects.find(
-      (proj) => proj.name.trim().toLowerCase() === currentProjectName.trim().toLowerCase(),
-    )
-    return p?.color || '#7a3fe0'
-  }, [state, currentProjectName])
-
   const resultsInCurrentProject = useMemo(() => {
     return projectMap.get(currentProjectName) ?? results
   }, [projectMap, currentProjectName, results])
@@ -110,6 +107,16 @@ export function DayCanvas({
   const [zoomedObjectiveResultName, setZoomedObjectiveResultName] = useState<string>('')
   const [showPhilosophyModal, setShowPhilosophyModal] = useState(false)
   const [showResultForm, setShowResultForm] = useState(false)
+  const [projectForm, setProjectForm] = useState<Project | undefined>()
+  const [projectFormOpen, setProjectFormOpen] = useState(false)
+
+  const activeProject = useMemo(() => {
+    return (
+      projects.find(
+        (proj) => proj.name.trim().toLowerCase() === currentProjectName.trim().toLowerCase(),
+      ) ?? projects[0]
+    )
+  }, [projects, currentProjectName])
 
   // Seed modal state
   const [showSeedModal, setShowSeedModal] = useState(false)
@@ -288,6 +295,29 @@ export function DayCanvas({
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto relative">
+        <div className="mx-auto w-full max-w-3xl px-4 pt-4">
+          <PlanningFlowGuide
+            dayKey={dayKey}
+            onNameResult={() => setShowResultForm(true)}
+            onNameObjective={(resultId) => {
+              const match = results.find((item) => item.id === resultId)
+              if (match) handleOpenNewObjective(match)
+            }}
+            onAddTodayStep={(resultId, objectiveId) => handleOpenSeed(resultId, objectiveId)}
+          />
+          <div className="mt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                onClose()
+                navigate('/planning')
+              }}
+              className="min-h-11 rounded-full px-3 text-[13px] font-semibold text-ink-3"
+            >
+              {t('flow.ledger')}
+            </button>
+          </div>
+        </div>
         {viewMode === 'tactical' ? (
           <DayTacticalDashboard
             tasks={tasks}
@@ -304,132 +334,53 @@ export function DayCanvas({
             />
           </div>
         ) : (
-          /* Project → Result → Objective → Task, same nest as Planning */
-          <div className="min-h-full flex flex-col items-center justify-start p-4 max-w-xl mx-auto pb-28">
-            <div
-              className="w-full overflow-hidden rounded-[24px] border border-line bg-white shadow-paper"
-              style={{ borderLeftWidth: '5px', borderLeftColor: activeProjectColor }}
-            >
-              <div
-                className="p-4"
-                style={{
-                  background: `linear-gradient(to right, ${activeProjectColor}14 0%, #ffffff 42%)`,
-                }}
-              >
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
-                        style={{ backgroundColor: activeProjectColor }}
-                      >
-                        <FolderGit2 className="size-3" />
-                        <span>{t('common.project')}</span>
-                      </span>
-                      {projectNames.length > 1 && (
-                        <select
-                          value={currentProjectName}
-                          onChange={(e) => setSelectedProject(e.target.value)}
-                          className="text-[12px] font-bold bg-transparent outline-none cursor-pointer border-b border-dashed"
-                          style={{
-                            color: activeProjectColor,
-                            borderColor: `${activeProjectColor}60`,
-                          }}
-                        >
-                          {projectNames.map((pName) => (
-                            <option key={pName} value={pName}>
-                              {pName}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
-                    <h2 className="mt-1.5 font-display text-[20px] font-bold text-ink leading-snug">
-                      {currentProjectName}
-                    </h2>
-                    <p className="mt-1 text-[11px] text-ink-3">
-                      {t('planning.resultsInside', { name: currentProjectName })}
-                    </p>
-                  </div>
+          /* One tree: the day's step lives in the field, list and tactical stay beside it */
+          <div className="min-h-full flex flex-col items-center justify-start px-2 max-w-3xl mx-auto pb-28">
+            {projectNames.length > 1 ? (
+              <div className="mb-3 flex w-full gap-2 overflow-x-auto px-2">
+                {projectNames.map((pName) => (
                   <button
+                    key={pName}
                     type="button"
-                    onClick={() => setShowResultForm(true)}
-                    className="flex items-center gap-1 text-[12px] font-semibold transition-colors px-2.5 py-1.5 rounded-full"
-                    style={{
-                      backgroundColor: `${activeProjectColor}18`,
-                      color: activeProjectColor,
-                    }}
+                    onClick={() => setSelectedProject(pName)}
+                    className={
+                      pName === currentProjectName
+                        ? 'min-h-11 shrink-0 rounded-full bg-violet-soft px-3 text-[13px] font-semibold text-violet'
+                        : 'min-h-11 shrink-0 rounded-full border border-line bg-white px-3 text-[13px] font-medium text-ink-2'
+                    }
                   >
-                    <Plus className="size-3.5" />
-                    <span>{t('planning.newResult')}</span>
+                    {pName}
                   </button>
-                </div>
-
-                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-ink-3">
-                  <span>
-                    <strong className="text-ink font-semibold">{resultsInCurrentProject.length}</strong>{' '}
-                    {t('common.result')}
-                  </span>
-                  <span>·</span>
-                  <span>
-                    {t('planning.canvas.tasksToday', {
-                      count: tasks.filter(
-                        (task) =>
-                          task.resultId &&
-                          resultsInCurrentProject.some((r) => r.id === task.resultId),
-                      ).length,
-                    })}
-                  </span>
-                </div>
+                ))}
               </div>
-
-              <div className="border-t border-line/60 p-3 flex flex-col gap-3">
-                {resultsInCurrentProject.length === 0 && (
-                  <div className="rounded-[16px] border border-dashed border-line bg-surface/50 p-5 text-center">
-                    <p className="text-[14px] font-medium text-ink-2">
-                      {t('planning.emptyProjectResults')}
-                    </p>
-                    <p className="mt-1 text-[12px] text-ink-3">
-                      {t('planning.canvas.emptyProjectHint')}
-                    </p>
-                    <div className="mt-4 flex justify-center">
-                      <button
-                        type="button"
-                        onClick={() => setShowResultForm(true)}
-                        className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-[13px] font-semibold text-white shadow-xs"
-                        style={{ backgroundColor: activeProjectColor }}
-                      >
-                        <Plus className="size-4" />
-                        <span>{t('planning.canvas.addFirstResult')}</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {resultsInCurrentProject.map((res) => {
-                  const resObjectives = objectivesOfResult(state, res.id)
-                  const resTasks = tasks.filter((task) => task.resultId === res.id)
-
-                  return (
-                    <ResultCellCard
-                      key={res.id}
-                      result={res}
-                      objectives={resObjectives}
-                      tasks={resTasks}
-                      onToggleTask={handleToggleTask}
-                      onZoomResult={() => setZoomedResult(res)}
-                      onZoomObjective={(obj) => {
-                        setZoomedObjective(obj)
-                        setZoomedObjectiveResultName(res.name)
-                      }}
-                      onAddStep={(objId) => handleOpenSeed(res.id, objId)}
-                      onAddObjective={() => handleOpenNewObjective(res)}
-                      onOpenTacticalTask={(taskId) => setSelectedTacticalTaskId(taskId)}
-                    />
-                  )
-                })}
-
-                {tasks.filter(
+            ) : null}
+            {activeProject ? (
+              <div className="mb-4 w-full">
+                <VisualPlanningField
+                  project={activeProject}
+                  results={resultsInCurrentProject}
+                  currentDay={dayKey}
+                  onNewResult={() => setShowResultForm(true)}
+                  onNewObjective={handleOpenNewObjective}
+                  onNewTask={(resultId, objectiveId) => handleOpenSeed(resultId, objectiveId)}
+                  onEditProject={(project) => {
+                    setProjectForm(project)
+                    setProjectFormOpen(true)
+                  }}
+                  onDeleteProject={(project) => {
+                    setProjectForm(project)
+                    setProjectFormOpen(true)
+                  }}
+                  onOpenTacticalTask={(taskId) => setSelectedTacticalTaskId(taskId)}
+                  onZoomResult={(result) => setZoomedResult(result)}
+                  onZoomObjective={(objective, result) => {
+                    setZoomedObjective(objective)
+                    setZoomedObjectiveResultName(result.name)
+                  }}
+                />
+              </div>
+            ) : null}
+            {tasks.filter(
                   (task) =>
                     !task.resultId ||
                     !resultsInCurrentProject.some((r) => r.id === task.resultId),
@@ -472,8 +423,6 @@ export function DayCanvas({
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
           </div>
         )}
       </div>
@@ -787,6 +736,15 @@ export function DayCanvas({
         />
       )}
 
+      <ProjectFormSheet
+        open={projectFormOpen}
+        project={projectForm}
+        onClose={() => {
+          setProjectFormOpen(false)
+          setProjectForm(undefined)
+        }}
+      />
+
       {/* Tactical Task Modal */}
       {selectedTacticalTaskId && (
         <TacticalTaskModal
@@ -795,224 +753,6 @@ export function DayCanvas({
           onClose={() => setSelectedTacticalTaskId(null)}
         />
       )}
-    </div>
-  )
-}
-
-/**
- * Célula de Resultado en el Lienzo
- */
-function ResultCellCard({
-  result,
-  objectives,
-  tasks,
-  onToggleTask,
-  onZoomResult,
-  onZoomObjective,
-  onAddStep,
-  onAddObjective,
-  onOpenTacticalTask,
-}: {
-  result: Result
-  objectives: Objective[]
-  tasks: Task[]
-  onToggleTask: (t: Task) => void
-  onZoomResult: () => void
-  onZoomObjective: (o: Objective) => void
-  onAddStep: (objId?: string) => void
-  onAddObjective: () => void
-  onOpenTacticalTask?: (taskId: string) => void
-}) {
-  const { t } = useTranslation()
-  const state = useAleph()
-  const projectColor = projectColorOfResult(state, result)
-  const hours = tasks.reduce(
-    (sum, task) => sum + (task.actualHours ?? task.estimatedHours ?? 1),
-    0,
-  )
-  const resultLevelTasks = tasks.filter((task) => !task.objectiveId)
-
-  return (
-    <div
-      className="relative flex flex-col rounded-[22px] border border-line bg-white/95 p-4 shadow-xs transition-all hover:border-line-strong hover:shadow-md overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, ${projectColor}0a 0%, #ffffff 45%)`,
-        borderLeftWidth: '4px',
-        borderLeftColor: projectColor,
-      }}
-    >
-      {/* Header de la Célula de Resultado */}
-      <div className="flex items-start justify-between pb-3 border-b border-line/60">
-        <div className="min-w-0 flex-1 pr-2">
-          <span
-            className="inline-block rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider mb-1"
-            style={{
-              backgroundColor: `${projectColor}18`,
-              color: projectColor,
-            }}
-          >
-            {t('common.result')}
-          </span>
-          <h3
-            onClick={onZoomResult}
-            className="text-[16px] font-bold text-ink hover:underline cursor-pointer transition-colors leading-tight truncate flex items-center gap-1.5 group"
-          >
-            <span>{result.name}</span>
-            <Maximize2 className="size-3 text-ink-4 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-          </h3>
-          {result.why && (
-            <p className="text-[11px] text-ink-3 truncate mt-0.5 italic">
-              "{result.why}"
-            </p>
-          )}
-          <p className="text-[11px] font-medium text-ink-3 mt-1">
-            {objectives.length} {t('common.objective')} ·{' '}
-            {t('planning.canvas.tasksTodayCount', { count: tasks.length, hours })}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-1.5 shrink-0">
-          <button
-            type="button"
-            onClick={onZoomResult}
-            className="flex items-center gap-1 text-[11px] font-semibold text-ink-3 hover:text-ink px-2.5 py-1 rounded-full border border-line bg-subtle transition-all"
-            title={t('planning.canvas.zoomStructure')}
-          >
-            <Maximize2 className="size-3" />
-            <span>{t('planning.canvas.zoom')}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => onAddStep()}
-            className="flex items-center gap-1 text-[12px] font-semibold px-2.5 py-1 rounded-full transition-colors"
-            style={{
-              backgroundColor: `${projectColor}16`,
-              color: projectColor,
-            }}
-          >
-            <Plus className="size-3" />
-            <span>{t('common.task')}</span>
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-3">
-        <div className="flex items-center justify-between mb-1.5 px-0.5">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3">
-            {t('common.objective')}
-          </span>
-          <button
-            type="button"
-            onClick={onAddObjective}
-            className="text-[11px] font-semibold hover:underline"
-            style={{ color: projectColor }}
-          >
-            + {t('planning.defineObjective')}
-          </button>
-        </div>
-        {objectives.length === 0 ? (
-          <p className="text-[12px] text-ink-3 italic px-0.5">{t('planning.emptyResultObjectives')}</p>
-        ) : (
-          <div className="flex flex-col gap-2">
-            {objectives.map((obj) => {
-              const objTasks = tasks.filter((task) => task.objectiveId === obj.id)
-              return (
-                <div
-                  key={obj.id}
-                  className="rounded-[12px] border border-line/50 bg-subtle/30 px-2.5 py-2"
-                  style={{ borderLeftWidth: '3px', borderLeftColor: projectColor }}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <button
-                      type="button"
-                      onClick={() => onZoomObjective(obj)}
-                      className="flex items-center gap-2 min-w-0 text-left flex-1 pr-2"
-                    >
-                      <span
-                        className="size-2 rounded-full shrink-0"
-                        style={{ backgroundColor: projectColor }}
-                      />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-ink-3">
-                          {t('common.objective')}
-                        </span>
-                        <span className="text-[13px] font-medium text-ink truncate hover:underline block">
-                          {obj.name}
-                        </span>
-                      </span>
-                      <span className="text-[11px] text-ink-3 shrink-0">
-                        ({objTasks.length} {t('common.task')})
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => onAddStep(obj.id)}
-                      className="text-[11px] font-semibold hover:underline shrink-0"
-                      style={{ color: projectColor }}
-                    >
-                      + {t('common.task')}
-                    </button>
-                  </div>
-                  {objTasks.length > 0 && (
-                    <div className="mt-2 flex flex-col gap-1.5 pl-3 border-l" style={{ borderLeftColor: `${projectColor}30` }}>
-                      {objTasks.map((task) => (
-                        <TaskStepRow
-                          key={task.id}
-                          task={task}
-                          onToggle={() => onToggleTask(task)}
-                          onOpenTactical={() => onOpenTacticalTask?.(task.id)}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {resultLevelTasks.length > 0 || tasks.length === 0 ? (
-          <div className="mt-3">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-ink-3 block mb-1.5 px-0.5">
-              {t('planning.canvas.tasksTodayLabel')}
-            </span>
-            {resultLevelTasks.length === 0 ? (
-              <div className="py-2 px-3 rounded-[10px] bg-subtle/20 border border-dashed border-line text-center text-[12px] text-ink-4">
-                {t('planning.canvas.noTasksToday')}
-              </div>
-            ) : (
-              <div className="flex flex-col gap-1.5">
-                {resultLevelTasks.map((task) => (
-                  <TaskStepRow
-                    key={task.id}
-                    task={task}
-                    onToggle={() => onToggleTask(task)}
-                    onOpenTactical={() => onOpenTacticalTask?.(task.id)}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        ) : null}
-
-      <div className="mt-3.5 pt-2.5 border-t border-line/60 flex items-center justify-between text-[12px]">
-        <button
-          type="button"
-          onClick={onAddObjective}
-          className="text-ink-3 hover:text-ink font-medium transition-colors"
-        >
-          + {t('planning.defineObjective')}
-        </button>
-        <button
-          type="button"
-          onClick={() => onAddStep()}
-          className="text-[#7a3fe0] hover:text-[#6832c7] font-semibold transition-colors"
-        >
-          + {t('home.clock.addTask')}
-        </button>
-      </div>
     </div>
   )
 }

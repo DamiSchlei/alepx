@@ -704,9 +704,9 @@
     "sun": "Sun"
   },
   "flow": {
-    "kicker": "Laws of planning",
-    "title": "The flow of the work",
-    "hint": "Home and planning are one screen. Each step waits for the one before it.",
+    "kicker": "Map of initiation",
+    "title": "Today's step",
+    "hint": "Planning the day is one combat: a place of your own to reach, and a step that shows whether you arrived.",
     "today": "Today:",
     "saveMeaning": "Save the meaning",
     "ledger": "Full list",
@@ -714,34 +714,34 @@
     "laws": {
       "vision": {
         "name": "Vision",
-        "law": "A result is a point beyond today. Planning only from what you can already do repeats the present.",
-        "ask": "What this result means to you",
-        "placeholder": "The tension that makes you invent what you do not have yet…",
+        "law": "The first step is one combat. The result is the place of your own you set out to reach. What is outside does not decide whether you walk.",
+        "ask": "What is yours that this result asks you to reach",
+        "placeholder": "The place this combat is walking toward…",
         "cta": "Name the result",
         "missing": "its meaning is still open"
       },
       "vector": {
         "name": "Bearing",
-        "law": "An objective is not a task list. It is the intermediate mark that makes the result inevitable.",
-        "ask": "Where this objective points",
-        "placeholder": "This week, the bow points toward…",
+        "law": "That combat has one objective: to reach that place. Each mark is a floor of the same path, not a loose list.",
+        "ask": "What floor this week is",
+        "placeholder": "This floor brings the place you decided closer…",
         "cta": "Define the objective",
         "missing": "its bearing is still open"
       },
       "pulse": {
         "name": "Pulse",
-        "law": "Today's task is where the vision touches matter. One step, tied to that objective, inside the hours of the work.",
+        "law": "The day is the mirror. The hours do not decide whether you walk: today's step shows whether you arrived or whether you stopped yourself.",
         "cta": "Note today's step",
         "missing": "today has no step of this work"
       },
       "texture": {
         "name": "Ground",
-        "law": "Every step has a nature: to name and decide, to cross a limit, or to make matter concrete.",
+        "law": "Every step has a nature: to name what you decide, to cross your own limit, or to leave it in matter.",
         "cta": "Choose the nature of this step"
       },
       "hold": {
         "name": "Sustain",
-        "law": "The tree is not a cage. Today's step and the result say the same thing: keep the pulse."
+        "law": "How to keep walking is found by keeping walking. What is outside does not determine the step."
       }
     }
   },
@@ -763,7 +763,7 @@
       "seedBiz": "Venture — First product ready to sell",
       "customPlaceholder": "Or write your own",
       "cta": "Continue",
-      "law": "Law of vision: decide a result beyond what you can already do, and say what it means.",
+      "law": "The first step is one combat: a place of your own to reach, and what it means to you.",
       "meaningLabel": "What it means to you",
       "meaningPlaceholder": "Why this result pulls on you…",
       "vectorLabel": "First bearing",
@@ -772,7 +772,7 @@
     "block": {
       "title": "What will you do today?",
       "subtitle": "One step of that work, for today.",
-      "law": "Law of the pulse: one step of that work, for today. Choose its nature.",
+      "law": "The day is the mirror. One step of that work, and the nature of that step.",
       "taskPlaceholder": "One step of that work, for today…",
       "cta": "Enter today"
     }

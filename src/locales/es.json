@@ -704,9 +704,9 @@
     "sun": "Dom"
   },
   "flow": {
-    "kicker": "Leyes de la planificación",
-    "title": "El flujo de la obra",
-    "hint": "Inicio y planificación son la misma pantalla. Cada paso espera al anterior.",
+    "kicker": "Mapa de la iniciación",
+    "title": "El paso de hoy",
+    "hint": "Planificar el día es un solo combate: un lugar propio al que llegar, y un paso que muestra si llegaste.",
     "today": "Hoy:",
     "saveMeaning": "Guardar el sentido",
     "ledger": "Lista completa",
@@ -714,34 +714,34 @@
     "laws": {
       "vision": {
         "name": "Visión",
-        "law": "Un resultado es un punto más allá de hoy. Si solo planificás desde lo que ya podés, repetís el presente.",
-        "ask": "Qué significa este resultado para vos",
-        "placeholder": "La tensión que te obliga a inventar lo que hoy no tenés…",
+        "law": "El primer paso es un solo combate. El resultado es el lugar propio al que te proponés llegar. Lo de afuera no decide si caminás.",
+        "ask": "Qué es lo propio que este resultado te pide alcanzar",
+        "placeholder": "El lugar al que este combate te lleva…",
         "cta": "Nombrar el resultado",
         "missing": "falta qué significa"
       },
       "vector": {
         "name": "A dónde",
-        "law": "El objetivo no es una lista de tareas. Es el hito intermedio que vuelve inevitable el resultado.",
-        "ask": "Hacia dónde apunta este objetivo",
-        "placeholder": "Esta semana, la proa va hacia…",
+        "law": "Ese combate tiene un solo objetivo: alcanzar ese lugar. Cada hito es un piso del mismo camino, no una lista suelta.",
+        "ask": "Cuál es el piso de esta semana",
+        "placeholder": "Este piso acerca el lugar que decidiste…",
         "cta": "Definir el objetivo",
         "missing": "falta hacia dónde apunta"
       },
       "pulse": {
         "name": "Pulso",
-        "law": "La tarea de hoy es la unidad donde la visión toca la materia. Un paso, ligado a ese objetivo, dentro de las horas de la obra.",
+        "law": "El día es el espejo. Las horas no deciden si caminás: un paso de hoy muestra si llegaste o si te frenaste vos.",
         "cta": "Anotar el paso de hoy",
         "missing": "hoy no hay un paso de esta obra"
       },
       "texture": {
         "name": "Terreno",
-        "law": "Cada paso tiene una naturaleza: decidir y nombrar, atravesar un límite, o concretar materia.",
+        "law": "Cada paso tiene una naturaleza: nombrar lo que decidís, atravesar el límite propio, o dejarlo en materia.",
         "cta": "Elegí la naturaleza de este paso"
       },
       "hold": {
         "name": "Sostener",
-        "law": "El árbol no es una jaula. El paso de hoy y el resultado dicen lo mismo: sostené el pulso."
+        "law": "Se encuentra cómo seguir cuando se sigue. El afuera no es lo que determina el paso."
       }
     }
   },
@@ -763,7 +763,7 @@
       "seedBiz": "Empresa — Primer producto listo para vender",
       "customPlaceholder": "O escribí la tuya",
       "cta": "Seguir",
-      "law": "Ley de la visión: decidí un resultado más allá de lo que hoy ya podés, y decí qué significa.",
+      "law": "El primer paso es un solo combate: un lugar propio al que llegar, y qué significa para vos.",
       "meaningLabel": "Qué significa para vos",
       "meaningPlaceholder": "Por qué este resultado te tensa…",
       "vectorLabel": "Primer a dónde",
@@ -772,7 +772,7 @@
     "block": {
       "title": "Qué vas a hacer hoy",
       "subtitle": "Un paso de esa obra, para hoy.",
-      "law": "Ley del pulso: un solo paso de esa obra, para hoy. Elegí su naturaleza.",
+      "law": "El día es el espejo. Un solo paso de esa obra, y la naturaleza de ese paso.",
       "taskPlaceholder": "Un paso de esa obra, para hoy…",
       "cta": "Entrar a hoy"
     }
