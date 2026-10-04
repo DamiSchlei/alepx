@@ -233,7 +233,7 @@ export function DayCanvas({
           <button
             type="button"
             onClick={() => setShowPhilosophyModal(true)}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink-2 hover:text-[#7a3fe0] hover:border-[#7a3fe0]/40 transition-all"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full border border-line bg-white text-ink-2 hover:border-violet/40 hover:text-violet"
             title={t('planning.canvas.philosophyTitle')}
             aria-label={t('planning.canvas.philosophyAria')}
           >
@@ -242,7 +242,7 @@ export function DayCanvas({
           <button
             type="button"
             onClick={() => handleOpenSeed()}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#7a3fe0] text-white hover:bg-[#6832c7] active:scale-95 transition-all shadow-sm"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-violet text-white shadow-sm"
             title={t('home.clock.addTask')}
           >
             <Plus className="size-4" />
@@ -385,7 +385,7 @@ export function DayCanvas({
                       <button
                         type="button"
                         onClick={() => handleOpenSeed()}
-                        className="flex items-center gap-1 text-[12px] font-semibold text-[#7a3fe0] px-2.5 py-1 rounded-full bg-[#f5f0ff]"
+                        className="flex min-h-11 items-center gap-1 rounded-full bg-violet-soft px-3 text-[13px] font-semibold text-violet"
                       >
                         <Plus className="size-3" />
                         <span>{t('common.task')}</span>
@@ -496,7 +496,7 @@ export function DayCanvas({
                 <button
                   type="button"
                   onClick={() => setShowSeedModal(false)}
-                  className="flex size-8 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
+                  className="flex size-11 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
                 >
                   <X className="size-4" />
                 </button>
@@ -666,7 +666,7 @@ export function DayCanvas({
                 <button
                   type="button"
                   onClick={() => setShowNewObjectiveModal(false)}
-                  className="flex size-8 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
+                  className="flex size-11 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
                 >
                   <X className="size-4" />
                 </button>
@@ -816,7 +816,7 @@ function ResultZoomModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex size-8 shrink-0 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
           >
             <X className="size-4" />
           </button>
@@ -1083,7 +1083,7 @@ function ObjectiveZoomModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
+            className="flex size-11 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
           >
             <X className="size-4" />
           </button>
@@ -1199,7 +1199,7 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
+            className="flex size-11 items-center justify-center rounded-full text-ink-3 hover:bg-subtle"
           >
             <X className="size-4" />
           </button>
@@ -1220,8 +1220,8 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 rounded-[14px] bg-[#eef2ff]/60 border border-[#4f46e5]/20 p-3">
-            <span className="mt-1.5 size-2.5 rounded-full bg-[#4f46e5] shrink-0" />
+          <div className="flex items-start gap-3 rounded-[14px] border border-amber/20 bg-amber-soft p-3">
+            <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-amber" />
             <div>
               <h4 className="text-[13px] font-bold text-ink">{t('planning.canvas.philosophy.arteTitle')}</h4>
               <p className="text-[12px] text-ink-2 mt-0.5">
@@ -1230,8 +1230,8 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 rounded-[14px] bg-[#ecfdf5]/60 border border-[#0f9f6e]/20 p-3">
-            <span className="mt-1.5 size-2.5 rounded-full bg-[#0f9f6e] shrink-0" />
+          <div className="flex items-start gap-3 rounded-[14px] border border-mint/20 bg-mint-soft p-3">
+            <span className="mt-1.5 size-2.5 shrink-0 rounded-full bg-mint" />
             <div>
               <h4 className="text-[13px] font-bold text-ink">{t('planning.canvas.philosophy.empresaTitle')}</h4>
               <p className="text-[12px] text-ink-2 mt-0.5">
@@ -1249,7 +1249,7 @@ function PhilosophyPresentationModal({ onClose }: { onClose: () => void }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-full rounded-full bg-[#7a3fe0] py-2.5 text-[14px] font-semibold text-white hover:bg-[#6832c7] transition-all"
+            className="min-h-11 w-full rounded-full bg-violet text-[14px] font-semibold text-white"
           >
             {t('planning.canvas.understood')}
           </button>

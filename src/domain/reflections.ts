@@ -34,11 +34,11 @@ export const THOUGHTS_ANTHOLOGY: LocalizedThoughtSeed[] = [
   {
     id: 'borges-aleph',
     theme: 'perspectiva',
-    author: 'Jorge Luis Borges',
-    work: { es: 'El Aleph', en: 'The Aleph' },
+    author: 'Aleph',
+    work: { es: 'Lectura de El Aleph', en: 'A reading of The Aleph' },
     text: {
-      es: 'Vi el populoso mar, vi el alba y la tarde, vi las muchedumbres de América, vi una plateada telaraña en el centro de una negra pirámide, vi un laberinto roto.',
-      en: 'I saw the populous sea, I saw dawn and evening, I saw the multitudes of America, I saw a silvery cobweb at the center of a black pyramid, I saw a broken labyrinth.',
+      es: 'El todo cabe en un punto. Ese punto, hoy, no es el mapa: es el primer paso.',
+      en: 'The whole fits in one point. Today that point is not the map. It is the first step.',
     },
     prompt: {
       es: '¿Desde qué ángulo estás mirando tu problema de hoy? Cambiá el punto de vista.',
@@ -48,11 +48,11 @@ export const THOUGHTS_ANTHOLOGY: LocalizedThoughtSeed[] = [
   {
     id: 'borges-tiempo',
     theme: 'tiempo',
-    author: 'Jorge Luis Borges',
-    work: { es: 'Otras inquisiciones', en: 'Other Inquisitions' },
+    author: 'Aleph',
+    work: { es: 'Lectura del tiempo', en: 'A reading of time' },
     text: {
-      es: 'El tiempo es la sustancia de que estoy hecho. El tiempo es un río que me arrebata, pero yo soy el río; es un tigre que me destroza, pero yo soy el tigre.',
-      en: 'Time is the substance from which I am made. Time is a river which sweeps me along, but I am the river; it is a tiger which mangles me, but I am the tiger.',
+      es: 'El tiempo del camino es largo. El tiempo del acto es este día.',
+      en: 'The time of the path is long. The time of the act is this day.',
     },
     prompt: {
       es: 'No pelees contra las horas del día; hacete cargo del cauce en el que estás.',
@@ -118,11 +118,11 @@ export const THOUGHTS_ANTHOLOGY: LocalizedThoughtSeed[] = [
   {
     id: 'calvino-visibilidad',
     theme: 'perspectiva',
-    author: 'Italo Calvino',
-    work: { es: 'Seis propuestas para el próximo milenio', en: 'Six Memos for the Next Millennium' },
+    author: 'Aleph',
+    work: { es: 'La obra y el peso', en: 'The work and the weight' },
     text: {
-      es: 'Tomad la vida con ligereza, que ligereza no es superficialidad, sino planear sobre las cosas desde lo alto, no tener pesos en el corazón.',
-      en: 'Take life lightly, for lightness is not superficiality, but gliding over things from above, not having boulders on your heart.',
+      es: 'Ver el conjunto desde arriba no es huir. Es no cargarle a un solo paso el peso de toda la obra.',
+      en: 'Seeing the whole from above is not escape. It is refusing to load one step with the weight of the entire work.',
     },
     prompt: {
       es: '¿Qué gravedad innecesaria le estás cargando a la tarea que tenés por delante?',
@@ -160,11 +160,11 @@ export const THOUGHTS_ANTHOLOGY: LocalizedThoughtSeed[] = [
   {
     id: 'cortazar-rayuela',
     theme: 'memoria',
-    author: 'Julio Cortázar',
-    work: { es: 'Rayuela', en: 'Hopscotch' },
+    author: 'Aleph',
+    work: { es: 'Lectura de los senderos', en: 'A reading of the forking paths' },
     text: {
-      es: 'Andábamos sin buscarnos pero sabiendo que andábamos para encontrarnos.',
-      en: 'We walked without looking for each other, but knowing that we walked to meet.',
+      es: 'Los caminos se bifurcan sin fin. Caminás uno. El plan elige cuál; el acto lo pisa.',
+      en: 'The paths fork without end. You walk one. The plan chooses it; the act steps on it.',
     },
     prompt: {
       es: 'Dejá un margen de azar en tu planificación de hoy. No todo debe estar blindado.',
@@ -174,11 +174,11 @@ export const THOUGHTS_ANTHOLOGY: LocalizedThoughtSeed[] = [
   {
     id: 'camus-sisifo',
     theme: 'voluntad',
-    author: 'Albert Camus',
-    work: { es: 'El mito de Sísifo', en: 'The Myth of Sisyphus' },
+    author: 'Aleph',
+    work: { es: 'El paso que se repite', en: 'The step that repeats' },
     text: {
-      es: 'La lucha hacia las cumbres basta para llenar el corazón de un hombre. Hay que imaginarse a Sísifo dichoso.',
-      en: 'The struggle itself towards the heights is enough to fill a man’s heart. One must imagine Sisyphus happy.',
+      es: 'La cumbre no dispensa la piedra de hoy. El corazón se llena con el paso que volvés a dar.',
+      en: 'The summit does not spare today’s stone. The heart fills with the step you take again.',
     },
     prompt: {
       es: 'Encontrá goce en la repetición del esfuerzo diario, no sólo en la meta final.',
@@ -211,6 +211,34 @@ export const THOUGHTS_ANTHOLOGY: LocalizedThoughtSeed[] = [
     prompt: {
       es: 'El plan es una hipótesis; la realidad se construye con el primer paso de hoy.',
       en: 'The plan is a hypothesis; reality is constructed with your first step today.',
+    },
+  },
+  {
+    id: 'gira-cotidiana',
+    theme: 'obra',
+    author: 'Aleph',
+    work: { es: 'Lectura de una gira por lo cotidiano', en: 'A reading of a tour through the ordinary' },
+    text: {
+      es: 'Lo absoluto también camina por el día común. Después de ver la obra entera, el acto que queda es chico e inmediato.',
+      en: 'The absolute also walks through an ordinary day. After you see the whole work, the act that remains is small and immediate.',
+    },
+    prompt: {
+      es: 'Cerrá el plan y hacé el primer paso antes de abrir otra idea.',
+      en: 'Close the plan and take the first step before you open another idea.',
+    },
+  },
+  {
+    id: 'biblioteca-acto',
+    theme: 'perspectiva',
+    author: 'Aleph',
+    work: { es: 'Lectura de la biblioteca total', en: 'A reading of the total library' },
+    text: {
+      es: 'Lo posible no termina. Tu obra de hoy es una página, y esa página se escribe al actuar.',
+      en: 'The possible does not end. Today’s work is one page, and that page is written by acting.',
+    },
+    prompt: {
+      es: 'Elegí una página de la obra y dejala hecha antes de seguir mirando el estante.',
+      en: 'Choose one page of the work and finish it before you keep looking at the shelf.',
     },
   },
 ]

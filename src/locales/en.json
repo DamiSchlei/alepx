@@ -326,8 +326,8 @@
         "empresaSub": "tangible matter"
       },
       "philosophy": {
-        "intro": "Your projects move through everyday actions. Each task toward your <strong>projects and objectives</strong> feeds three living dimensions:",
-        "outro": "Day to day these are not bureaucratic labels: they are the living texture of the work toward the objectives you already chose.",
+        "intro": "Seeing the whole work does not replace the act. Each step today has a nature, and that nature is what moves the result:",
+        "outro": "The path can be endless. What exists now is the first step, immediately after the plan.",
         "literaturaTitle": "Literature (Name and decide)",
         "literaturaBody": "What names, agrees, and gives structure: rules, times, conditions, and commitments.",
         "arteTitle": "Art (The inner friction)",
@@ -722,7 +722,7 @@
   "flow": {
     "kicker": "Laws of planning",
     "title": "The flow of the work",
-    "hint": "One result, one bearing, one step today. Each one waits for the one before it.",
+    "hint": "The work is the whole. The path is long. The act is the first step, the moment the plan closes.",
     "today": "Today:",
     "saveMeaning": "Save the meaning",
     "ledger": "Full list",
@@ -730,7 +730,7 @@
     "laws": {
       "vision": {
         "name": "Vision",
-        "law": "There is one result in play: something you cannot do yet. The name is not enough. It needs what it means to you.",
+        "law": "One result: the whole work, not a fragment. You cannot do it yet. The name is not enough. It needs what it means to you.",
         "ask": "What this result means to you",
         "placeholder": "The tension that makes you invent what you do not have yet…",
         "cta": "Name the result",
@@ -738,7 +738,7 @@
       },
       "vector": {
         "name": "Bearing",
-        "law": "That result asks for one bearing at a time. The objective is a mark on the same path, not a task list.",
+        "law": "The path is not walked all at once. It asks for one bearing at a time: a mark of that work, not a task list.",
         "ask": "Where this objective points",
         "placeholder": "This week, this mark brings the result closer…",
         "cta": "Define the objective",
@@ -746,7 +746,7 @@
       },
       "pulse": {
         "name": "Pulse",
-        "law": "Today's step belongs to that objective. The hours you have do not replace it: you either took it, or you have not yet.",
+        "law": "The moment the plan closes, the act is due. Today's step belongs to that objective. The hours do not replace it.",
         "cta": "Note today's step",
         "missing": "today has no step of this work"
       },
@@ -757,7 +757,7 @@
       },
       "hold": {
         "name": "Sustain",
-        "law": "Once the four are said, the work is to continue. The plan is not a cage: today's step and the result have to say the same thing."
+        "law": "The long path does not spare the first step. Once the four are said, continue: today's step and the work have to say the same thing."
       }
     }
   },
@@ -779,7 +779,7 @@
       "seedBiz": "Venture — First product ready to sell",
       "customPlaceholder": "Or write your own",
       "cta": "Continue",
-      "law": "One result, beyond what you can already do, and what it means to you.",
+      "law": "One result: the whole work, and what it means to you.",
       "meaningLabel": "What it means to you",
       "meaningPlaceholder": "Why this result pulls on you…",
       "vectorLabel": "First bearing",
@@ -788,7 +788,7 @@
     "block": {
       "title": "What will you do today?",
       "subtitle": "One step of that work, for today.",
-      "law": "One step of that work, for today. The hours do not replace the step. Choose its nature.",
+      "law": "The plan is done. The act is one step, now. Choose its nature.",
       "taskPlaceholder": "One step of that work, for today…",
       "cta": "Enter today"
     }

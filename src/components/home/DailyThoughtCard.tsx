@@ -27,46 +27,46 @@ const THEME_ACCENTS: Record<
   { bg: string; text: string; border: string; dot: string }
 > = {
   obra: {
-    bg: 'bg-emerald-50',
-    text: 'text-emerald-800',
-    border: 'border-emerald-200',
-    dot: 'bg-emerald-600',
+    bg: 'bg-mint-soft',
+    text: 'text-mint',
+    border: 'border-mint/20',
+    dot: 'bg-mint',
   },
   tiempo: {
-    bg: 'bg-violet-50',
-    text: 'text-violet-900',
-    border: 'border-violet-200',
-    dot: 'bg-violet-600',
+    bg: 'bg-violet-soft',
+    text: 'text-violet',
+    border: 'border-violet/20',
+    dot: 'bg-violet',
   },
   atencion: {
-    bg: 'bg-amber-50',
-    text: 'text-amber-900',
-    border: 'border-amber-200',
-    dot: 'bg-amber-600',
+    bg: 'bg-amber-soft',
+    text: 'text-amber',
+    border: 'border-amber/20',
+    dot: 'bg-amber',
   },
   silencio: {
-    bg: 'bg-slate-100',
-    text: 'text-slate-800',
-    border: 'border-slate-200',
-    dot: 'bg-slate-500',
+    bg: 'bg-subtle',
+    text: 'text-ink-2',
+    border: 'border-line',
+    dot: 'bg-ink-3',
   },
   voluntad: {
-    bg: 'bg-rose-50',
-    text: 'text-rose-900',
-    border: 'border-rose-200',
-    dot: 'bg-rose-600',
+    bg: 'bg-rose-soft',
+    text: 'text-rose',
+    border: 'border-rose/20',
+    dot: 'bg-rose',
   },
   perspectiva: {
-    bg: 'bg-sky-50',
-    text: 'text-sky-900',
-    border: 'border-sky-200',
-    dot: 'bg-sky-600',
+    bg: 'bg-violet-soft',
+    text: 'text-violet',
+    border: 'border-violet/20',
+    dot: 'bg-violet',
   },
   memoria: {
-    bg: 'bg-purple-50',
-    text: 'text-purple-900',
-    border: 'border-purple-200',
-    dot: 'bg-purple-600',
+    bg: 'bg-subtle',
+    text: 'text-ink-2',
+    border: 'border-line',
+    dot: 'bg-ink-3',
   },
 }
 
@@ -132,7 +132,7 @@ export function DailyThoughtCard({ activeDay, localeTag }: DailyThoughtCardProps
             type="button"
             onClick={handleFetchNew}
             disabled={isPending}
-            className="flex size-7 items-center justify-center rounded-lg border border-line bg-subtle/50 text-ink-3 hover:text-ink hover:bg-subtle transition-all active:scale-95 disabled:opacity-50"
+            className="flex size-11 items-center justify-center rounded-xl border border-line bg-white text-ink-3 hover:text-ink disabled:opacity-50"
             title={t('reflection.refresh')}
             aria-label={t('reflection.refresh')}
           >
@@ -142,7 +142,7 @@ export function DailyThoughtCard({ activeDay, localeTag }: DailyThoughtCardProps
           <button
             type="button"
             onClick={() => setIsFolded((f) => !f)}
-            className="flex size-7 items-center justify-center rounded-lg border border-line bg-subtle/50 text-ink-3 hover:text-ink hover:bg-subtle transition-all active:scale-95"
+            className="flex size-11 items-center justify-center rounded-xl border border-line bg-white text-ink-3 hover:text-ink"
             title={isFolded ? t('reflection.unfold') : t('reflection.fold')}
             aria-label={isFolded ? t('reflection.unfold') : t('reflection.fold')}
           >
