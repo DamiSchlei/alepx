@@ -722,7 +722,7 @@
   "flow": {
     "kicker": "Leyes de la planificación",
     "title": "El flujo de la obra",
-    "hint": "Cada paso espera al anterior.",
+    "hint": "Un resultado, un a dónde, un paso de hoy. Cada uno espera al anterior.",
     "today": "Hoy:",
     "saveMeaning": "Guardar el sentido",
     "ledger": "Lista completa",
@@ -730,7 +730,7 @@
     "laws": {
       "vision": {
         "name": "Visión",
-        "law": "Un resultado es un punto más allá de hoy. Si solo planificás desde lo que ya podés, repetís el presente.",
+        "law": "Hay un solo resultado en juego: algo que hoy todavía no podés. El nombre no alcanza. Hace falta qué significa para vos.",
         "ask": "Qué significa este resultado para vos",
         "placeholder": "La tensión que te obliga a inventar lo que hoy no tenés…",
         "cta": "Nombrar el resultado",
@@ -738,15 +738,15 @@
       },
       "vector": {
         "name": "A dónde",
-        "law": "El objetivo no es una lista de tareas. Es el hito intermedio que vuelve inevitable el resultado.",
+        "law": "Ese resultado pide un solo a dónde por vez. El objetivo es un hito del mismo camino, no una lista de tareas.",
         "ask": "Hacia dónde apunta este objetivo",
-        "placeholder": "Esta semana, la proa va hacia…",
+        "placeholder": "Esta semana, este hito acerca el resultado…",
         "cta": "Definir el objetivo",
         "missing": "falta hacia dónde apunta"
       },
       "pulse": {
         "name": "Pulso",
-        "law": "La tarea de hoy es la unidad donde la visión toca la materia. Un paso, ligado a ese objetivo, dentro de las horas de la obra.",
+        "law": "El paso de hoy es de ese objetivo. Las horas que tengas no lo reemplazan: o lo diste, o todavía no.",
         "cta": "Anotar el paso de hoy",
         "missing": "hoy no hay un paso de esta obra"
       },
@@ -757,7 +757,7 @@
       },
       "hold": {
         "name": "Sostener",
-        "law": "El árbol no es una jaula. El paso de hoy y el resultado dicen lo mismo: sostené el pulso."
+        "law": "Con las cuatro dichas, el trabajo es seguir. El plan no es una jaula: el paso de hoy y el resultado tienen que decir lo mismo."
       }
     }
   },
@@ -779,16 +779,16 @@
       "seedBiz": "Empresa — Primer producto listo para vender",
       "customPlaceholder": "O escribí la tuya",
       "cta": "Seguir",
-      "law": "Ley de la visión: decidí un resultado más allá de lo que hoy ya podés, y decí qué significa.",
+      "law": "Un solo resultado, más allá de lo que hoy ya podés, y qué significa para vos.",
       "meaningLabel": "Qué significa para vos",
       "meaningPlaceholder": "Por qué este resultado te tensa…",
       "vectorLabel": "Primer a dónde",
-      "vectorPlaceholder": "El hito que vuelve inevitable ese resultado…"
+      "vectorPlaceholder": "El hito de esta semana que acerca ese resultado…"
     },
     "block": {
       "title": "Qué vas a hacer hoy",
       "subtitle": "Un paso de esa obra, para hoy.",
-      "law": "Ley del pulso: un solo paso de esa obra, para hoy. Elegí su naturaleza.",
+      "law": "Un solo paso de esa obra, para hoy. Las horas no reemplazan el paso. Elegí su naturaleza.",
       "taskPlaceholder": "Un paso de esa obra, para hoy…",
       "cta": "Entrar a hoy"
     }
