@@ -251,7 +251,8 @@
       "reopen": "Reabrir tarea",
       "complete": "Completar tarea",
       "openTactical": "Abrir táctica",
-      "taskCount": "{{count}} tareas",
+      "taskCount_one": "{{count}} tarea",
+      "taskCount_other": "{{count}} tareas",
       "minutesDedicated": "{{count}} min",
       "elapsed": "{{time}} en curso"
     }
@@ -277,7 +278,8 @@
       "list": "Lista",
       "tactical": "Táctica",
       "backToCarousel": "Volver al día",
-      "tasksToday": "{{count}} tareas para hoy",
+      "tasksToday_one": "{{count}} tarea para hoy",
+      "tasksToday_other": "{{count}} tareas para hoy",
       "looseToday": "Tareas sueltas del día",
       "looseHint": "Acciones que caminan de forma libre",
       "defineObjectiveTitle": "Definir objetivo",
@@ -307,7 +309,9 @@
       "noTasksInObjective": "No hay tareas para este objetivo hoy.",
       "tasksTodayLabel": "Tareas para hoy",
       "tasksTodayForResult": "Tareas del día para este resultado",
-      "tasksTodayCount": "{{count}} tareas hoy ({{hours}}h)",
+      "taskPair": "{{done}}/{{total}}",
+      "tasksTodayCount_one": "{{count}} tarea hoy ({{hours}}h)",
+      "tasksTodayCount_other": "{{count}} tareas hoy ({{hours}}h)",
       "dedication": "Dedicación: {{hours}} h",
       "criteria": "Criterio: {{text}}",
       "openTactical": "Abrir táctica",
@@ -542,7 +546,7 @@
     "results": {
       "title": "Avance por resultado",
       "empty": "No hay resultados para seguir.",
-      "emptyCta": "Abrir Planning",
+      "emptyCta": "Ir al día",
       "noTasks": "Todavía sin tareas",
       "expand": "Ver objetivos",
       "collapse": "Ocultar objetivos"
@@ -593,6 +597,18 @@
     "characterTitle": "Bitácora",
     "characterPlaceholder": "¿Qué te está dejando esto, entre las empresas?",
     "characterEmpty": "Todavía no escribiste nada.",
+    "doneWithBoth": "Hoy registrás {{done}} impulsando el objetivo {{objectives}} y tu resultado {{results}}. ¿Cómo impactaron estas acciones en lo que te propusiste?",
+    "doneWithResult": "Hoy lograste {{done}} con foco en {{results}}. ¿Qué avances concretos sentís hacia ese resultado?",
+    "doneWithObjective": "Con {{done}} orientadas a {{objectives}}: ¿cómo sentís que respondió tu enfoque?",
+    "donePlain": "Con {{done}} hoy: ¿cómo dialogan estos pasos con lo que te propusiste?",
+    "pendingWithObjective_one": "Tenés {{count}} tarea propuesta hacia {{objectives}}. ¿Qué intención querés fijar antes de ejecutarla?",
+    "pendingWithObjective_other": "Tenés {{count}} tareas propuestas hacia {{objectives}}. ¿Qué intención querés fijar antes de ejecutarlas?",
+    "pendingPlain": "Para las tareas de hoy: ¿cuál es la decisión central que querés sostener?",
+    "resultsOnly": "Tus resultados activos son {{results}}. Anotá qué decisión te acerca hoy.",
+    "emptyPrompt": "Conectá una decisión de hoy con el resultado que estás armando.",
+    "promptJoin": " y ",
+    "doneCount_one": "{{count}} tarea realizada",
+    "doneCount_other": "{{count}} tareas realizadas",
     "bubbleOpen": "Abrir bitácora",
     "bubbleHide": "Esconder bitácora"
   },
@@ -704,9 +720,9 @@
     "sun": "Dom"
   },
   "flow": {
-    "kicker": "Mapa de la iniciación",
-    "title": "El paso de hoy",
-    "hint": "Planificar el día es un solo combate: un lugar propio al que llegar, y un paso que muestra si llegaste.",
+    "kicker": "Leyes de la planificación",
+    "title": "El flujo de la obra",
+    "hint": "Un resultado, un a dónde, un paso de hoy. Cada uno espera al anterior.",
     "today": "Hoy:",
     "saveMeaning": "Guardar el sentido",
     "ledger": "Lista completa",
@@ -714,34 +730,34 @@
     "laws": {
       "vision": {
         "name": "Visión",
-        "law": "El primer paso es un solo combate. El resultado es el lugar propio al que te proponés llegar. Lo de afuera no decide si caminás.",
-        "ask": "Qué es lo propio que este resultado te pide alcanzar",
-        "placeholder": "El lugar al que este combate te lleva…",
+        "law": "Hay un solo resultado en juego: algo que hoy todavía no podés. El nombre no alcanza. Hace falta qué significa para vos.",
+        "ask": "Qué significa este resultado para vos",
+        "placeholder": "La tensión que te obliga a inventar lo que hoy no tenés…",
         "cta": "Nombrar el resultado",
         "missing": "falta qué significa"
       },
       "vector": {
         "name": "A dónde",
-        "law": "Ese combate tiene un solo objetivo: alcanzar ese lugar. Cada hito es un piso del mismo camino, no una lista suelta.",
-        "ask": "Cuál es el piso de esta semana",
-        "placeholder": "Este piso acerca el lugar que decidiste…",
+        "law": "Ese resultado pide un solo a dónde por vez. El objetivo es un hito del mismo camino, no una lista de tareas.",
+        "ask": "Hacia dónde apunta este objetivo",
+        "placeholder": "Esta semana, este hito acerca el resultado…",
         "cta": "Definir el objetivo",
         "missing": "falta hacia dónde apunta"
       },
       "pulse": {
         "name": "Pulso",
-        "law": "El día es el espejo. Las horas no deciden si caminás: un paso de hoy muestra si llegaste o si te frenaste vos.",
+        "law": "El paso de hoy es de ese objetivo. Las horas que tengas no lo reemplazan: o lo diste, o todavía no.",
         "cta": "Anotar el paso de hoy",
         "missing": "hoy no hay un paso de esta obra"
       },
       "texture": {
         "name": "Terreno",
-        "law": "Cada paso tiene una naturaleza: nombrar lo que decidís, atravesar el límite propio, o dejarlo en materia.",
+        "law": "Cada paso tiene una naturaleza: decidir y nombrar, atravesar un límite, o concretar materia.",
         "cta": "Elegí la naturaleza de este paso"
       },
       "hold": {
         "name": "Sostener",
-        "law": "Se encuentra cómo seguir cuando se sigue. El afuera no es lo que determina el paso."
+        "law": "Con las cuatro dichas, el trabajo es seguir. El plan no es una jaula: el paso de hoy y el resultado tienen que decir lo mismo."
       }
     }
   },
@@ -763,16 +779,16 @@
       "seedBiz": "Empresa — Primer producto listo para vender",
       "customPlaceholder": "O escribí la tuya",
       "cta": "Seguir",
-      "law": "El primer paso es un solo combate: un lugar propio al que llegar, y qué significa para vos.",
+      "law": "Un solo resultado, más allá de lo que hoy ya podés, y qué significa para vos.",
       "meaningLabel": "Qué significa para vos",
       "meaningPlaceholder": "Por qué este resultado te tensa…",
       "vectorLabel": "Primer a dónde",
-      "vectorPlaceholder": "El hito que vuelve inevitable ese resultado…"
+      "vectorPlaceholder": "El hito de esta semana que acerca ese resultado…"
     },
     "block": {
       "title": "Qué vas a hacer hoy",
       "subtitle": "Un paso de esa obra, para hoy.",
-      "law": "El día es el espejo. Un solo paso de esa obra, y la naturaleza de ese paso.",
+      "law": "Un solo paso de esa obra, para hoy. Las horas no reemplazan el paso. Elegí su naturaleza.",
       "taskPlaceholder": "Un paso de esa obra, para hoy…",
       "cta": "Entrar a hoy"
     }

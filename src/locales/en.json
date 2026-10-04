@@ -251,7 +251,8 @@
       "reopen": "Reopen task",
       "complete": "Complete task",
       "openTactical": "Open tactics",
-      "taskCount": "{{count}} tasks",
+      "taskCount_one": "{{count}} task",
+      "taskCount_other": "{{count}} tasks",
       "minutesDedicated": "{{count}} min",
       "elapsed": "{{time}} elapsed"
     }
@@ -277,7 +278,8 @@
       "list": "List",
       "tactical": "Tactics",
       "backToCarousel": "Back to the day",
-      "tasksToday": "{{count}} tasks for today",
+      "tasksToday_one": "{{count}} task for today",
+      "tasksToday_other": "{{count}} tasks for today",
       "looseToday": "Loose tasks today",
       "looseHint": "Actions walking on their own",
       "defineObjectiveTitle": "Define objective",
@@ -307,7 +309,9 @@
       "noTasksInObjective": "No tasks for this objective today.",
       "tasksTodayLabel": "Tasks for today",
       "tasksTodayForResult": "Today’s tasks for this result",
-      "tasksTodayCount": "{{count}} tasks today ({{hours}}h)",
+      "taskPair": "{{done}}/{{total}}",
+      "tasksTodayCount_one": "{{count}} task today ({{hours}}h)",
+      "tasksTodayCount_other": "{{count}} tasks today ({{hours}}h)",
       "dedication": "Dedicated: {{hours}} h",
       "criteria": "Criterion: {{text}}",
       "openTactical": "Open tactics",
@@ -542,7 +546,7 @@
     "results": {
       "title": "Result progress",
       "empty": "No results to track.",
-      "emptyCta": "Open Planning",
+      "emptyCta": "Open the day",
       "noTasks": "No tasks yet",
       "expand": "Show objectives",
       "collapse": "Hide objectives"
@@ -593,6 +597,18 @@
     "characterTitle": "Journal",
     "characterPlaceholder": "What is this leaving you, across the work?",
     "characterEmpty": "Nothing written yet.",
+    "doneWithBoth": "Today you logged {{done}} toward {{objectives}} and {{results}}. How did that move what you set out to reach?",
+    "doneWithResult": "Today you finished {{done}} aimed at {{results}}. What actually moved?",
+    "doneWithObjective": "With {{done}} aimed at {{objectives}}: how did your focus answer?",
+    "donePlain": "With {{done}} today: how do these steps talk to what you set out to reach?",
+    "pendingWithObjective_one": "You have {{count}} proposed task toward {{objectives}}. What intention do you want to set before you start?",
+    "pendingWithObjective_other": "You have {{count}} proposed tasks toward {{objectives}}. What intention do you want to set before you start?",
+    "pendingPlain": "For today's tasks: what decision do you want to hold?",
+    "resultsOnly": "Your active results are {{results}}. Note the decision that brings you closer today.",
+    "emptyPrompt": "Connect one decision from today with the result you are building.",
+    "promptJoin": " and ",
+    "doneCount_one": "{{count}} finished task",
+    "doneCount_other": "{{count}} finished tasks",
     "bubbleOpen": "Open journal",
     "bubbleHide": "Hide journal"
   },
@@ -704,9 +720,9 @@
     "sun": "Sun"
   },
   "flow": {
-    "kicker": "Map of initiation",
-    "title": "Today's step",
-    "hint": "Planning the day is one combat: a place of your own to reach, and a step that shows whether you arrived.",
+    "kicker": "Laws of planning",
+    "title": "The flow of the work",
+    "hint": "One result, one bearing, one step today. Each one waits for the one before it.",
     "today": "Today:",
     "saveMeaning": "Save the meaning",
     "ledger": "Full list",
@@ -714,34 +730,34 @@
     "laws": {
       "vision": {
         "name": "Vision",
-        "law": "The first step is one combat. The result is the place of your own you set out to reach. What is outside does not decide whether you walk.",
-        "ask": "What is yours that this result asks you to reach",
-        "placeholder": "The place this combat is walking toward…",
+        "law": "There is one result in play: something you cannot do yet. The name is not enough. It needs what it means to you.",
+        "ask": "What this result means to you",
+        "placeholder": "The tension that makes you invent what you do not have yet…",
         "cta": "Name the result",
         "missing": "its meaning is still open"
       },
       "vector": {
         "name": "Bearing",
-        "law": "That combat has one objective: to reach that place. Each mark is a floor of the same path, not a loose list.",
-        "ask": "What floor this week is",
-        "placeholder": "This floor brings the place you decided closer…",
+        "law": "That result asks for one bearing at a time. The objective is a mark on the same path, not a task list.",
+        "ask": "Where this objective points",
+        "placeholder": "This week, this mark brings the result closer…",
         "cta": "Define the objective",
         "missing": "its bearing is still open"
       },
       "pulse": {
         "name": "Pulse",
-        "law": "The day is the mirror. The hours do not decide whether you walk: today's step shows whether you arrived or whether you stopped yourself.",
+        "law": "Today's step belongs to that objective. The hours you have do not replace it: you either took it, or you have not yet.",
         "cta": "Note today's step",
         "missing": "today has no step of this work"
       },
       "texture": {
         "name": "Ground",
-        "law": "Every step has a nature: to name what you decide, to cross your own limit, or to leave it in matter.",
+        "law": "Every step has a nature: to name and decide, to cross a limit, or to make matter concrete.",
         "cta": "Choose the nature of this step"
       },
       "hold": {
         "name": "Sustain",
-        "law": "How to keep walking is found by keeping walking. What is outside does not determine the step."
+        "law": "Once the four are said, the work is to continue. The plan is not a cage: today's step and the result have to say the same thing."
       }
     }
   },
@@ -763,16 +779,16 @@
       "seedBiz": "Venture — First product ready to sell",
       "customPlaceholder": "Or write your own",
       "cta": "Continue",
-      "law": "The first step is one combat: a place of your own to reach, and what it means to you.",
+      "law": "One result, beyond what you can already do, and what it means to you.",
       "meaningLabel": "What it means to you",
       "meaningPlaceholder": "Why this result pulls on you…",
       "vectorLabel": "First bearing",
-      "vectorPlaceholder": "The mark that makes that result inevitable…"
+      "vectorPlaceholder": "This week's mark that brings that result closer…"
     },
     "block": {
       "title": "What will you do today?",
       "subtitle": "One step of that work, for today.",
-      "law": "The day is the mirror. One step of that work, and the nature of that step.",
+      "law": "One step of that work, for today. The hours do not replace the step. Choose its nature.",
       "taskPlaceholder": "One step of that work, for today…",
       "cta": "Enter today"
     }

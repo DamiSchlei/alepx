@@ -24,6 +24,8 @@ import type { Objective, Project, Result, Task } from '@/domain/types'
 import { PlanningPhilosophyModal } from './PlanningPhilosophyModal'
 
 interface VisualPlanningFieldProps {
+  /** Hide the essay card. The day overlay already states the step. */
+  quiet?: boolean
   project: Project
   results: Result[]
   currentDay: string
@@ -38,6 +40,7 @@ interface VisualPlanningFieldProps {
 }
 
 export function VisualPlanningField({
+  quiet = false,
   project,
   results,
   currentDay,
@@ -174,8 +177,8 @@ export function VisualPlanningField({
   }
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto px-2 sm:px-4 pb-24">
-      {/* 1. TEACHING & PHILOSOPHY CARD */}
+    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto px-2 sm:px-4 pb-8">
+      {quiet ? null : (
       <div className="relative overflow-hidden rounded-2xl border border-accent/20 bg-gradient-to-br from-purple-500/5 via-accent/5 to-transparent p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
@@ -209,6 +212,7 @@ export function VisualPlanningField({
           </button>
         </div>
       </div>
+      )}
 
       {/* 2. RAPID FREE-FORM STEP NAMING ("ir nombrando esos pasos sin ser una estructura fija") */}
       <div className="rounded-2xl border border-line bg-white p-4 shadow-paper">
@@ -264,7 +268,7 @@ export function VisualPlanningField({
                   : 'bg-subtle text-ink-3 hover:text-ink'
               }`}
             >
-              ⚡ Tarea de base para hoy
+              Tarea de base para hoy
             </button>
             <button
               type="button"
@@ -275,7 +279,7 @@ export function VisualPlanningField({
                   : 'bg-subtle text-ink-3 hover:text-ink'
               }`}
             >
-              📅 Tarea abierta en backlog
+              Tarea abierta en backlog
             </button>
             {results.length > 0 && (
               <button
@@ -287,7 +291,7 @@ export function VisualPlanningField({
                     : 'bg-subtle text-ink-3 hover:text-ink'
                 }`}
               >
-                🎯 Objetivo ('A dónde')
+                Objetivo
               </button>
             )}
           </div>
@@ -314,7 +318,10 @@ export function VisualPlanningField({
                   {t('common.project')} · Raíz
                 </span>
                 <span className="text-[12px] font-medium text-ink-3">
-                  {results.length} {t('common.result')} · {totalTasks} tareas ({completedTasks.length} listas)
+                  {results.length} {t('common.result')}
+                  {totalTasks > 0
+                    ? ` · ${t('planning.canvas.taskPair', { done: completedTasks.length, total: totalTasks })}`
+                    : ''}
                 </span>
               </div>
               <h2 className="mt-1 text-[22px] font-extrabold text-ink leading-tight">
@@ -578,7 +585,7 @@ export function VisualPlanningField({
                                       Objetivo · A dónde
                                     </span>
                                     <span className="text-[10px] text-ink-3">
-                                      ({objCompletedTasks.length}/{objTasks.length} tareas)
+                                      {t('planning.canvas.taskPair', { done: objCompletedTasks.length, total: objTasks.length })}
                                     </span>
                                   </div>
                                   <h4 className="text-[14px] font-bold text-ink truncate mt-0.5">

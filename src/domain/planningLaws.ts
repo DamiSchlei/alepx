@@ -6,13 +6,13 @@ import type { AlephState, Objective, Result, Task, Terreno } from '@/domain/type
 /**
  * The planning laws, in the order a work is initiated.
  *
- * 1. Vision — a Result beyond today's limits, plus what it means to the person.
- * 2. Vector — an intermediate Objective (an "a dónde"), plus what it points at.
- * 3. Pulse — one base Task of that work scheduled on the day.
+ * 1. Vision — one Result beyond what is already possible, plus what it means.
+ * 2. Vector — one Objective at a time, a mark on that same path, plus where it points.
+ * 3. Pulse — one Task of that objective on the day. Available hours do not replace the step.
  * 4. Texture — the step's terreno: literatura, arte, or empresa.
  *
- * Hold is not a fifth law. It means the four are coherent, so the day can sustain them.
- * The tree is not a cage: later edits do not rewind a step that already has its meaning.
+ * Hold is not a fifth law. It means the four are coherent, so the work is to continue.
+ * The plan is not a cage: later edits do not rewind a step that already has its meaning.
  */
 export const PLANNING_LAW_ORDER = ['vision', 'vector', 'pulse', 'texture'] as const
 

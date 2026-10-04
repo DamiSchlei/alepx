@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { Trans, useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'motion/react'
 import {
@@ -57,7 +56,6 @@ export function DayCanvas({
   onClose,
 }: DayCanvasProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const state = useAleph()
   const locale = state.character.locale
   const cap = state.character.dailyHourCap ?? 5
@@ -256,7 +254,7 @@ export function DayCanvas({
             <button
               type="button"
               onClick={() => setViewMode('canvas')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium transition-all ${
+              className={`flex min-h-11 items-center gap-1 rounded-full px-3 text-[13px] font-medium transition-all ${
                 viewMode === 'canvas'
                   ? 'bg-white shadow-xs text-ink font-semibold'
                   : 'text-ink-3 hover:text-ink'
@@ -268,7 +266,7 @@ export function DayCanvas({
             <button
               type="button"
               onClick={() => setViewMode('list')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium transition-all ${
+              className={`flex min-h-11 items-center gap-1 rounded-full px-3 text-[13px] font-medium transition-all ${
                 viewMode === 'list'
                   ? 'bg-white shadow-xs text-ink font-semibold'
                   : 'text-ink-3 hover:text-ink'
@@ -280,9 +278,9 @@ export function DayCanvas({
             <button
               type="button"
               onClick={() => setViewMode('tactical')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-medium transition-all ${
+              className={`flex min-h-11 items-center gap-1 rounded-full px-3 text-[13px] font-medium transition-all ${
                 viewMode === 'tactical'
-                  ? 'bg-white shadow-xs text-purple-700 font-bold'
+                  ? 'bg-white shadow-xs font-semibold text-violet'
                   : 'text-ink-3 hover:text-ink'
               }`}
             >
@@ -305,18 +303,6 @@ export function DayCanvas({
             }}
             onAddTodayStep={(resultId, objectiveId) => handleOpenSeed(resultId, objectiveId)}
           />
-          <div className="mt-2 flex justify-end">
-            <button
-              type="button"
-              onClick={() => {
-                onClose()
-                navigate('/planning')
-              }}
-              className="min-h-11 rounded-full px-3 text-[13px] font-semibold text-ink-3"
-            >
-              {t('flow.ledger')}
-            </button>
-          </div>
         </div>
         {viewMode === 'tactical' ? (
           <DayTacticalDashboard
@@ -357,6 +343,7 @@ export function DayCanvas({
             {activeProject ? (
               <div className="mb-4 w-full">
                 <VisualPlanningField
+                  quiet
                   project={activeProject}
                   results={resultsInCurrentProject}
                   currentDay={dayKey}
