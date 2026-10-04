@@ -326,8 +326,8 @@
         "empresaSub": "materia tangible"
       },
       "philosophy": {
-        "intro": "Tus proyectos avanzan mediante acciones cotidianas. Cada tarea que realizás hacia tus <strong>proyectos y objetivos</strong> nutre tres dimensiones fundamentales:",
-        "outro": "En tu día a día, esto no son rótulos burocráticos: es la textura viva con la que avanzás hacia tus objetivos decididos.",
+        "intro": "Ver la obra entera no reemplaza el acto. Cada paso de hoy tiene una naturaleza, y esa naturaleza es la que mueve el resultado:",
+        "outro": "El camino puede ser eterno. Lo que existe ahora es el primer paso, inmediatamente después del plan.",
         "literaturaTitle": "Literatura (Decidir y nombrar)",
         "literaturaBody": "Lo que nombra, acuerda y da estructura: reglas, tiempos, condiciones y compromisos.",
         "arteTitle": "Arte (El roce interno)",
@@ -722,7 +722,7 @@
   "flow": {
     "kicker": "Leyes de la planificación",
     "title": "El flujo de la obra",
-    "hint": "Un resultado, un a dónde, un paso de hoy. Cada uno espera al anterior.",
+    "hint": "La obra es el todo. El camino es largo. El acto es el primer paso, apenas termina el plan.",
     "today": "Hoy:",
     "saveMeaning": "Guardar el sentido",
     "ledger": "Lista completa",
@@ -730,7 +730,7 @@
     "laws": {
       "vision": {
         "name": "Visión",
-        "law": "Hay un solo resultado en juego: algo que hoy todavía no podés. El nombre no alcanza. Hace falta qué significa para vos.",
+        "law": "Un solo resultado: la obra entera, no un pedazo. Hoy todavía no la podés. El nombre no alcanza. Hace falta qué significa para vos.",
         "ask": "Qué significa este resultado para vos",
         "placeholder": "La tensión que te obliga a inventar lo que hoy no tenés…",
         "cta": "Nombrar el resultado",
@@ -738,7 +738,7 @@
       },
       "vector": {
         "name": "A dónde",
-        "law": "Ese resultado pide un solo a dónde por vez. El objetivo es un hito del mismo camino, no una lista de tareas.",
+        "law": "El camino no se recorre de una vez. Pide un solo a dónde por vez: un hito de esa obra, no una lista de tareas.",
         "ask": "Hacia dónde apunta este objetivo",
         "placeholder": "Esta semana, este hito acerca el resultado…",
         "cta": "Definir el objetivo",
@@ -746,7 +746,7 @@
       },
       "pulse": {
         "name": "Pulso",
-        "law": "El paso de hoy es de ese objetivo. Las horas que tengas no lo reemplazan: o lo diste, o todavía no.",
+        "law": "Apenas cierra el plan, hace falta el acto. El paso de hoy es de ese objetivo. Las horas no lo reemplazan.",
         "cta": "Anotar el paso de hoy",
         "missing": "hoy no hay un paso de esta obra"
       },
@@ -757,7 +757,7 @@
       },
       "hold": {
         "name": "Sostener",
-        "law": "Con las cuatro dichas, el trabajo es seguir. El plan no es una jaula: el paso de hoy y el resultado tienen que decir lo mismo."
+        "law": "Lo eterno del camino no ahorra el primer paso. Con las cuatro dichas, seguí: el paso de hoy y la obra tienen que decir lo mismo."
       }
     }
   },
@@ -779,7 +779,7 @@
       "seedBiz": "Empresa — Primer producto listo para vender",
       "customPlaceholder": "O escribí la tuya",
       "cta": "Seguir",
-      "law": "Un solo resultado, más allá de lo que hoy ya podés, y qué significa para vos.",
+      "law": "Un solo resultado: la obra entera, y qué significa para vos.",
       "meaningLabel": "Qué significa para vos",
       "meaningPlaceholder": "Por qué este resultado te tensa…",
       "vectorLabel": "Primer a dónde",
@@ -788,7 +788,7 @@
     "block": {
       "title": "Qué vas a hacer hoy",
       "subtitle": "Un paso de esa obra, para hoy.",
-      "law": "Un solo paso de esa obra, para hoy. Las horas no reemplazan el paso. Elegí su naturaleza.",
+      "law": "El plan ya está. El acto es un solo paso, ahora. Elegí su naturaleza.",
       "taskPlaceholder": "Un paso de esa obra, para hoy…",
       "cta": "Entrar a hoy"
     }

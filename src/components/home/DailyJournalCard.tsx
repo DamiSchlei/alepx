@@ -254,7 +254,7 @@ export function DailyJournalCard({ activeDay, localeTag }: DailyJournalCardProps
                 type="button"
                 onClick={handleSaveReflection}
                 disabled={!reflectionText.trim() || savedSuccess}
-                className="flex items-center gap-1.5 rounded-xl bg-violet px-3.5 py-1.5 text-[11.5px] font-bold text-white hover:bg-violet-600 active:scale-95 disabled:opacity-40 transition-all shadow-xs"
+                className="flex min-h-11 items-center gap-1.5 rounded-full bg-violet px-4 text-[13px] font-semibold text-white disabled:opacity-40"
               >
                 {savedSuccess ? (
                   <>

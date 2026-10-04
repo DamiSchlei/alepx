@@ -366,7 +366,7 @@ export function DayTaskClock({
                       <button
                         type="button"
                         onClick={() => setSelectedTacticalTaskId(task.id)}
-                        className="flex size-9 items-center justify-center rounded-xl text-ink-3 hover:bg-violet-soft hover:text-violet"
+                        className="flex size-11 items-center justify-center rounded-xl text-ink-3 hover:bg-violet-soft hover:text-violet"
                         title={t('home.clock.openTactical')}
                       >
                         <SlidersHorizontal className="size-3.5" />
@@ -376,7 +376,7 @@ export function DayTaskClock({
                           type="button"
                           onClick={() => startExecution(task, activeDay)}
                           className={cx(
-                            'inline-flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold text-white shadow-sm',
+                            'inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-[13px] font-semibold text-white shadow-sm',
                             isExecuting ? 'bg-amber' : 'bg-ink hover:bg-ink-2',
                           )}
                         >

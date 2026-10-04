@@ -219,10 +219,7 @@ export function VisualPlanningField({
         <form onSubmit={handleQuickStepSubmit} className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between gap-2">
             <label className="text-[12px] font-bold text-ink flex items-center gap-1.5">
-              <span>Nombrar un paso libremente en este campo</span>
-              <span className="text-[10px] font-normal text-ink-3">
-                (sin fricción burocrática)
-              </span>
+              <span>Nombrar el paso y pasar al acto</span>
             </label>
             {results.length > 1 && (
               <select
@@ -239,21 +236,21 @@ export function VisualPlanningField({
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2">
             <input
               type="text"
               value={quickStepText}
               onChange={(e) => setQuickStepText(e.target.value)}
-              placeholder="Escribí aquí el paso que imaginás para tu obra y presioná Enter…"
-              className="flex-1 rounded-xl border border-line bg-surface px-3.5 py-2 text-[13px] text-ink placeholder:text-ink-3 focus:border-accent focus:bg-white focus:outline-none transition-all"
+              placeholder="El primer paso, apenas cierra el plan…"
+              className="min-h-11 w-full rounded-xl border border-line bg-white px-3.5 text-[14px] text-ink placeholder:text-ink-3 focus:border-violet focus:outline-none"
             />
             <button
               type="submit"
               disabled={!quickStepText.trim()}
-              className="flex items-center gap-1 rounded-xl bg-accent px-4 py-2 text-[13px] font-bold text-white shadow-xs hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:scale-100 transition-all"
+              className="flex min-h-11 w-full items-center justify-center gap-1 rounded-full bg-violet px-4 text-[14px] font-semibold text-white disabled:opacity-40"
             >
               <Plus className="size-4" />
-              <span>Sembrar</span>
+              <span>Sembrar el paso</span>
             </button>
           </div>
 
@@ -264,7 +261,7 @@ export function VisualPlanningField({
               onClick={() => setQuickStepKind('task_today')}
               className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                 quickStepKind === 'task_today'
-                  ? 'bg-purple-100 font-bold text-purple-700 ring-1 ring-purple-300'
+                  ? 'bg-violet-soft font-semibold text-violet ring-1 ring-violet/30'
                   : 'bg-subtle text-ink-3 hover:text-ink'
               }`}
             >
@@ -275,7 +272,7 @@ export function VisualPlanningField({
               onClick={() => setQuickStepKind('task_loose')}
               className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                 quickStepKind === 'task_loose'
-                  ? 'bg-blue-100 font-bold text-blue-700 ring-1 ring-blue-300'
+                  ? 'bg-amber-soft font-semibold text-amber ring-1 ring-amber/30'
                   : 'bg-subtle text-ink-3 hover:text-ink'
               }`}
             >
@@ -287,7 +284,7 @@ export function VisualPlanningField({
                 onClick={() => setQuickStepKind('objective')}
                 className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${
                   quickStepKind === 'objective'
-                    ? 'bg-emerald-100 font-bold text-emerald-700 ring-1 ring-emerald-300'
+                    ? 'bg-violet font-semibold text-white ring-1 ring-violet'
                     : 'bg-subtle text-ink-3 hover:text-ink'
                 }`}
               >
@@ -339,7 +336,7 @@ export function VisualPlanningField({
               <button
                 type="button"
                 onClick={() => onEditProject(project)}
-                className="flex items-center gap-1 rounded-xl border border-line bg-white/80 px-2.5 py-1.5 text-[12px] font-medium text-ink-2 hover:border-accent hover:text-accent active:scale-95 transition-all shadow-2xs"
+                className="flex min-h-11 items-center gap-1 rounded-xl border border-line bg-white px-3 text-[13px] font-medium text-ink-2"
                 title="Editar nombre, visión o color del proyecto"
               >
                 <Edit2 className="size-3.5" />
@@ -348,7 +345,7 @@ export function VisualPlanningField({
               <button
                 type="button"
                 onClick={() => onDeleteProject(project)}
-                className="flex items-center gap-1 rounded-xl border border-red-200 bg-red-50/70 px-2.5 py-1.5 text-[12px] font-medium text-red-600 hover:bg-red-100 hover:text-red-700 active:scale-95 transition-all shadow-2xs"
+                className="flex min-h-11 items-center gap-1 rounded-xl border border-rose/30 bg-rose-soft px-3 text-[13px] font-medium text-rose"
                 title="Eliminar este proyecto"
               >
                 <Trash2 className="size-3.5" />
@@ -357,7 +354,7 @@ export function VisualPlanningField({
               <button
                 type="button"
                 onClick={() => onNewResult(project.name)}
-                className="flex items-center gap-1 rounded-xl bg-accent px-3 py-1.5 text-[12px] font-bold text-white shadow-xs hover:opacity-90 active:scale-95 transition-all"
+                className="flex min-h-11 items-center gap-1 rounded-xl bg-violet px-3 text-[13px] font-semibold text-white"
               >
                 <Plus className="size-3.5" />
                 <span>Nuevo Resultado</span>
@@ -464,7 +461,7 @@ export function VisualPlanningField({
                         <button
                           type="button"
                           onClick={() => onZoomResult(result)}
-                          className="flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-[11px] font-medium text-ink-2 hover:border-accent hover:text-accent active:scale-95 transition-all"
+                          className="flex min-h-11 items-center gap-1 rounded-lg border border-line bg-white px-3 text-[13px] font-semibold text-ink-2"
                           title="Ver zoom detallado"
                         >
                           <span>Zoom</span>
@@ -479,7 +476,7 @@ export function VisualPlanningField({
                             setActiveInlineAddObjectiveResId(result.id)
                           }
                         }}
-                        className="flex items-center gap-1 rounded-lg bg-blue-50 border border-blue-200 px-2 py-1 text-[11px] font-bold text-blue-700 hover:bg-blue-100 active:scale-95 transition-all"
+                        className="flex min-h-11 items-center gap-1 rounded-lg border border-violet/25 bg-violet-soft px-3 text-[13px] font-semibold text-violet"
                         title="Agregar un objetivo / 'a dónde' intermedio"
                       >
                         <Plus className="size-3" />
@@ -488,7 +485,7 @@ export function VisualPlanningField({
                       <button
                         type="button"
                         onClick={() => onNewTask(result.id)}
-                        className="flex items-center gap-1 rounded-lg bg-emerald-50 border border-emerald-200 px-2 py-1 text-[11px] font-bold text-emerald-700 hover:bg-emerald-100 active:scale-95 transition-all"
+                        className="flex min-h-11 items-center gap-1 rounded-lg bg-violet px-3 text-[13px] font-semibold text-white"
                         title="Agregar una tarea de base directa"
                       >
                         <Plus className="size-3" />
@@ -502,8 +499,8 @@ export function VisualPlanningField({
                     <div className="p-4 sm:p-5 flex flex-col gap-4">
                       {/* INLINE OBJECTIVE CREATOR (IF OPEN) */}
                       {activeInlineAddObjectiveResId === result.id && (
-                        <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-3 animate-in fade-in zoom-in-95">
-                          <label className="text-[11px] font-bold text-blue-900 block mb-1">
+                        <div className="rounded-xl border border-violet/20 bg-violet-soft/60 p-3">
+                          <label className="mb-1 block text-[13px] font-semibold text-ink">
                             🎯 Nombrar Objetivo Intermedio (El 'A Dónde' necesario):
                           </label>
                           <div className="flex items-center gap-2">
@@ -516,13 +513,13 @@ export function VisualPlanningField({
                               onKeyDown={(e) => {
                                 if (e.key === 'Enter') handleInlineObjectiveCreate(result.id)
                               }}
-                              className="flex-1 rounded-lg border border-blue-300 bg-white px-3 py-1.5 text-[13px] text-ink placeholder:text-ink-3 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              className="min-h-11 flex-1 rounded-xl border border-line bg-white px-3 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none focus:ring-1 focus:ring-violet"
                             />
                             <button
                               type="button"
                               onClick={() => handleInlineObjectiveCreate(result.id)}
                               disabled={!inlineObjectiveName.trim()}
-                              className="rounded-lg bg-blue-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-40"
+                              className="min-h-11 rounded-full bg-violet px-4 text-[13px] font-semibold text-white disabled:opacity-40"
                             >
                               Guardar
                             </button>
@@ -562,7 +559,7 @@ export function VisualPlanningField({
                           <div
                             key={obj.id}
                             className="relative flex flex-col rounded-xl border border-line/80 bg-surface/30 pl-3 sm:pl-4 transition-all"
-                            style={{ borderLeft: '4px solid #2563eb' }}
+                            style={{ borderLeft: `4px solid ${accentColor}` }}
                           >
                             {/* OBJECTIVE HEADER */}
                             <div className="flex flex-wrap items-center justify-between gap-2 p-3 pr-4">
@@ -578,10 +575,10 @@ export function VisualPlanningField({
                                     <ChevronDown className="size-3.5" />
                                   )}
                                 </button>
-                                <Target className="size-4 shrink-0 text-blue-600" />
+                                <Target className="size-4 shrink-0 text-violet" />
                                 <div className="min-w-0 flex-1">
                                   <div className="flex items-center gap-1.5">
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-blue-700 bg-blue-100/70 px-1.5 py-0.2 rounded">
+                                    <span className="rounded bg-violet-soft px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet">
                                       Objetivo · A dónde
                                     </span>
                                     <span className="text-[10px] text-ink-3">
@@ -611,7 +608,7 @@ export function VisualPlanningField({
                               <button
                                 type="button"
                                 onClick={() => setActiveInlineAddTaskObjId(obj.id)}
-                                className="flex items-center gap-1 rounded-lg border border-emerald-300 bg-white px-2 py-1 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-50 active:scale-95 transition-all shadow-2xs"
+                                className="flex min-h-11 items-center gap-1 rounded-lg border border-violet/25 bg-white px-3 text-[13px] font-semibold text-violet"
                               >
                                 <Plus className="size-3" />
                                 <span>Tarea de base</span>
@@ -640,7 +637,7 @@ export function VisualPlanningField({
                                     type="button"
                                     onClick={() => handleInlineTaskCreate(result.id, obj.id)}
                                     disabled={!inlineTaskTitle.trim()}
-                                    className="rounded-lg bg-emerald-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-emerald-700 active:scale-95 transition-all disabled:opacity-40"
+                                    className="min-h-11 rounded-full bg-violet px-4 text-[13px] font-semibold text-white disabled:opacity-40"
                                   >
                                     Sumar hoy
                                   </button>
