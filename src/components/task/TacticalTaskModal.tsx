@@ -18,11 +18,13 @@ import {
   Play,
   Flame,
   Calendar,
+  Sparkles,
 } from 'lucide-react'
 import { MindMapCanvas } from './MindMapCanvas'
 import { TaskTemplatePicker, TaskTemplateTrigger } from './TaskTemplatePicker'
 import { useFeedback } from '@/app/FeedbackProvider'
 import {
+  createArtifact,
   addTaskCheckItem,
   addTaskContact,
   addTaskMetric,
@@ -100,6 +102,7 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
   const [contactStatus, setContactStatus] = useState('Activo')
   const [contactNotes, setContactNotes] = useState('')
   const [showAddContactForm, setShowAddContactForm] = useState(false)
+  const [harvested, setHarvested] = useState(false)
 
   const task = useMemo(() => {
     if (!taskId) return null
@@ -220,6 +223,29 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
 
   const handleThoughtMapChange = (newMap: ThoughtMap) => {
     updateTaskThoughtMap(task.id, newMap)
+  }
+
+  const handleHarvestArtifact = () => {
+    const content = [
+      task.notes,
+      ...(task.workLogs || []).map((w) => w.summary),
+    ]
+      .filter(Boolean)
+      .join('\n\n')
+
+    createArtifact({
+      projectId: ctx.project?.id,
+      resultId: task.resultId,
+      objectiveId: task.objectiveId,
+      sourceTaskId: task.id,
+      terreno: task.terreno || 'literatura',
+      type: 'note',
+      title: task.title,
+      content: content || task.title,
+      url: task.referenceUrl || task.workLogs?.[0]?.deliverableUrl,
+    })
+    setHarvested(true)
+    setTimeout(() => setHarvested(false), 2500)
   }
 
   return (
@@ -1182,7 +1208,19 @@ export function TacticalTaskModal({ taskId, onClose }: TacticalTaskModalProps) {
         {/* Modal Bottom Actions */}
         <div className="flex items-center justify-between p-3.5 sm:p-4 bg-slate-50 border-t border-line shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-[12px] text-ink-3">{t('taskView.footer')}</span>
+            <button
+              type="button"
+              onClick={handleHarvestArtifact}
+              disabled={harvested}
+              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-[12px] font-semibold transition-all ${
+                harvested
+                  ? 'bg-mint/15 text-mint'
+                  : 'bg-violet/10 text-violet hover:bg-violet/20'
+              }`}
+            >
+              <Sparkles className="size-3.5" />
+              <span>{harvested ? t('obra.taskModal.harvestSuccess') : t('obra.taskModal.harvestAction')}</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-2">

@@ -259,6 +259,27 @@ export interface Cosmetic {
   preview: string
 }
 
+export type ObraArtifactType = 'note' | 'decision' | 'reference' | 'deliverable' | 'snippet'
+
+/** An artifact or knowledge note in the Project / Result second brain repository */
+export interface ObraArtifact {
+  id: string
+  projectId?: string
+  resultId?: string
+  objectiveId?: string
+  sourceTaskId?: string
+  terreno: Terreno
+  type: ObraArtifactType
+  title: string
+  content: string
+  url?: string
+  tags?: string[]
+  canvasPosition?: { x: number; y: number }
+  color?: string
+  createdAt: string
+  updatedAt: string
+}
+
 /** Derived result figures. Computed on read, never persisted. */
 export interface ResultProgress {
   tasksDone: number
@@ -281,4 +302,6 @@ export interface AlephState {
   tasks: Task[]
   comments: Comment[]
   relations: Relation[]
+  artifacts?: ObraArtifact[]
 }
+

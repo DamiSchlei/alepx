@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Folder } from 'lucide-react'
+import { Folder, Sparkles, Layers } from 'lucide-react'
 import { ObjectiveFormSheet } from '@/components/planning/ObjectiveForm'
 import { ResultFormSheet } from '@/components/planning/ResultForm'
+import { ObraRepositoryView } from '@/components/obra/ObraRepositoryView'
 import { TaskRow } from '@/components/task/TaskRow'
 import { Button, EmptyState, Page, SectionTitle, cx } from '@/components/ui/primitives'
 import { ConfirmDialog } from '@/components/ui/Sheet'
@@ -14,6 +15,7 @@ import { archiveResult, completeTask, reopenTask, reorderObjectives, restoreResu
 import { canAddObjective } from '@/domain/limits'
 import {
   activeObjectivesOfResult,
+  artifactsOfResult,
   completedObjectivesOfResult,
   deriveObjectiveStage,
   projectColorOfResult,
@@ -146,6 +148,8 @@ export function ResultDetailPage() {
   const [archiveOpen, setArchiveOpen] = useState(false)
   const atLimit = !canAddObjective(state.objectives, resultId)
   const isArchived = result?.status === 'archived'
+  const [pageView, setPageView] = useState<'structure' | 'obra'>('structure')
+  const resultArtifacts = result ? artifactsOfResult(state, result.id) : []
 
   if (!result) {
     return (
@@ -258,72 +262,112 @@ export function ResultDetailPage() {
         </div>
       )}
 
-      <div>
-        <SectionTitle
-          action={
-            isArchived ? null : (
-              <button
-                type="button"
-                disabled={atLimit}
-                aria-label="Nuevo objetivo"
-                onClick={() => setAddObjective(true)}
-                className="flex size-9 items-center justify-center rounded-full border disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
-                style={{
-                  borderColor: `${projectColor}45`,
-                  color: projectColor,
-                  backgroundColor: `${projectColor}10`,
-                }}
-              >
-                +
-              </button>
-            )
-          }
+      {/* View Switch: Structure vs Second Brain Obra */}
+      <div className="flex rounded-2xl border border-line bg-surface p-1 shadow-xs">
+        <button
+          type="button"
+          onClick={() => setPageView('structure')}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2 text-[13px] font-semibold transition-all ${
+            pageView === 'structure'
+              ? 'bg-ink text-white shadow-xs'
+              : 'text-ink-3 hover:text-ink hover:bg-surface-2'
+          }`}
         >
-          Objetivos y Tareas
-        </SectionTitle>
-        {atLimit && !isArchived ? (
-          <p className="mb-3 text-[13px] leading-relaxed text-amber">{t('planning.objectives.limitReached')}</p>
-        ) : null}
-        {active.length === 0 ? (
-          <EmptyState>
-            {completed.length > 0 ? 'No hay objetivos activos' : 'No hay objetivos'}
-          </EmptyState>
-        ) : (
-          <SortableList
-            ids={active.map((o) => o.id)}
-            onReorder={(ids) => reorderObjectives(result.id, ids)}
-            handleLabel="Reordenar"
-          >
-            {(id, handle) => {
-              const objective = active.find((o) => o.id === id)
-              if (!objective) return null
-              return (
-                <ObjectiveRow
-                  objective={objective}
-                  handle={handle}
-                  projectColor={projectColor}
-                />
-              )
-            }}
-          </SortableList>
-        )}
+          <Layers className="size-4" />
+          <span>Estructura y Tareas ({active.length + completed.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setPageView('obra')}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2 text-[13px] font-semibold transition-all ${
+            pageView === 'obra'
+              ? 'bg-ink text-white shadow-xs'
+              : 'text-ink-3 hover:text-ink hover:bg-surface-2'
+          }`}
+        >
+          <Sparkles className="size-4" style={{ color: projectColor }} />
+          <span>Segundo Cerebro / Obra ({resultArtifacts.length})</span>
+        </button>
       </div>
 
-      {completed.length > 0 ? (
-        <div>
-          <SectionTitle>Objetivos cumplidos</SectionTitle>
-          <ul className="flex flex-col gap-2">
-            {completed.map((objective) => (
-              <li key={objective.id}>
-                <ObjectiveRow
-                  objective={objective}
-                  projectColor={projectColor}
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      {pageView === 'obra' ? (
+        <ObraRepositoryView
+          artifacts={resultArtifacts}
+          objectives={active}
+          tasks={resultTasks}
+          resultId={result.id}
+          projectColor={projectColor}
+        />
+      ) : (
+        <>
+          <div>
+            <SectionTitle
+              action={
+                isArchived ? null : (
+                  <button
+                    type="button"
+                    disabled={atLimit}
+                    aria-label="Nuevo objetivo"
+                    onClick={() => setAddObjective(true)}
+                    className="flex size-9 items-center justify-center rounded-full border disabled:cursor-not-allowed disabled:opacity-40 transition-colors"
+                    style={{
+                      borderColor: `${projectColor}45`,
+                      color: projectColor,
+                      backgroundColor: `${projectColor}10`,
+                    }}
+                  >
+                    +
+                  </button>
+                )
+              }
+            >
+              Objetivos y Tareas
+            </SectionTitle>
+            {atLimit && !isArchived ? (
+              <p className="mb-3 text-[13px] leading-relaxed text-amber">{t('planning.objectives.limitReached')}</p>
+            ) : null}
+            {active.length === 0 ? (
+              <EmptyState>
+                {completed.length > 0 ? 'No hay objetivos activos' : 'No hay objetivos'}
+              </EmptyState>
+            ) : (
+              <SortableList
+                ids={active.map((o) => o.id)}
+                onReorder={(ids) => reorderObjectives(result.id, ids)}
+                handleLabel="Reordenar"
+              >
+                {(id, handle) => {
+                  const objective = active.find((o) => o.id === id)
+                  if (!objective) return null
+                  return (
+                    <ObjectiveRow
+                      objective={objective}
+                      handle={handle}
+                      projectColor={projectColor}
+                    />
+                  )
+                }}
+              </SortableList>
+            )}
+          </div>
+
+          {completed.length > 0 ? (
+            <div>
+              <SectionTitle>Objetivos cumplidos</SectionTitle>
+              <ul className="flex flex-col gap-2">
+                {completed.map((objective) => (
+                  <li key={objective.id}>
+                    <ObjectiveRow
+                      objective={objective}
+                      projectColor={projectColor}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </>
+      )}
 
       <ResultFormSheet open={edit} result={result} onClose={() => setEdit(false)} />
       <ObjectiveFormSheet
