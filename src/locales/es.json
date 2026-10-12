@@ -898,5 +898,61 @@
     "customize": "Personalizar",
     "skills": "Habilidades",
     "locale": "Idioma"
+  },
+  "obra": {
+    "repositoryTitle": "Repositorio de la Obra",
+    "repositorySubtitle": "Segundo cerebro: notas, decisiones, entregables y referencias que hacen avanzar este resultado.",
+    "canvasTitle": "Lienzo de la Obra",
+    "canvasSubtitle": "Mapa visual del pensamiento y estado de los objetivos.",
+    "newArtifact": "Nuevo apunte / artefacto",
+    "editArtifact": "Editar apunte",
+    "deleteArtifact": "Eliminar apunte",
+    "confirmDelete": "¿Eliminar este apunte del repositorio?",
+    "convertAction": "Llevar a hoy como Tarea",
+    "convertedSuccess": "Tarea creada en la agenda de hoy.",
+    "filterAllTerrenos": "Todos los terrenos",
+    "filterAllTypes": "Todos los tipos",
+    "searchPlaceholder": "Buscar en el repositorio por título, notas o etiquetas…",
+    "emptyRepositoryTitle": "El repositorio está esperando tu primer apunte",
+    "emptyRepositoryBody": "Anotá decisiones, borradores, referencias o entregables. Cada tarea que realizás puede alimentar esta obra.",
+    "viewTabs": {
+      "hierarchy": "Estructura",
+      "repository": "Repositorio",
+      "canvas": "Lienzo"
+    },
+    "types": {
+      "note": "Nota",
+      "decision": "Decisión",
+      "reference": "Referencia",
+      "deliverable": "Entregable",
+      "snippet": "Snippet / Código"
+    },
+    "form": {
+      "titleLabel": "Título del apunte",
+      "titlePlaceholder": "Ej. Criterio de arquitectura, borrador de copy, acuerdo clave...",
+      "terrenoLabel": "Terreno de la acción",
+      "typeLabel": "Tipo de contenido",
+      "contentLabel": "Contenido / Notas / Síntesis",
+      "contentPlaceholder": "Escribí tus reflexiones, notas de investigación o síntesis de lo realizado...",
+      "urlLabel": "Enlace de referencia o entregable",
+      "urlPlaceholder": "https://...",
+      "tagsLabel": "Etiquetas (separadas por coma)",
+      "tagsPlaceholder": "diseño, contrato, copy",
+      "save": "Guardar en el repositorio"
+    },
+    "canvas": {
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "resetZoom": "Centrar",
+      "addNote": "Agregar nota",
+      "dragHint": "Arrastrá las tarjetas para organizar tu mapa mental.",
+      "objectivesSection": "Objetivos de la obra",
+      "artifactsSection": "Apuntes del repositorio"
+    },
+    "taskModal": {
+      "harvestTitle": "Segundo cerebro",
+      "harvestAction": "Guardar nota en la Obra",
+      "harvestSuccess": "Guardado en el repositorio de la obra."
+    }
   }
 }

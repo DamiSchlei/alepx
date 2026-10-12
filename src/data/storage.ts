@@ -170,6 +170,7 @@ export function normalize(input: unknown): AlephState {
     tasks,
     comments: raw.comments ?? [],
     relations: raw.relations ?? [],
+    artifacts: raw.artifacts ?? [],
   }
 }
 

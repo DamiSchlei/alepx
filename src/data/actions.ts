@@ -18,6 +18,8 @@ import type {
   Objective,
   ObjectiveInventory,
   ObjectiveStatus,
+  ObraArtifact,
+  ObraArtifactType,
   ParentType,
   Pillar,
   Project,
@@ -1041,6 +1043,81 @@ export function addComment(parentType: ParentType, parentId: string, body: strin
   return comment
 }
 
+// ---------------------------------------------------------------- obra & second brain artifacts
+
+export interface CreateArtifactInput {
+  projectId?: string
+  resultId?: string
+  objectiveId?: string
+  sourceTaskId?: string
+  terreno?: Terreno
+  type?: ObraArtifactType
+  title: string
+  content?: string
+  url?: string
+  tags?: string[]
+  canvasPosition?: { x: number; y: number }
+  color?: string
+}
+
+export function createArtifact(input: CreateArtifactInput): ObraArtifact {
+  const artifact: ObraArtifact = {
+    id: newId('art'),
+    projectId: input.projectId,
+    resultId: input.resultId,
+    objectiveId: input.objectiveId,
+    sourceTaskId: input.sourceTaskId,
+    terreno: input.terreno || 'literatura',
+    type: input.type || 'note',
+    title: input.title.trim() || 'Nota de la obra',
+    content: input.content || '',
+    url: input.url?.trim() || undefined,
+    tags: input.tags || [],
+    canvasPosition: input.canvasPosition || { x: 50, y: 50 },
+    color: input.color,
+    createdAt: now(),
+    updatedAt: now(),
+  }
+  setState((s) => ({
+    ...s,
+    artifacts: [...(s.artifacts || []), artifact],
+  }))
+  return artifact
+}
+
+export function updateArtifact(id: string, patch: Partial<ObraArtifact>): void {
+  setState((s) => ({
+    ...s,
+    artifacts: (s.artifacts || []).map((art) =>
+      art.id === id ? { ...art, ...patch, updatedAt: now() } : art,
+    ),
+  }))
+}
+
+export function deleteArtifact(id: string): void {
+  setState((s) => ({
+    ...s,
+    artifacts: (s.artifacts || []).filter((art) => art.id !== id),
+  }))
+}
+
+export function convertArtifactToTask(artifactId: string, targetDayKey?: string): Task | null {
+  const state = getState()
+  const artifact = (state.artifacts || []).find((a) => a.id === artifactId)
+  if (!artifact) return null
+  const today = targetDayKey || toDayKey(new Date())
+
+  return createTask({
+    title: artifact.title,
+    notes: artifact.content,
+    terreno: artifact.terreno,
+    resultId: artifact.resultId,
+    objectiveId: artifact.objectiveId,
+    stage: 'execution',
+    estimatedHours: 1,
+    scheduledFor: today,
+    dueAt: today,
+  })
 export function deleteComment(id: string): void {
   setState((s) => ({ ...s, comments: s.comments.filter((c) => c.id !== id) }))
 }
@@ -1048,3 +1125,4 @@ export function deleteComment(id: string): void {
 /** Aliases kept for capture-UI call sites. */
 export const markCharacterOnboarded = markOnboarded
 export const setLocale = setCharacterLocale
+

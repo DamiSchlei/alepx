@@ -20,6 +20,8 @@ import type {
   Comment,
   Difficulty,
   Objective,
+  ObraArtifact,
+  ObraArtifactType,
   ParentType,
   Pillar,
   Project,
@@ -1083,3 +1085,61 @@ export function nextReviewDue(
   if (doneSince >= n) return toDayKey(now)
   return undefined
 }
+
+// ---------------------------------------------------------------- artifacts & obra repository
+
+export function allArtifacts(state: AlephState): ObraArtifact[] {
+  return state.artifacts ?? []
+}
+
+export function artifactById(state: AlephState, id: string): ObraArtifact | undefined {
+  return (state.artifacts ?? []).find((a) => a.id === id)
+}
+
+export function artifactsOfProject(state: AlephState, projectIdOrName: string): ObraArtifact[] {
+  const all = state.artifacts ?? []
+  const norm = projectIdOrName.trim().toLowerCase()
+  return all.filter((a) => {
+    if (a.projectId && a.projectId.toLowerCase() === norm) return true
+    if (a.resultId) {
+      const res = state.results.find((r) => r.id === a.resultId)
+      if (res?.projectName && res.projectName.trim().toLowerCase() === norm) return true
+    }
+    return false
+  })
+}
+
+export function artifactsOfResult(state: AlephState, resultId: string): ObraArtifact[] {
+  return (state.artifacts ?? []).filter((a) => a.resultId === resultId)
+}
+
+export function artifactsOfObjective(state: AlephState, objectiveId: string): ObraArtifact[] {
+  return (state.artifacts ?? []).filter((a) => a.objectiveId === objectiveId)
+}
+
+export function filterArtifacts(
+  artifacts: ObraArtifact[],
+  filters: {
+    terreno?: Terreno | 'all'
+    type?: ObraArtifactType | 'all'
+    query?: string
+  },
+): ObraArtifact[] {
+  return artifacts.filter((a) => {
+    if (filters.terreno && filters.terreno !== 'all' && a.terreno !== filters.terreno) {
+      return false
+    }
+    if (filters.type && filters.type !== 'all' && a.type !== filters.type) {
+      return false
+    }
+    if (filters.query && filters.query.trim()) {
+      const q = filters.query.toLowerCase().trim()
+      const titleMatch = a.title.toLowerCase().includes(q)
+      const contentMatch = a.content.toLowerCase().includes(q)
+      const tagsMatch = (a.tags || []).some((t) => t.toLowerCase().includes(q))
+      if (!titleMatch && !contentMatch && !tagsMatch) return false
+    }
+    return true
+  })
+}
+

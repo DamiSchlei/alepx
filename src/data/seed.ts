@@ -163,5 +163,22 @@ export function demoState(locale: Character['locale'] = 'es'): AlephState {
     ],
     comments: [],
     relations: [],
+    artifacts: [
+      {
+        id: 'art_lit_propuesta',
+        projectId: 'proj_obra_principal',
+        resultId: 'result_obra_1',
+        objectiveId: 'obj_oferta_1',
+        sourceTaskId: 'task_lit_1',
+        terreno: 'literatura',
+        type: 'deliverable',
+        title: 'Propuesta de valor y condiciones',
+        content: 'Definición de la oferta principal: garantía de entrega, alcance concreto para el cliente, precio cerrado sin costos ocultos.',
+        tags: ['oferta', 'copy', 'lanzamiento'],
+        canvasPosition: { x: 80, y: 100 },
+        createdAt: '2026-09-19T11:00:00.000Z',
+        updatedAt: '2026-09-19T11:00:00.000Z',
+      },
+    ],
   }
 }

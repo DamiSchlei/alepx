@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Sparkles, CheckSquare } from 'lucide-react'
 import { JournalThread } from '@/components/journal/JournalThread'
 import { ObjectiveFormSheet } from '@/components/planning/ObjectiveForm'
 import { TaskFormSheet } from '@/components/planning/TaskForm'
+import { ObraRepositoryView } from '@/components/obra/ObraRepositoryView'
 import { TaskRow } from '@/components/task/TaskRow'
 import { useTaskCompletion } from '@/components/task/useTaskCompletion'
 import { useTaskActions } from '@/components/task/useTaskActions'
@@ -13,6 +15,7 @@ import { RowMenu } from '@/components/ui/RowMenu'
 import { SaberProgressBar } from '@/components/ui/SaberProgressBar'
 import { archiveObjective, setObjectiveStatus } from '@/data/actions'
 import {
+  artifactsOfObjective,
   deriveObjectiveStage,
   objectiveById,
   objectiveProgress,
@@ -47,7 +50,9 @@ export function ObjectiveDetailPage() {
   const [creatingObjective, setCreatingObjective] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | undefined>()
   const [archiveOpen, setArchiveOpen] = useState(false)
+  const [tab, setTab] = useState<'tasks' | 'obra'>('tasks')
   const canAddNext = objective ? canAddObjective(state.objectives, objective.resultId) : false
+  const objectiveArtifacts = objective ? artifactsOfObjective(state, objective.id) : []
 
   const all = useMemo(
     () => (objective ? tasksOfObjective(state, objective.id) : []),
@@ -170,85 +175,125 @@ export function ObjectiveDetailPage() {
         ))}
       </div>
 
-      {objective.status === 'done' ? (
-        <div className="flex flex-col gap-2">
-          <p className="text-[13px] text-ink-3">{t('planning.objectives.completedCtaTitle')}</p>
-          {canAddNext ? (
-            <Button className="min-h-11 w-full" onClick={() => setCreatingObjective(true)}>
-              {t('planning.objectives.completedCtaNew')}
+      {/* View Switch: Tareas vs Obra */}
+      <div className="flex rounded-2xl border border-line bg-surface p-1 shadow-xs">
+        <button
+          type="button"
+          onClick={() => setTab('tasks')}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2 text-[13px] font-semibold transition-all ${
+            tab === 'tasks'
+              ? 'bg-ink text-white shadow-xs'
+              : 'text-ink-3 hover:text-ink hover:bg-surface-2'
+          }`}
+        >
+          <CheckSquare className="size-4" />
+          <span>Tareas ({all.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('obra')}
+          className={`flex-1 flex items-center justify-center gap-2 rounded-xl py-2 text-[13px] font-semibold transition-all ${
+            tab === 'obra'
+              ? 'bg-ink text-white shadow-xs'
+              : 'text-ink-3 hover:text-ink hover:bg-surface-2'
+          }`}
+        >
+          <Sparkles className="size-4" style={{ color: projectColor }} />
+          <span>Segundo Cerebro ({objectiveArtifacts.length})</span>
+        </button>
+      </div>
+
+      {tab === 'obra' ? (
+        <ObraRepositoryView
+          artifacts={objectiveArtifacts}
+          tasks={all}
+          resultId={objective.resultId}
+          objectiveId={objective.id}
+          projectColor={projectColor}
+        />
+      ) : (
+        <>
+          {objective.status === 'done' ? (
+            <div className="flex flex-col gap-2">
+              <p className="text-[13px] text-ink-3">{t('planning.objectives.completedCtaTitle')}</p>
+              {canAddNext ? (
+                <Button className="min-h-11 w-full" onClick={() => setCreatingObjective(true)}>
+                  {t('planning.objectives.completedCtaNew')}
+                </Button>
+              ) : (
+                <Button
+                  variant="secondary"
+                  className="min-h-11 w-full"
+                  onClick={() => navigate(`/planning/results/${objective.resultId}`)}
+                >
+                  {t('planning.objectives.completedCtaBack')}
+                </Button>
+              )}
+            </div>
+          ) : null}
+
+          <section>
+            <p className="mb-2 text-[13px] font-semibold tracking-[0.14em] text-ink-3 uppercase">
+              {t('objectiveDetail.tasksTitle')}
+            </p>
+            {associated.length === 0 ? (
+              <EmptyState>{t('planning.objectives.noneInProgress')}</EmptyState>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {associated.map((task) => (
+                  <li key={task.id}>
+                    <TaskRow
+                      task={task}
+                      onToggle={() => toggle(task)}
+                      onExecute={() => execute(task)}
+                      onReturn={() => actions.back(task)}
+                      onDelete={() => actions.requestDelete(task)}
+                      onOpen={() => setEditingTask(task)}
+                      showContext={false}
+                    />
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Button className="mt-3 min-h-11 w-full" onClick={() => setCreating(true)}>
+              {t('objectiveDetail.createTask')}
             </Button>
-          ) : (
-            <Button
-              variant="secondary"
-              className="min-h-11 w-full"
-              onClick={() => navigate(`/planning/results/${objective.resultId}`)}
-            >
-              {t('planning.objectives.completedCtaBack')}
-            </Button>
-          )}
-        </div>
-      ) : null}
+          </section>
 
-      <section>
-        <p className="mb-2 text-[13px] font-semibold tracking-[0.14em] text-ink-3 uppercase">
-          {t('objectiveDetail.tasksTitle')}
-        </p>
-        {associated.length === 0 ? (
-          <EmptyState>{t('planning.objectives.noneInProgress')}</EmptyState>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {associated.map((task) => (
-              <li key={task.id}>
-                <TaskRow
-                  task={task}
-                  onToggle={() => toggle(task)}
-                  onExecute={() => execute(task)}
-                  onReturn={() => actions.back(task)}
-                  onDelete={() => actions.requestDelete(task)}
-                  onOpen={() => setEditingTask(task)}
-                  showContext={false}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-        <Button className="mt-3 min-h-11 w-full" onClick={() => setCreating(true)}>
-          {t('objectiveDetail.createTask')}
-        </Button>
-      </section>
+          {completed.length > 0 ? (
+            <section>
+              <p className="mb-2 text-[13px] font-semibold tracking-[0.14em] text-ink-3 uppercase">
+                {t('objectiveDetail.completedTasksTitle')}
+              </p>
+              <ul className="flex flex-col gap-2">
+                {completed.map((task) => (
+                  <li
+                    key={task.id}
+                    className="flex min-h-11 items-center gap-3 rounded-2xl border border-line bg-subtle px-3 py-2 opacity-80"
+                  >
+                    <span className="flex size-6 items-center justify-center rounded-md bg-mint text-white">
+                      <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                    <span className={cx('min-w-0 flex-1 truncate text-[15px] text-ink-3 line-through')}>
+                      {task.title}
+                    </span>
+                    <span className="text-[12px] text-ink-3">{t(`taskStatus.${task.status}`)}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
-      {completed.length > 0 ? (
-        <section>
-          <p className="mb-2 text-[13px] font-semibold tracking-[0.14em] text-ink-3 uppercase">
-            {t('objectiveDetail.completedTasksTitle')}
-          </p>
-          <ul className="flex flex-col gap-2">
-            {completed.map((task) => (
-              <li
-                key={task.id}
-                className="flex min-h-11 items-center gap-3 rounded-2xl border border-line bg-subtle px-3 py-2 opacity-80"
-              >
-                <span className="flex size-6 items-center justify-center rounded-md bg-mint text-white">
-                  <svg viewBox="0 0 16 16" className="size-3.5" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M3.5 8.5 6.5 11.5 12.5 4.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                <span className={cx('min-w-0 flex-1 truncate text-[15px] text-ink-3 line-through')}>
-                  {task.title}
-                </span>
-                <span className="text-[12px] text-ink-3">{t(`taskStatus.${task.status}`)}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      <JournalThread
-        parentType="objective"
-        parentId={objective.id}
-        placeholder={t('journal.objectivePlaceholder')}
-        chronological
-      />
+          <JournalThread
+            parentType="objective"
+            parentId={objective.id}
+            placeholder={t('journal.objectivePlaceholder')}
+            chronological
+          />
+        </>
+      )}
       {completionDialog}
       {actions.dialog}
 

@@ -898,5 +898,61 @@
     "customize": "Customize",
     "skills": "Skills",
     "locale": "Language"
+  },
+  "obra": {
+    "repositoryTitle": "Work Repository",
+    "repositorySubtitle": "Second brain: notes, decisions, deliverables and references that advance this outcome.",
+    "canvasTitle": "Work Canvas",
+    "canvasSubtitle": "Visual map of thought and objective states.",
+    "newArtifact": "New note / artifact",
+    "editArtifact": "Edit note",
+    "deleteArtifact": "Delete note",
+    "confirmDelete": "Delete this note from the repository?",
+    "convertAction": "Send to today as Task",
+    "convertedSuccess": "Task created in today's agenda.",
+    "filterAllTerrenos": "All grounds",
+    "filterAllTypes": "All types",
+    "searchPlaceholder": "Search repository by title, notes, or tags…",
+    "emptyRepositoryTitle": "The repository is awaiting its first note",
+    "emptyRepositoryBody": "Record decisions, drafts, references or deliverables. Every completed task can feed this work.",
+    "viewTabs": {
+      "hierarchy": "Structure",
+      "repository": "Repository",
+      "canvas": "Canvas"
+    },
+    "types": {
+      "note": "Note",
+      "decision": "Decision",
+      "reference": "Reference",
+      "deliverable": "Deliverable",
+      "snippet": "Snippet / Code"
+    },
+    "form": {
+      "titleLabel": "Note title",
+      "titlePlaceholder": "e.g. Architecture criteria, copy draft, key agreement...",
+      "terrenoLabel": "Ground of action",
+      "typeLabel": "Content type",
+      "contentLabel": "Content / Notes / Synthesis",
+      "contentPlaceholder": "Write your reflections, research notes or synthesis...",
+      "urlLabel": "Reference or deliverable link",
+      "urlPlaceholder": "https://...",
+      "tagsLabel": "Tags (comma-separated)",
+      "tagsPlaceholder": "design, contract, copy",
+      "save": "Save to repository"
+    },
+    "canvas": {
+      "zoomIn": "Zoom In",
+      "zoomOut": "Zoom Out",
+      "resetZoom": "Reset view",
+      "addNote": "Add note",
+      "dragHint": "Drag cards to organize your thought map.",
+      "objectivesSection": "Work objectives",
+      "artifactsSection": "Repository notes"
+    },
+    "taskModal": {
+      "harvestTitle": "Second brain",
+      "harvestAction": "Save note into Work repository",
+      "harvestSuccess": "Saved to the work repository."
+    }
   }
 }
