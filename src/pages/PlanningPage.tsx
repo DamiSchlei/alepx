@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { FolderPlus, GitFork, Layers, ListTodo } from 'lucide-react'
+import { FolderPlus, GitFork, Layers, ListTodo, Sparkles } from 'lucide-react'
 import { GlobalHierarchyTree } from '@/components/planning/GlobalHierarchyTree'
 import { ObjectiveFormSheet } from '@/components/planning/ObjectiveForm'
 import { ProjectCarousel } from '@/components/planning/ProjectCarousel'
@@ -9,6 +9,7 @@ import { ProjectFormSheet } from '@/components/planning/ProjectFormSheet'
 import { ProjectHierarchyView } from '@/components/planning/ProjectHierarchyView'
 import { ResultFormSheet } from '@/components/planning/ResultForm'
 import { TaskFormSheet } from '@/components/planning/TaskForm'
+import { ObraRepositoryView } from '@/components/obra/ObraRepositoryView'
 import { AssignSheet } from '@/components/task/AssignSheet'
 import { TacticalTaskModal } from '@/components/task/TacticalTaskModal'
 import { TaskRow } from '@/components/task/TaskRow'
@@ -28,8 +29,10 @@ import { archiveResult, restoreResult } from '@/data/actions'
 import {
   activeResults,
   allProjects,
+  artifactsOfProject,
   attendingResults,
   leastActiveAttending,
+  objectivesOfResult,
   pickerObjectives,
   pickerResults,
   projectOfTask,
@@ -42,7 +45,7 @@ import { STAGE_ORDER } from '@/domain/stage'
 import { skillName } from '@/i18n/labels'
 import type { Project, Result, StageId, Task, TaskStatus } from '@/domain/types'
 
-type PlanningViewMode = 'project' | 'tree' | 'tasks'
+type PlanningViewMode = 'project' | 'tree' | 'tasks' | 'obra'
 
 export function PlanningPage() {
   const { t } = useTranslation()
@@ -77,6 +80,19 @@ export function PlanningPage() {
   const projectResults = useMemo(() => {
     return resultsOfProject(state, activeProject.name)
   }, [state, activeProject.name])
+
+  // Obra artifacts, objectives, and tasks for the active project
+  const projectArtifacts = useMemo(() => {
+    return artifactsOfProject(state, activeProject.id || activeProject.name)
+  }, [state, activeProject])
+
+  const projectObjectives = useMemo(() => {
+    return projectResults.flatMap((r) => objectivesOfResult(state, r.id))
+  }, [projectResults, state])
+
+  const projectTasks = useMemo(() => {
+    return state.tasks.filter((t) => projectResults.some((r) => r.id === t.resultId))
+  }, [projectResults, state.tasks])
 
   // Modals state
   const [projectFormOpen, setProjectFormOpen] = useState(false)
@@ -188,6 +204,14 @@ export function PlanningPage() {
             <ListTodo className="size-3.5" />
             <span>{t('planning.viewList')}</span>
           </Chip>
+          <Chip
+            active={viewMode === 'obra'}
+            onClick={() => setViewMode('obra')}
+            className="flex items-center gap-1.5 px-3 py-1 text-[13px]"
+          >
+            <Sparkles className="size-3.5 text-accent" />
+            <span>{t('obra.tabSecondBrain')}</span>
+          </Chip>
         </div>
       </div>
 
@@ -233,8 +257,29 @@ export function PlanningPage() {
 
       {viewMode === 'tasks' && <TasksTab />}
 
+      {viewMode === 'obra' && (
+        <div className="flex flex-col gap-4">
+          <ProjectCarousel
+            projects={projects}
+            selectedProjectId={activeProject.id}
+            onSelectProject={setSelectedProjectId}
+            onNewProject={handleNewProject}
+            onEditProject={handleEditProject}
+            results={results}
+            tasks={state.tasks}
+          />
+          <ObraRepositoryView
+            artifacts={projectArtifacts}
+            objectives={projectObjectives}
+            tasks={projectTasks}
+            projectId={activeProject.id}
+            projectColor={activeProject.color}
+          />
+        </div>
+      )}
+
       {/* ARCHIVED RESULTS SECTION */}
-      {archived.length > 0 && viewMode !== 'tasks' && (
+      {archived.length > 0 && viewMode !== 'tasks' && viewMode !== 'obra' && (
         <div className="mt-6 border-t border-line/60 pt-4">
           <Button
             variant="ghost"

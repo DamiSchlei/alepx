@@ -1099,11 +1099,17 @@ export function artifactById(state: AlephState, id: string): ObraArtifact | unde
 export function artifactsOfProject(state: AlephState, projectIdOrName: string): ObraArtifact[] {
   const all = state.artifacts ?? []
   const norm = projectIdOrName.trim().toLowerCase()
+  const proj = (state.projects ?? []).find(
+    (p) => p.id.toLowerCase() === norm || p.name.trim().toLowerCase() === norm,
+  )
+  const projName = proj?.name.trim().toLowerCase() ?? norm
+  const projId = proj?.id.toLowerCase() ?? norm
+
   return all.filter((a) => {
-    if (a.projectId && a.projectId.toLowerCase() === norm) return true
+    if (a.projectId && (a.projectId.toLowerCase() === projId || a.projectId.toLowerCase() === projName)) return true
     if (a.resultId) {
       const res = state.results.find((r) => r.id === a.resultId)
-      if (res?.projectName && res.projectName.trim().toLowerCase() === norm) return true
+      if (res?.projectName && res.projectName.trim().toLowerCase() === projName) return true
     }
     return false
   })
