@@ -19,6 +19,7 @@ import {
   Flame,
   Calendar,
   Sparkles,
+  Target,
 } from 'lucide-react'
 import { computeEndTime } from '@/domain/clockHours'
 import { MindMapCanvas } from './MindMapCanvas'

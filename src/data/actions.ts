@@ -1118,6 +1118,8 @@ export function convertArtifactToTask(artifactId: string, targetDayKey?: string)
     scheduledFor: today,
     dueAt: today,
   })
+}
+
 export function deleteComment(id: string): void {
   setState((s) => ({ ...s, comments: s.comments.filter((c) => c.id !== id) }))
 }
