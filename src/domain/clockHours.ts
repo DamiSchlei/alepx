@@ -9,6 +9,18 @@ export interface ClockPlacement {
   title: string
 }
 
+export function computeEndTime(startTime?: string, durationHours: number = 1): string {
+  if (!startTime || !startTime.includes(':')) return ''
+  const [hStr, mStr] = startTime.split(':')
+  const h = Number(hStr)
+  const m = Number(mStr)
+  if (isNaN(h) || isNaN(m)) return ''
+  const totalMinutes = Math.round(h * 60 + m + durationHours * 60) % (24 * 60)
+  const endH = Math.floor(totalMinutes / 60)
+  const endM = totalMinutes % 60
+  return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`
+}
+
 export function polarToCartesian(
   centerX: number,
   centerY: number,

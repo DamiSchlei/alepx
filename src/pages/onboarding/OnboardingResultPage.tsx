@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createResult, updateResult } from '@/data/actions'
+import { useTranslation } from 'react-i18next'
+import { createObjective, createResult, updateResult } from '@/data/actions'
 import { useAleph } from '@/data/store'
 import { TERRENO_MAP } from '@/domain/terrenos'
 
 const DEFAULT_WORK = 'Primer producto listo para vender'
 
 export function OnboardingResultPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const state = useAleph()
 
@@ -15,26 +17,38 @@ export function OnboardingResultPage() {
     existingResult?.projectName ?? 'La Obra Principal',
   )
   const [work, setWork] = useState(existingResult?.name ?? DEFAULT_WORK)
+  const [meaning, setMeaning] = useState(existingResult?.why ?? '')
+  const [vector, setVector] = useState('')
 
-  const canContinue = work.trim().length > 0 && projectName.trim().length > 0
+  const canContinue =
+    work.trim().length > 0 && projectName.trim().length > 0 && meaning.trim().length > 0
 
   const confirm = () => {
     if (!canContinue) return
     const chosenProject = projectName.trim()
     const chosenName = work.trim()
+    const chosenMeaning = meaning.trim()
 
+    let resultId = existingResult?.id
     if (existingResult) {
       updateResult(existingResult.id, {
         projectName: chosenProject,
         name: chosenName,
+        why: chosenMeaning,
         pillar: 'body',
       })
     } else {
-      createResult({
+      resultId = createResult({
         projectName: chosenProject,
         name: chosenName,
+        why: chosenMeaning,
         pillar: 'body',
-      })
+      }).id
+    }
+
+    const bearing = vector.trim()
+    if (resultId && bearing && !state.objectives.some((objective) => objective.resultId === resultId)) {
+      createObjective({ resultId, name: bearing, why: bearing })
     }
     navigate('/onboarding/block')
   }
@@ -62,6 +76,7 @@ export function OnboardingResultPage() {
           <p className="text-[15px] leading-relaxed text-ink-3">
             El proyecto es tu marco de creación; el resultado es lo concreto que se sostiene dentro.
           </p>
+          <p className="text-[14px] leading-relaxed text-ink-2">{t('onboarding.result.law')}</p>
         </div>
 
         {/* Primary inputs */}
@@ -88,6 +103,32 @@ export function OnboardingResultPage() {
               value={work}
               onChange={(e) => setWork(e.target.value)}
               placeholder="Ej. Primer producto listo para vender"
+              className="h-12 w-full rounded-[16px] border border-line bg-white px-4 text-[15px] text-ink placeholder:text-ink-4 outline-none transition-all focus:border-[#7a3fe0] focus:ring-2 focus:ring-[#7a3fe0]/15"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-[12px] font-bold uppercase tracking-wider text-ink-3">
+              {t('onboarding.result.meaningLabel')}
+            </label>
+            <textarea
+              value={meaning}
+              onChange={(e) => setMeaning(e.target.value)}
+              placeholder={t('onboarding.result.meaningPlaceholder')}
+              rows={3}
+              className="w-full resize-none rounded-[16px] border border-line bg-white px-4 py-3 text-[15px] text-ink placeholder:text-ink-4 outline-none transition-all focus:border-[#7a3fe0] focus:ring-2 focus:ring-[#7a3fe0]/15"
+            />
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-[12px] font-bold uppercase tracking-wider text-ink-3">
+              {t('onboarding.result.vectorLabel')}
+            </label>
+            <input
+              type="text"
+              value={vector}
+              onChange={(e) => setVector(e.target.value)}
+              placeholder={t('onboarding.result.vectorPlaceholder')}
               className="h-12 w-full rounded-[16px] border border-line bg-white px-4 text-[15px] text-ink placeholder:text-ink-4 outline-none transition-all focus:border-[#7a3fe0] focus:ring-2 focus:ring-[#7a3fe0]/15"
             />
           </div>

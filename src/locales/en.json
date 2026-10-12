@@ -251,7 +251,8 @@
       "reopen": "Reopen task",
       "complete": "Complete task",
       "openTactical": "Open tactics",
-      "taskCount": "{{count}} tasks",
+      "taskCount_one": "{{count}} task",
+      "taskCount_other": "{{count}} tasks",
       "minutesDedicated": "{{count}} min",
       "elapsed": "{{time}} elapsed"
     }
@@ -277,7 +278,8 @@
       "list": "List",
       "tactical": "Tactics",
       "backToCarousel": "Back to the day",
-      "tasksToday": "{{count}} tasks for today",
+      "tasksToday_one": "{{count}} task for today",
+      "tasksToday_other": "{{count}} tasks for today",
       "looseToday": "Loose tasks today",
       "looseHint": "Actions walking on their own",
       "defineObjectiveTitle": "Define objective",
@@ -307,7 +309,9 @@
       "noTasksInObjective": "No tasks for this objective today.",
       "tasksTodayLabel": "Tasks for today",
       "tasksTodayForResult": "Today’s tasks for this result",
-      "tasksTodayCount": "{{count}} tasks today ({{hours}}h)",
+      "taskPair": "{{done}}/{{total}}",
+      "tasksTodayCount_one": "{{count}} task today ({{hours}}h)",
+      "tasksTodayCount_other": "{{count}} tasks today ({{hours}}h)",
       "dedication": "Dedicated: {{hours}} h",
       "criteria": "Criterion: {{text}}",
       "openTactical": "Open tactics",
@@ -322,8 +326,8 @@
         "empresaSub": "tangible matter"
       },
       "philosophy": {
-        "intro": "Your projects move through everyday actions. Each task toward your <strong>projects and objectives</strong> feeds three living dimensions:",
-        "outro": "Day to day these are not bureaucratic labels: they are the living texture of the work toward the objectives you already chose.",
+        "intro": "Seeing the whole work does not replace the act. Each step today has a nature, and that nature is what moves the result:",
+        "outro": "The path can be endless. What exists now is the first step, immediately after the plan.",
         "literaturaTitle": "Literature (Name and decide)",
         "literaturaBody": "What names, agrees, and gives structure: rules, times, conditions, and commitments.",
         "arteTitle": "Art (The inner friction)",
@@ -542,7 +546,7 @@
     "results": {
       "title": "Result progress",
       "empty": "No results to track.",
-      "emptyCta": "Open Planning",
+      "emptyCta": "Open the day",
       "noTasks": "No tasks yet",
       "expand": "Show objectives",
       "collapse": "Hide objectives"
@@ -593,6 +597,18 @@
     "characterTitle": "Journal",
     "characterPlaceholder": "What is this leaving you, across the work?",
     "characterEmpty": "Nothing written yet.",
+    "doneWithBoth": "Today you logged {{done}} toward {{objectives}} and {{results}}. How did that move what you set out to reach?",
+    "doneWithResult": "Today you finished {{done}} aimed at {{results}}. What actually moved?",
+    "doneWithObjective": "With {{done}} aimed at {{objectives}}: how did your focus answer?",
+    "donePlain": "With {{done}} today: how do these steps talk to what you set out to reach?",
+    "pendingWithObjective_one": "You have {{count}} proposed task toward {{objectives}}. What intention do you want to set before you start?",
+    "pendingWithObjective_other": "You have {{count}} proposed tasks toward {{objectives}}. What intention do you want to set before you start?",
+    "pendingPlain": "For today's tasks: what decision do you want to hold?",
+    "resultsOnly": "Your active results are {{results}}. Note the decision that brings you closer today.",
+    "emptyPrompt": "Connect one decision from today with the result you are building.",
+    "promptJoin": " and ",
+    "doneCount_one": "{{count}} finished task",
+    "doneCount_other": "{{count}} finished tasks",
     "bubbleOpen": "Open journal",
     "bubbleHide": "Hide journal"
   },
@@ -703,6 +719,48 @@
     "sat": "Sat",
     "sun": "Sun"
   },
+  "flow": {
+    "kicker": "Laws of planning",
+    "title": "The flow of the work",
+    "hint": "The work is the whole. The path is long. The act is the first step, the moment the plan closes.",
+    "today": "Today:",
+    "saveMeaning": "Save the meaning",
+    "ledger": "Full list",
+    "backToFlow": "Back to the flow",
+    "laws": {
+      "vision": {
+        "name": "Vision",
+        "law": "One result: the whole work, not a fragment. You cannot do it yet. The name is not enough. It needs what it means to you.",
+        "ask": "What this result means to you",
+        "placeholder": "The tension that makes you invent what you do not have yet…",
+        "cta": "Name the result",
+        "missing": "its meaning is still open"
+      },
+      "vector": {
+        "name": "Bearing",
+        "law": "The path is not walked all at once. It asks for one bearing at a time: a mark of that work, not a task list.",
+        "ask": "Where this objective points",
+        "placeholder": "This week, this mark brings the result closer…",
+        "cta": "Define the objective",
+        "missing": "its bearing is still open"
+      },
+      "pulse": {
+        "name": "Pulse",
+        "law": "The moment the plan closes, the act is due. Today's step belongs to that objective. The hours do not replace it.",
+        "cta": "Note today's step",
+        "missing": "today has no step of this work"
+      },
+      "texture": {
+        "name": "Ground",
+        "law": "Every step has a nature: to name and decide, to cross a limit, or to make matter concrete.",
+        "cta": "Choose the nature of this step"
+      },
+      "hold": {
+        "name": "Sustain",
+        "law": "The long path does not spare the first step. Once the four are said, continue: today's step and the work have to say the same thing."
+      }
+    }
+  },
   "onboarding": {
     "back": "Back",
     "character": {
@@ -720,11 +778,17 @@
       "seedLit": "Literature — A sustained text",
       "seedBiz": "Venture — First product ready to sell",
       "customPlaceholder": "Or write your own",
-      "cta": "Continue"
+      "cta": "Continue",
+      "law": "One result: the whole work, and what it means to you.",
+      "meaningLabel": "What it means to you",
+      "meaningPlaceholder": "Why this result pulls on you…",
+      "vectorLabel": "First bearing",
+      "vectorPlaceholder": "This week's mark that brings that result closer…"
     },
     "block": {
       "title": "What will you do today?",
       "subtitle": "One step of that work, for today.",
+      "law": "The plan is done. The act is one step, now. Choose its nature.",
       "taskPlaceholder": "One step of that work, for today…",
       "cta": "Enter today"
     }

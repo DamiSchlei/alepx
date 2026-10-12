@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BookOpen, Clock } from 'lucide-react'
 import { Avatar } from '@/components/character/Avatar'
+import { CharacterAssistantSheet } from '@/components/character/CharacterAssistantSheet'
 import { CustomizeSheet } from '@/components/character/CustomizeSheet'
+import { DailyCapacitySheet } from '@/components/home/DailyCapacitySheet'
 import { SkillsSheet } from '@/components/home/SkillsSheet'
 import { ProgressBar, cx } from '@/components/ui/primitives'
 import { applyLocale } from '@/i18n'
@@ -20,8 +23,10 @@ export function AccountMenu({
   const { t } = useTranslation()
   const { character } = useAleph()
   const { pulseKey } = useFeedback()
+  const [assistant, setAssistant] = useState(false)
   const [customize, setCustomize] = useState(false)
   const [skills, setSkills] = useState(false)
+  const [capacity, setCapacity] = useState(false)
   const xpRatio = character.xpToNext > 0 ? character.xp / character.xpToNext : null
 
   useEffect(() => {
@@ -79,8 +84,34 @@ export function AccountMenu({
           </div>
 
           <nav className="no-scrollbar flex-1 overflow-y-auto px-2 pb-4">
+            <button
+              type="button"
+              onClick={() => setAssistant(true)}
+              className="mb-1 flex min-h-12 w-full items-center justify-between rounded-2xl border border-violet/30 bg-violet-soft/60 px-3 text-left text-[14.5px] font-semibold text-violet hover:bg-violet-soft transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <BookOpen className="size-4 text-violet" />
+                <span>Bitácora (Personaje y Proyectos)</span>
+              </div>
+              <span className="rounded-full bg-violet px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">
+                Bitácora
+              </span>
+            </button>
             <MenuButton onClick={() => setCustomize(true)}>{t('account.customize')}</MenuButton>
             <MenuButton onClick={() => setSkills(true)}>{t('account.skills')}</MenuButton>
+            <button
+              type="button"
+              onClick={() => setCapacity(true)}
+              className="flex min-h-12 w-full items-center justify-between rounded-2xl px-3 text-left text-[15px] font-medium text-ink hover:bg-subtle transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <Clock className="size-4 text-violet" />
+                <span>{t('capacity.title', 'Horas disponibles al día')}</span>
+              </div>
+              <span className="rounded-full bg-violet-soft border border-violet/20 px-2.5 py-0.5 text-[12px] font-bold text-violet">
+                {character.dailyHourCap ?? 5} h
+              </span>
+            </button>
 
             <div className="mt-3 px-3">
               <p className="mb-2 text-[11px] font-extrabold tracking-[0.14em] text-ink-3 uppercase">
@@ -110,6 +141,8 @@ export function AccountMenu({
 
       <CustomizeSheet open={customize} onClose={() => setCustomize(false)} pulseKey={pulseKey} />
       <SkillsSheet open={skills} onClose={() => setSkills(false)} />
+      <DailyCapacitySheet open={capacity} onClose={() => setCapacity(false)} />
+      <CharacterAssistantSheet open={assistant} onClose={() => setAssistant(false)} />
     </>
   )
 }

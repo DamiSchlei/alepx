@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/components/character/Avatar'
-import { JournalThread } from '@/components/journal/JournalThread'
-import { Sheet } from '@/components/ui/Sheet'
+import { CharacterAssistantSheet } from '@/components/character/CharacterAssistantSheet'
 import { setJournalBubbleHidden } from '@/data/actions'
 import { useAleph } from '@/data/store'
 
@@ -81,12 +80,14 @@ export function JournalBubble() {
           type="button"
           aria-label={t('journal.bubbleOpen')}
           onClick={showCollapsed}
-          className="fixed z-40 size-3 rounded-full bg-ink-2/80"
+          className="fixed z-40 flex size-11 items-center justify-center"
           style={{
-            right: 'max(1rem, env(safe-area-inset-right))',
-            bottom: 'max(calc(var(--tab-bar-height) + 9.5rem), env(safe-area-inset-bottom))',
+            right: 'max(0.5rem, env(safe-area-inset-right))',
+            bottom: 'max(calc(var(--tab-bar-height) + 8.5rem), env(safe-area-inset-bottom))',
           }}
-        />
+        >
+          <span className="size-2.5 rounded-full bg-ink-2/80" />
+        </button>
       ) : null}
 
       {visibleMode === 'collapsed' ? (
@@ -123,16 +124,11 @@ export function JournalBubble() {
         </div>
       ) : null}
 
-      <Sheet open={mode === 'open'} onClose={closeSheet} title={t('journal.characterTitle')}>
-        <JournalThread
-          parentType="character"
-          parentId={character.id}
-          placeholder={t('journal.characterPlaceholder')}
-          emptyLabel={t('journal.characterEmpty')}
-          showHeading={false}
-          chronological
-        />
-      </Sheet>
+      <CharacterAssistantSheet
+        open={mode === 'open'}
+        onClose={closeSheet}
+        initialTab="character"
+      />
     </>
   )
 }

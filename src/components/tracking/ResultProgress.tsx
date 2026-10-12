@@ -49,7 +49,7 @@ export function ResultProgress({
         const expanded = openId === result.id
         const objectives = objectivesOfResult(state, result.id)
         const metaParts: string[] = []
-        metaParts.push(`${formatHours(week.hours, locale)} h`)
+        if (week.hours > 0) metaParts.push(`${formatHours(week.hours, locale)} h`)
         if (stage) metaParts.push(stageShort(t, stage))
         if (!weekly && overall.tasksTotal > 0) metaParts.push(t('tracking.resultOverall'))
 

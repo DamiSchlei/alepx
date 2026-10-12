@@ -251,7 +251,8 @@
       "reopen": "Reabrir tarea",
       "complete": "Completar tarea",
       "openTactical": "Abrir táctica",
-      "taskCount": "{{count}} tareas",
+      "taskCount_one": "{{count}} tarea",
+      "taskCount_other": "{{count}} tareas",
       "minutesDedicated": "{{count}} min",
       "elapsed": "{{time}} en curso"
     }
@@ -277,7 +278,8 @@
       "list": "Lista",
       "tactical": "Táctica",
       "backToCarousel": "Volver al día",
-      "tasksToday": "{{count}} tareas para hoy",
+      "tasksToday_one": "{{count}} tarea para hoy",
+      "tasksToday_other": "{{count}} tareas para hoy",
       "looseToday": "Tareas sueltas del día",
       "looseHint": "Acciones que caminan de forma libre",
       "defineObjectiveTitle": "Definir objetivo",
@@ -307,7 +309,9 @@
       "noTasksInObjective": "No hay tareas para este objetivo hoy.",
       "tasksTodayLabel": "Tareas para hoy",
       "tasksTodayForResult": "Tareas del día para este resultado",
-      "tasksTodayCount": "{{count}} tareas hoy ({{hours}}h)",
+      "taskPair": "{{done}}/{{total}}",
+      "tasksTodayCount_one": "{{count}} tarea hoy ({{hours}}h)",
+      "tasksTodayCount_other": "{{count}} tareas hoy ({{hours}}h)",
       "dedication": "Dedicación: {{hours}} h",
       "criteria": "Criterio: {{text}}",
       "openTactical": "Abrir táctica",
@@ -322,8 +326,8 @@
         "empresaSub": "materia tangible"
       },
       "philosophy": {
-        "intro": "Tus proyectos avanzan mediante acciones cotidianas. Cada tarea que realizás hacia tus <strong>proyectos y objetivos</strong> nutre tres dimensiones fundamentales:",
-        "outro": "En tu día a día, esto no son rótulos burocráticos: es la textura viva con la que avanzás hacia tus objetivos decididos.",
+        "intro": "Ver la obra entera no reemplaza el acto. Cada paso de hoy tiene una naturaleza, y esa naturaleza es la que mueve el resultado:",
+        "outro": "El camino puede ser eterno. Lo que existe ahora es el primer paso, inmediatamente después del plan.",
         "literaturaTitle": "Literatura (Decidir y nombrar)",
         "literaturaBody": "Lo que nombra, acuerda y da estructura: reglas, tiempos, condiciones y compromisos.",
         "arteTitle": "Arte (El roce interno)",
@@ -542,7 +546,7 @@
     "results": {
       "title": "Avance por resultado",
       "empty": "No hay resultados para seguir.",
-      "emptyCta": "Abrir Planning",
+      "emptyCta": "Ir al día",
       "noTasks": "Todavía sin tareas",
       "expand": "Ver objetivos",
       "collapse": "Ocultar objetivos"
@@ -593,6 +597,18 @@
     "characterTitle": "Bitácora",
     "characterPlaceholder": "¿Qué te está dejando esto, entre las empresas?",
     "characterEmpty": "Todavía no escribiste nada.",
+    "doneWithBoth": "Hoy registrás {{done}} impulsando el objetivo {{objectives}} y tu resultado {{results}}. ¿Cómo impactaron estas acciones en lo que te propusiste?",
+    "doneWithResult": "Hoy lograste {{done}} con foco en {{results}}. ¿Qué avances concretos sentís hacia ese resultado?",
+    "doneWithObjective": "Con {{done}} orientadas a {{objectives}}: ¿cómo sentís que respondió tu enfoque?",
+    "donePlain": "Con {{done}} hoy: ¿cómo dialogan estos pasos con lo que te propusiste?",
+    "pendingWithObjective_one": "Tenés {{count}} tarea propuesta hacia {{objectives}}. ¿Qué intención querés fijar antes de ejecutarla?",
+    "pendingWithObjective_other": "Tenés {{count}} tareas propuestas hacia {{objectives}}. ¿Qué intención querés fijar antes de ejecutarlas?",
+    "pendingPlain": "Para las tareas de hoy: ¿cuál es la decisión central que querés sostener?",
+    "resultsOnly": "Tus resultados activos son {{results}}. Anotá qué decisión te acerca hoy.",
+    "emptyPrompt": "Conectá una decisión de hoy con el resultado que estás armando.",
+    "promptJoin": " y ",
+    "doneCount_one": "{{count}} tarea realizada",
+    "doneCount_other": "{{count}} tareas realizadas",
     "bubbleOpen": "Abrir bitácora",
     "bubbleHide": "Esconder bitácora"
   },
@@ -703,6 +719,48 @@
     "sat": "Sáb",
     "sun": "Dom"
   },
+  "flow": {
+    "kicker": "Leyes de la planificación",
+    "title": "El flujo de la obra",
+    "hint": "La obra es el todo. El camino es largo. El acto es el primer paso, apenas termina el plan.",
+    "today": "Hoy:",
+    "saveMeaning": "Guardar el sentido",
+    "ledger": "Lista completa",
+    "backToFlow": "Volver al flujo",
+    "laws": {
+      "vision": {
+        "name": "Visión",
+        "law": "Un solo resultado: la obra entera, no un pedazo. Hoy todavía no la podés. El nombre no alcanza. Hace falta qué significa para vos.",
+        "ask": "Qué significa este resultado para vos",
+        "placeholder": "La tensión que te obliga a inventar lo que hoy no tenés…",
+        "cta": "Nombrar el resultado",
+        "missing": "falta qué significa"
+      },
+      "vector": {
+        "name": "A dónde",
+        "law": "El camino no se recorre de una vez. Pide un solo a dónde por vez: un hito de esa obra, no una lista de tareas.",
+        "ask": "Hacia dónde apunta este objetivo",
+        "placeholder": "Esta semana, este hito acerca el resultado…",
+        "cta": "Definir el objetivo",
+        "missing": "falta hacia dónde apunta"
+      },
+      "pulse": {
+        "name": "Pulso",
+        "law": "Apenas cierra el plan, hace falta el acto. El paso de hoy es de ese objetivo. Las horas no lo reemplazan.",
+        "cta": "Anotar el paso de hoy",
+        "missing": "hoy no hay un paso de esta obra"
+      },
+      "texture": {
+        "name": "Terreno",
+        "law": "Cada paso tiene una naturaleza: decidir y nombrar, atravesar un límite, o concretar materia.",
+        "cta": "Elegí la naturaleza de este paso"
+      },
+      "hold": {
+        "name": "Sostener",
+        "law": "Lo eterno del camino no ahorra el primer paso. Con las cuatro dichas, seguí: el paso de hoy y la obra tienen que decir lo mismo."
+      }
+    }
+  },
   "onboarding": {
     "back": "Atrás",
     "character": {
@@ -720,11 +778,17 @@
       "seedLit": "Literatura — Un texto sostenido",
       "seedBiz": "Empresa — Primer producto listo para vender",
       "customPlaceholder": "O escribí la tuya",
-      "cta": "Seguir"
+      "cta": "Seguir",
+      "law": "Un solo resultado: la obra entera, y qué significa para vos.",
+      "meaningLabel": "Qué significa para vos",
+      "meaningPlaceholder": "Por qué este resultado te tensa…",
+      "vectorLabel": "Primer a dónde",
+      "vectorPlaceholder": "El hito de esta semana que acerca ese resultado…"
     },
     "block": {
       "title": "Qué vas a hacer hoy",
       "subtitle": "Un paso de esa obra, para hoy.",
+      "law": "El plan ya está. El acto es un solo paso, ahora. Elegí su naturaleza.",
       "taskPlaceholder": "Un paso de esa obra, para hoy…",
       "cta": "Entrar a hoy"
     }

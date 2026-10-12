@@ -16,7 +16,7 @@ export type ObjectiveStatus = 'pending' | 'in_progress' | 'done' | 'blocked'
 
 export type TaskStatus = 'pending' | 'in_progress' | 'done_on_time' | 'done_late' | 'cancelled'
 
-export type ParentType = 'result' | 'objective' | 'task' | 'character'
+export type ParentType = 'result' | 'objective' | 'task' | 'character' | 'project'
 
 export type RelationKind = 'depends_on' | 'feeds' | 'parallel'
 

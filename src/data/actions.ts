@@ -188,7 +188,7 @@ export function updateProject(
   })
 }
 
-export function deleteProject(id: string): void {
+export function deleteProject(id: string, cascadeDelete: boolean = true): void {
   setState((s) => {
     const existing = (s.projects ?? []).find((p) => p.id === id)
     let targetName = existing?.name
@@ -202,16 +202,44 @@ export function deleteProject(id: string): void {
       targetName = match?.projectName
     }
 
-    return {
-      ...s,
-      projects: (s.projects ?? []).filter((p) => p.id !== id),
-      results: targetName
+    const normName = targetName?.trim().toLowerCase()
+    const targetResultIds = new Set(
+      s.results
+        .filter((r) => normName && (r.projectName?.trim().toLowerCase() === normName))
+        .map((r) => r.id),
+    )
+
+    let nextResults = s.results
+    let nextObjectives = s.objectives
+    let nextTasks = s.tasks
+
+    if (cascadeDelete) {
+      const targetObjectiveIds = new Set(
+        s.objectives.filter((o) => targetResultIds.has(o.resultId)).map((o) => o.id),
+      )
+      nextResults = s.results.filter((r) => !targetResultIds.has(r.id))
+      nextObjectives = s.objectives.filter((o) => !targetResultIds.has(o.resultId))
+      nextTasks = s.tasks.filter(
+        (t) =>
+          !(t.resultId && targetResultIds.has(t.resultId)) &&
+          !(t.objectiveId && targetObjectiveIds.has(t.objectiveId)),
+      )
+    } else {
+      nextResults = targetName
         ? s.results.map((r) =>
             (r.projectName?.trim() || '').toLowerCase() === targetName.trim().toLowerCase()
               ? { ...r, projectName: undefined }
               : r,
           )
-        : s.results,
+        : s.results
+    }
+
+    return {
+      ...s,
+      projects: (s.projects ?? []).filter((p) => p.id !== id),
+      results: nextResults,
+      objectives: nextObjectives,
+      tasks: nextTasks,
     }
   })
 }
@@ -1090,6 +1118,8 @@ export function convertArtifactToTask(artifactId: string, targetDayKey?: string)
     scheduledFor: today,
     dueAt: today,
   })
+export function deleteComment(id: string): void {
+  setState((s) => ({ ...s, comments: s.comments.filter((c) => c.id !== id) }))
 }
 
 /** Aliases kept for capture-UI call sites. */

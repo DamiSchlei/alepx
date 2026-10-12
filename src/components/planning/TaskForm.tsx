@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Clock } from 'lucide-react'
 import { JournalThread } from '@/components/journal/JournalThread'
 import { Button, Chip, Field, Input, Select, Textarea, cx } from '@/components/ui/primitives'
 import { ConfirmDialog, Sheet } from '@/components/ui/Sheet'
@@ -9,6 +10,7 @@ import { newId, useAleph } from '@/data/store'
 import { useFeedback } from '@/app/FeedbackProvider'
 import { MAX_CHECKLIST_ITEMS, MAX_SERIES_BLOCKS, MIN_ESTIMATED_HOURS } from '@/domain/limits'
 import { addDays, isoWeekday, seriesDayKeys, startOfWeek, toDayKey } from '@/domain/dates'
+import { computeEndTime } from '@/domain/clockHours'
 import { isTaskDone } from '@/domain/economy'
 import { skillName } from '@/i18n/labels'
 import type { Difficulty, Task, TaskCheckItem } from '@/domain/types'
@@ -118,6 +120,8 @@ function TaskFormBody({
   const [notes, setNotes] = useState(task?.notes ?? '')
   const [resultId, setResultId] = useState(task?.resultId ?? preset?.resultId ?? '')
   const [objectiveId, setObjectiveId] = useState(task?.objectiveId ?? preset?.objectiveId ?? '')
+  const [scheduledStart, setScheduledStart] = useState(task?.scheduledStart ?? preset?.scheduledStart ?? '')
+  const [scheduledEnd, setScheduledEnd] = useState(task?.scheduledEnd ?? preset?.scheduledEnd ?? '')
   const [skillId, setSkillId] = useState(task?.skillId ?? '')
   const [hours, setHours] = useState(String(task?.estimatedHours ?? 1))
   const [difficulty, setDifficulty] = useState<Difficulty>(task?.difficulty ?? 'medium')
@@ -132,10 +136,8 @@ function TaskFormBody({
   const [horizon, setHorizon] = useState<'week' | 'month'>('week')
   const [moreOpen, setMoreOpen] = useState(!collapsedMore)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const objectives = useMemo(
-    () => (resultId ? pickerObjectives(state, resultId) : []),
-    [resultId, state],
-  )
+
+  const results = useMemo(() => pickerResults(state), [state])
 
   const today = todayKey()
   const weekEnd = weekEndKey()
@@ -157,6 +159,7 @@ function TaskFormBody({
     const trimmed = title.trim()
     if (!trimmed) return
     const estimatedHours = Math.max(MIN_ESTIMATED_HOURS, Number(hours) || 1)
+    const computedEnd = scheduledStart ? computeEndTime(scheduledStart, estimatedHours) : undefined
     const payload = {
       title: trimmed,
       notes: notes.trim() || undefined,
@@ -167,8 +170,8 @@ function TaskFormBody({
       difficulty,
       dueAt: dueAt || undefined,
       scheduledFor: dueAt || undefined,
-      scheduledStart: preset?.scheduledStart ?? task?.scheduledStart,
-      scheduledEnd: preset?.scheduledEnd ?? task?.scheduledEnd,
+      scheduledStart: scheduledStart.trim() || undefined,
+      scheduledEnd: scheduledEnd.trim() || computedEnd,
       doneCheck: doneCheck.trim() || undefined,
       checklist: checklist.filter((item) => item.text.trim()).map((item) => ({
         ...item,
@@ -203,6 +206,138 @@ function TaskFormBody({
         />
       </Field>
 
+      {/* ASIGNACIÓN A OBJETIVO Y RESULTADO (Visible de primer nivel) */}
+      {!scoped && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-line bg-surface/50 p-3.5">
+          <Field label={t('taskEdit.assignObjective', 'Asignar a un objetivo')}>
+            <Select
+              value={objectiveId}
+              onChange={(e) => {
+                const newObjId = e.target.value
+                setObjectiveId(newObjId)
+                if (newObjId) {
+                  const targetObj = state.objectives.find((o) => o.id === newObjId)
+                  if (targetObj) setResultId(targetObj.resultId)
+                }
+              }}
+            >
+              <option value="">{t('taskEdit.noObjective', 'Sin objetivo (paso suelto)')}</option>
+              {results.map((res) => {
+                const resObjectives = pickerObjectives(state, res.id)
+                if (resObjectives.length === 0) return null
+                return (
+                  <optgroup
+                    key={res.id}
+                    label={`${res.projectName ? `${res.projectName} · ` : ''}${res.name}`}
+                  >
+                    {resObjectives.map((obj) => (
+                      <option key={obj.id} value={obj.id}>
+                        {obj.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                )
+              })}
+            </Select>
+          </Field>
+
+          {/* Resultado opcional (si no se asignó un objetivo directo) */}
+          <Field label={t('taskEdit.result', 'Resultado')}>
+            <Select
+              value={resultId}
+              onChange={(e) => {
+                const newResId = e.target.value
+                setResultId(newResId)
+                if (!newResId) setObjectiveId('')
+              }}
+            >
+              <option value="">{t('common.unassigned', 'Sin resultado')}</option>
+              {results.map((res) => (
+                <option key={res.id} value={res.id}>
+                  {res.projectName ? `${res.projectName} · ` : ''}{res.name}
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+      )}
+
+      {/* HORARIO EN EL RELOJ (Inicio, presets y preview de arco) */}
+      <div className="flex flex-col gap-2.5 rounded-2xl border border-line bg-surface/50 p-3.5">
+        <div className="flex items-center justify-between">
+          <span className="flex items-center gap-1.5 text-[12px] font-bold text-ink">
+            <Clock className="size-4 text-violet" />
+            <span>{t('taskEdit.schedule', 'Horario en el reloj')}</span>
+          </span>
+          {scheduledStart ? (
+            <button
+              type="button"
+              onClick={() => {
+                setScheduledStart('')
+                setScheduledEnd('')
+              }}
+              className="text-[11px] font-medium text-ink-3 hover:text-ink hover:underline"
+            >
+              {t('taskEdit.noSpecificTime', 'Sin hora fija')}
+            </button>
+          ) : null}
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          <Input
+            type="time"
+            value={scheduledStart}
+            onChange={(e) => {
+              const start = e.target.value
+              setScheduledStart(start)
+              if (start) {
+                setScheduledEnd(computeEndTime(start, Number(hours) || 1))
+              }
+            }}
+            className="h-10 text-[14px] sm:w-36"
+          />
+
+          <div className="flex flex-wrap items-center gap-1.5">
+            {[
+              { label: '09:00', value: '09:00' },
+              { label: '12:00', value: '12:00' },
+              { label: '15:00', value: '15:00' },
+              { label: '18:30', value: '18:30' },
+            ].map((presetItem) => (
+              <button
+                key={presetItem.value}
+                type="button"
+                onClick={() => {
+                  setScheduledStart(presetItem.value)
+                  setScheduledEnd(computeEndTime(presetItem.value, Number(hours) || 1))
+                }}
+                className={cx(
+                  'rounded-full px-2.5 py-1 text-[11px] font-semibold transition',
+                  scheduledStart === presetItem.value
+                    ? 'bg-violet text-white shadow-xs'
+                    : 'bg-subtle text-ink-2 hover:bg-violet-soft hover:text-violet',
+                )}
+              >
+                {presetItem.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {scheduledStart ? (
+          <p className="text-[11px] font-medium text-violet">
+            {t('taskEdit.clockPreview', {
+              start: scheduledStart,
+              end: scheduledEnd || computeEndTime(scheduledStart, Number(hours) || 1),
+            })}
+          </p>
+        ) : (
+          <p className="text-[11px] text-ink-3">
+            {t('taskEdit.noSpecificTime', 'Sin hora fija (el reloj lo ubicará automáticamente en el día)')}
+          </p>
+        )}
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
         <Field label={t('taskEdit.hours')}>
           <Input
@@ -210,7 +345,12 @@ function TaskFormBody({
             min={MIN_ESTIMATED_HOURS}
             step={0.25}
             value={hours}
-            onChange={(e) => setHours(e.target.value)}
+            onChange={(e) => {
+              setHours(e.target.value)
+              if (scheduledStart) {
+                setScheduledEnd(computeEndTime(scheduledStart, Number(e.target.value) || 1))
+              }
+            }}
           />
         </Field>
         <Field label={t('taskEdit.difficulty')}>
@@ -240,41 +380,6 @@ function TaskFormBody({
 
       {moreOpen ? (
         <div className="flex flex-col gap-4">
-          {scoped ? null : (
-            <>
-              <Field label={t('taskEdit.result')}>
-                <Select
-                  value={resultId}
-                  onChange={(e) => {
-                    setResultId(e.target.value)
-                    setObjectiveId('')
-                  }}
-                >
-                  <option value="">{t('common.unassigned')}</option>
-                  {pickerResults(state).map((result) => (
-                    <option key={result.id} value={result.id}>
-                      {result.name}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-              <Field label={t('taskEdit.objective')}>
-                <Select
-                  value={objectiveId}
-                  onChange={(e) => setObjectiveId(e.target.value)}
-                  disabled={!resultId}
-                >
-                  <option value="">{t('common.unassigned')}</option>
-                  {objectives.map((objective) => (
-                    <option key={objective.id} value={objective.id}>
-                      {objective.name}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-            </>
-          )}
-
           <Field label={t('taskEdit.skill')}>
             <Select value={skillId} onChange={(e) => setSkillId(e.target.value)}>
               <option value="">{t('common.noSkill')}</option>

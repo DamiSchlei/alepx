@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next'
-import { Card } from '@/components/ui/primitives'
 import type { TrackingStats } from '@/data/selectors'
 
 const WEEKDAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const
@@ -15,13 +14,12 @@ export function WeekChart({ stats }: { stats: TrackingStats }) {
       dayKey: row?.dayKey ?? key,
       count,
       color: row?.color,
-      isSunday: key === 'sun',
     }
   })
   const max = Math.max(1, ...week.map((d) => d.count))
 
   return (
-    <Card className="relative rounded-[20px] py-4">
+    <div className="relative py-1">
       <div className="flex h-36 items-end justify-between gap-1.5">
         {week.map((day) => (
           <div key={day.dayKey} className="flex h-full flex-1 flex-col items-center justify-end gap-1">
@@ -36,12 +34,6 @@ export function WeekChart({ stats }: { stats: TrackingStats }) {
                   opacity: day.color ? 1 : 0.8,
                 }}
               />
-            ) : day.isSunday ? (
-              <div
-                className="w-full max-w-8 rounded-t-lg bg-subtle"
-                style={{ height: '22%', minHeight: 4 }}
-                aria-hidden
-              />
             ) : (
               <span className="mb-1 h-1.5 w-1.5 rounded-full bg-line-strong" aria-hidden="true" />
             )}
@@ -49,6 +41,6 @@ export function WeekChart({ stats }: { stats: TrackingStats }) {
           </div>
         ))}
       </div>
-    </Card>
+    </div>
   )
 }

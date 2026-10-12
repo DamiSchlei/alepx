@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { cx } from '@/components/ui/primitives'
 import { createTask, markOnboarded } from '@/data/actions'
 import { useAleph } from '@/data/store'
@@ -7,6 +8,8 @@ import { toDayKey } from '@/domain/dates'
 import type { Terreno } from '@/domain/types'
 
 export function OnboardingBlockPage() {
+  const { t, i18n } = useTranslation()
+  const isEn = i18n.language?.startsWith('en')
   const navigate = useNavigate()
   const state = useAleph()
   const [title, setTitle] = useState('')
@@ -23,12 +26,17 @@ export function OnboardingBlockPage() {
     if (!canContinue) return
     const today = toDayKey(new Date())
     const activeResult = state.results.find((r) => r.status === 'active') || state.results[0]
+    const objective = state.objectives.find(
+      (item) => item.resultId === activeResult?.id && !item.archivedAt && item.status !== 'done',
+    )
     createTask({
       title: title.trim(),
       estimatedHours: hours,
       dueAt: today,
       scheduledFor: today,
+      scheduledStart: '10:00',
       resultId: activeResult?.id,
+      objectiveId: objective?.id,
       terreno,
       stage: 'execution',
     })
@@ -46,7 +54,7 @@ export function OnboardingBlockPage() {
             onClick={() => navigate('/onboarding/result')}
             className="flex min-h-[44px] items-center pr-4 text-[15px] font-medium text-ink-3 transition-colors hover:text-ink"
           >
-            Atrás
+            {t('onboarding.back', 'Atrás')}
           </button>
           <span className="text-[13px] font-medium text-ink-3">3 / 3</span>
         </header>
@@ -54,11 +62,12 @@ export function OnboardingBlockPage() {
         {/* Title & subtitle */}
         <div className="mt-4 space-y-2">
           <h1 className="font-display text-[28px] font-semibold leading-tight tracking-tight text-ink">
-            Qué vas a hacer hoy
+            {t('onboarding.block.title', 'Qué vas a hacer hoy')}
           </h1>
           <p className="text-[15px] leading-relaxed text-ink-3">
-            Un paso de esa obra, para hoy.
+            {t('onboarding.block.subtitle', 'Un paso de esa obra, para hoy.')}
           </p>
+          <p className="text-[14px] leading-relaxed text-ink-2">{t('onboarding.block.law')}</p>
         </div>
 
         <div className="mt-7 space-y-4">
@@ -68,7 +77,7 @@ export function OnboardingBlockPage() {
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Un paso de esa obra, para hoy…"
+              placeholder={t('onboarding.block.taskPlaceholder', 'Un paso de esa obra, para hoy…')}
               autoFocus
               className="h-12 w-full rounded-[16px] border border-line bg-white px-4 text-[15px] text-ink placeholder:text-ink-4 outline-none transition-all focus:border-[#7a3fe0] focus:ring-2 focus:ring-[#7a3fe0]/15"
             />
@@ -76,7 +85,9 @@ export function OnboardingBlockPage() {
 
           {/* Selector del tono del paso */}
           <div className="space-y-1.5">
-            <span className="text-[13px] font-medium text-ink-3">Naturaleza de este paso</span>
+            <span className="text-[13px] font-medium text-ink-3">
+              {isEn ? 'Nature of this block' : 'Naturaleza de este paso'}
+            </span>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
@@ -90,9 +101,11 @@ export function OnboardingBlockPage() {
               >
                 <span className="flex items-center gap-1.5 text-[13px]">
                   <span className="size-2 rounded-full bg-[#7a3fe0]" />
-                  <span>Decidir</span>
+                  <span>{isEn ? 'Decide' : 'Decidir'}</span>
                 </span>
-                <span className="text-[10px] text-ink-3">acuerdo / regla</span>
+                <span className="text-[10px] text-ink-3">
+                  {isEn ? 'rule / framing' : 'acuerdo / regla'}
+                </span>
               </button>
 
               <button
@@ -107,9 +120,11 @@ export function OnboardingBlockPage() {
               >
                 <span className="flex items-center gap-1.5 text-[13px]">
                   <span className="size-2 rounded-full bg-[#4f46e5]" />
-                  <span>Atravesar</span>
+                  <span>{isEn ? 'Breakthrough' : 'Atravesar'}</span>
                 </span>
-                <span className="text-[10px] text-ink-3">límite / postura</span>
+                <span className="text-[10px] text-ink-3">
+                  {isEn ? 'edge / posture' : 'límite / postura'}
+                </span>
               </button>
 
               <button
@@ -124,16 +139,20 @@ export function OnboardingBlockPage() {
               >
                 <span className="flex items-center gap-1.5 text-[13px]">
                   <span className="size-2 rounded-full bg-[#0f9f6e]" />
-                  <span>Imprimir</span>
+                  <span>{isEn ? 'Print' : 'Imprimir'}</span>
                 </span>
-                <span className="text-[10px] text-ink-3">materia concreta</span>
+                <span className="text-[10px] text-ink-3">
+                  {isEn ? 'tangible output' : 'materia concreta'}
+                </span>
               </button>
             </div>
           </div>
 
           {/* Stepper de horas (− 1h +) */}
           <div className="flex min-h-[56px] items-center justify-between rounded-[16px] border border-line bg-white px-4 py-2">
-            <span className="text-[14px] font-medium text-ink-2">Dedicación</span>
+            <span className="text-[14px] font-medium text-ink-2">
+              {isEn ? 'Time dedication' : 'Dedicación'}
+            </span>
             <div className="flex items-center gap-3">
               <button
                 type="button"
@@ -169,7 +188,7 @@ export function OnboardingBlockPage() {
           onClick={confirm}
           className="flex h-[44px] min-h-[44px] w-full items-center justify-center rounded-[16px] bg-[#7a3fe0] text-[15px] font-medium text-white transition-all hover:bg-[#6c35cc] active:bg-[#5f2cb8] disabled:cursor-not-allowed disabled:opacity-35"
         >
-          Entrar a hoy
+          {t('onboarding.block.cta', 'Entrar a hoy')}
         </button>
       </div>
     </div>

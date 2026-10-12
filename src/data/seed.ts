@@ -38,8 +38,32 @@ export function newCharacter(locale: Character['locale'] = 'es'): Character {
   }
 }
 
-/** Structure with the required real sample data: one Obra, three terrenos on Saturday Sep 19 2026. */
+/** Initial clean state for new users: clean slate that starts the onboarding flow */
 export function initialState(locale: Character['locale'] = 'es'): AlephState {
+  return {
+    version: STATE_VERSION,
+    character: newCharacter(locale),
+    skills: DEFAULT_SKILLS.map((s) => ({ ...s })),
+    projects: [
+      {
+        id: 'proj_obra_principal',
+        name: 'La Obra Principal',
+        description: 'Proyecto central de creación, arte y desarrollo económico.',
+        color: '#7a3fe0',
+        icon: 'sparkles',
+        createdAt: new Date().toISOString(),
+      },
+    ],
+    results: [],
+    objectives: [],
+    tasks: [],
+    comments: [],
+    relations: [],
+  }
+}
+
+/** Sample state with demo work and tasks for previewing/testing */
+export function demoState(locale: Character['locale'] = 'es'): AlephState {
   return {
     version: STATE_VERSION,
     character: {

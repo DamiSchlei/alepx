@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ResultProgress } from '@/components/tracking/ResultProgress'
 import { WeekChart } from '@/components/tracking/WeekChart'
 import { Button } from '@/components/ui/primitives'
 import { tasksForDay, trackingStats } from '@/data/selectors'
@@ -50,14 +51,17 @@ export function TrackingPage() {
   const weekLine2 = `${weekRangeLabel(mondayKey, locale)} ${year}`
 
   const kpis = [
-    { label: t('tracking.kpiDone'), value: String(stats.weekCompleted) },
+    {
+      label: t('tracking.kpiDone'),
+      value: stats.weekCompleted === 0 ? t('common.dash') : String(stats.weekCompleted),
+    },
     {
       label: t('tracking.kpiOnTime'),
       value: stats.weekCompleted === 0 ? t('common.dash') : String(stats.weekOnTime),
     },
     {
       label: t('tracking.kpiHours'),
-      value: `${formatHours(stats.weekHours, locale)} h`,
+      value: stats.weekHours === 0 ? t('common.dash') : `${formatHours(stats.weekHours, locale)} h`,
     },
   ]
 
@@ -123,6 +127,13 @@ export function TrackingPage() {
         </h3>
         <WeekChart stats={stats} />
       </div>
+
+      <section className="flex flex-col gap-2">
+        <h3 className="px-1 text-[12px] font-semibold uppercase tracking-[0.12em] text-ink-3">
+          {t('tracking.results.title')}
+        </h3>
+        <ResultProgress weekAnchor={weekAnchor} hideEmptyCta={stats.completed === 0} />
+      </section>
 
       {stats.completed === 0 ? (
         <Button variant="secondary" onClick={() => navigate('/')}>
