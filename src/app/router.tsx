@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { OnboardingGate } from './OnboardingGate'
 import { Shell } from './Shell'
 import { HomePage } from '@/pages/HomePage'
+import { PlanningPage } from '@/pages/PlanningPage'
 import { ResultDetailPage } from '@/pages/ResultDetailPage'
 import { ObjectiveDetailPage } from '@/pages/ObjectiveDetailPage'
 import { TrackingPage } from '@/pages/TrackingPage'
@@ -28,7 +29,7 @@ export const router = createBrowserRouter([
         element: <Shell />,
         children: [
           { index: true, element: <HomePage /> },
-          { path: 'planning', element: <Navigate to="/" replace /> },
+          { path: 'planning', element: <PlanningPage /> },
           { path: 'planning/week', element: <Navigate to="/" replace /> },
           { path: 'planning/results/:resultId', element: <ResultDetailPage /> },
           { path: 'planning/objectives/:objectiveId', element: <ObjectiveDetailPage /> },

@@ -7,11 +7,13 @@ import { useFeedback } from '@/app/FeedbackProvider'
 
 const TABS = [
   { id: 'home', to: '/', labelKey: 'nav.home' },
+  { id: 'planning', to: '/planning', labelKey: 'nav.planning' },
   { id: 'tracking', to: '/tracking', labelKey: 'nav.tracking' },
 ] as const
 
 function tabIsActive(pathname: string, to: string): boolean {
   if (to === '/') return pathname === '/'
+  if (to === '/planning') return pathname === '/planning' || pathname.startsWith('/planning/')
   if (to === '/tracking') return pathname === '/tracking'
   return false
 }
@@ -90,6 +92,15 @@ function TabIcon({ id, filled }: { id: (typeof TABS)[number]['id']; filled: bool
           strokeWidth="1.7"
           strokeLinejoin="round"
         />
+      </svg>
+    )
+  }
+
+  if (id === 'planning') {
+    return (
+      <svg viewBox="0 0 24 24" className="size-6" fill="none" aria-hidden>
+        <rect x="4" y="5.5" width="16" height="14" rx="2.2" stroke="currentColor" strokeWidth="1.7" />
+        <path d="M4 10h16M8 3.5v4M16 3.5v4M8 14h8M8 17.5h5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
       </svg>
     )
   }
